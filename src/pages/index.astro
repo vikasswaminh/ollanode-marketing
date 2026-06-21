@@ -1,87 +1,201 @@
 ---
 import Site from '../layouts/Site.astro';
-const features = [
-  { icon: '⬆', tone: 'text-paper', title: 'Upload any source', body: 'Direct upload, resumable multipart for large files, or pull from a URL. We handle the rest.' },
-  { icon: '⚙', tone: 'text-blue', title: 'Adaptive transcoding', body: 'Automatic HLS ladders, audio loudness normalization, MP4 + audio renditions, thumbnails and storyboards.' },
-  { icon: '▶', tone: 'text-paper', title: 'Player & embed', body: 'Drop-in embed, signed or public playback, chapters, and multi-language subtitles out of the box.' },
-  { icon: '◳', tone: 'text-green', title: 'Global CDN', body: 'Multi-tenant pull zones with instant purge, signed URLs, CORS, and declarative edge rules.' },
-  { icon: 'ƒ', tone: 'text-accent', title: 'Edge functions', body: 'Deploy JavaScript that runs in a V8 isolate at the edge — invoke at /__fn/<id> in seconds.' },
-  { icon: '⌘', tone: 'text-paper', title: 'API-first', body: 'Everything is a REST endpoint: API keys, webhooks (Mux-style events), and per-project scoping.' },
+
+const stats = [
+  { n: '8', l: 'microservices' },
+  { n: '60+', l: 'REST endpoints' },
+  { n: '4', l: 'delivery primitives' },
+  { n: '100%', l: 'your infrastructure' },
 ];
-const steps = [
-  { n: '01', title: 'Create a video', body: 'POST a video (or a source URL) and get a presigned upload target.' },
-  { n: '02', title: 'We process it', body: 'Transcode to an adaptive ladder, extract thumbnails, normalize audio — fully async.' },
-  { n: '03', title: 'Stream anywhere', body: 'Embed the player or serve the HLS manifest through your CDN, signed or public.' },
+
+const pillars = [
+  {
+    tag: 'Video', tone: 'text-paper',
+    title: 'A full video pipeline',
+    sub: 'Ingest, process, enrich, and stream — fully async, fully API-driven.',
+    items: [
+      ['Ingest', 'Direct upload, resumable multipart, or pull-from-URL.'],
+      ['Transcode', 'Adaptive HLS ladder, quality presets, H.264/AAC, loudness normalization, MP4 renditions.'],
+      ['Thumbnails & storyboards', 'Poster frames plus scrubbing sprite sheets + storyboard.vtt.'],
+      ['Transcripts', 'Whisper-powered transcripts with VTT/SRT and timed segments.'],
+      ['Subtitles & chapters', 'Multi-language WebVTT tracks and chapter markers.'],
+      ['Clipping', 'Cut a sub-clip into a brand-new video, server-side.'],
+      ['Playback', 'Signed or public, short-lived tokens, adaptive HLS, poster.'],
+      ['Hosted player', 'Drop-in <iframe> embed — no SDK required.'],
+    ],
+  },
+  {
+    tag: 'Delivery', tone: 'text-green',
+    title: 'A CDN you control',
+    sub: 'Multi-tenant pull zones and object storage, cached at the edge with instant invalidation.',
+    items: [
+      ['Pull zones', 'Map any hostname to an origin or a storage zone.'],
+      ['Cache control', 'Per-zone TTL and cache-bypass prefixes for dynamic paths.'],
+      ['Instant + granular purge', 'Drop the whole cache or exact paths in milliseconds.'],
+      ['Hotlink protection', 'HMAC-signed URLs with rotatable secrets.'],
+      ['CORS at the edge', 'Per-zone allow-origin, no origin round-trip.'],
+      ['Live edge analytics', 'Requests, egress, and cache hit-ratio per zone.'],
+      ['Storage zones', 'S3-style buckets, presigned uploads, CDN-fronted.'],
+      ['Edge rules', 'Ordered set-header / redirect / block rules at the edge.'],
+    ],
+  },
+  {
+    tag: 'Edge compute', tone: 'text-blue',
+    title: 'Run code at the edge',
+    sub: 'Deploy JavaScript that executes in a V8 isolate next to your cache.',
+    items: [
+      ['V8 isolates', 'Standard Deno.serve(handler) — no cold-start containers.'],
+      ['Instant deploys', 'Push code and invoke at /__fn/<id> in seconds.'],
+      ['Request rewriting', 'Auth, A/B, geo-routing, headers — at the edge.'],
+      ['Per-project isolation', 'Scoped, sandboxed, metered.'],
+    ],
+  },
+  {
+    tag: 'Control plane', tone: 'text-accent',
+    title: 'Built for builders',
+    sub: 'Everything is a REST endpoint, scoped per project, with the operational surface you expect.',
+    items: [
+      ['API keys & scopes', 'read / write / admin keys, created once, rotatable.'],
+      ['Webhooks', 'HMAC-signed, retried events (asset.ready, transcript.ready…).'],
+      ['Analytics & usage', 'Storage, views, by-status, per-day, top videos.'],
+      ['Team & roles', 'Invite teammates with scoped access.'],
+      ['Audit log', 'Every mutation recorded and queryable.'],
+      ['Self-serve auth', 'Signup, email verification, password reset.'],
+    ],
+  },
 ];
-const snippet = `curl -X POST https://api.ollanode.com/v1/videos \\
+
+const compare = [
+  ['Pricing model', 'Per-minute + egress', 'Flat — your own VMs & storage'],
+  ['Egress bills', 'Metered, unpredictable', 'None beyond your provider'],
+  ['Data location', 'Their cloud', 'Your infrastructure'],
+  ['Source access', 'Closed', 'Full, permissive stack'],
+  ['Edge functions', 'Add-on / limited', 'Included'],
+  ['Vendor lock-in', 'High', 'None'],
+];
+
+const snippets = [
+  { label: 'Ingest a video', code: `curl -X POST https://api.ollanode.com/v1/videos \\
   -H "authorization: Bearer $OLLA_KEY" \\
-  -d '{"title":"launch.mp4","source_url":"https://.../launch.mp4"}'`;
+  -d '{"title":"launch","source_url":"https://.../launch.mp4"}'` },
+  { label: 'Spin up a CDN zone', code: `curl -X POST https://api.ollanode.com/v1/zones \\
+  -H "authorization: Bearer $OLLA_KEY" \\
+  -d '{"hostname":"cdn.you.com","origin_url":"https://origin.you.com","cors":"*"}'` },
+  { label: 'Deploy an edge function', code: `curl -X POST https://api.ollanode.com/v1/functions \\
+  -H "authorization: Bearer $OLLA_KEY" \\
+  -d '{"name":"hello","code":"Deno.serve(()=>new Response(\\"hi\\"))"}'` },
+];
 ---
 <Site>
   <!-- Hero -->
   <section class="relative overflow-hidden border-b border-line">
     <div class="grid-bg pointer-events-none absolute inset-0"></div>
-    <div class="relative mx-auto max-w-content px-6 py-28 text-center">
-      <span class="chamfer-sm inline-block border border-line bg-surface-2 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-paper-muted">
-        API-first · self-hosted · CDN included
+    <div class="relative mx-auto max-w-content px-6 pt-28 pb-24">
+      <span class="chamfer-sm inline-block border border-line bg-surface-2 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-paper-muted">
+        Video · CDN · Storage · Edge — self-hosted
       </span>
-      <h1 class="mx-auto mt-7 max-w-3xl text-4xl font-semibold tracking-tight text-paper sm:text-6xl">
-        Video infrastructure & CDN <span class="text-accent">you actually own</span>
+      <h1 class="mt-8 max-w-5xl text-5xl font-bold leading-[0.95] tracking-tight text-paper sm:text-7xl lg:text-8xl">
+        Ship video &amp; deliver it<br /><span class="text-accent">on infra you own.</span>
       </h1>
-      <p class="mx-auto mt-6 max-w-2xl text-lg text-paper-muted">
-        Upload, transcode, stream, and deliver video at scale — on your own VMs and storage.
-        The power of Mux or Cloudflare Stream, without the lock-in or per-minute pricing.
+      <p class="mt-7 max-w-2xl text-lg text-paper-muted sm:text-xl">
+        Upload, transcode, stream, cache, and run code at the edge — one API-first platform.
+        The power of Mux <span class="text-paper">and</span> Cloudflare Stream, without the per-minute pricing or egress bills.
       </p>
-      <div class="mt-9 flex items-center justify-center gap-3">
-        <a href="https://login.ollanode.com" class="chamfer-sm bg-paper px-5 py-3 font-mono text-xs font-medium uppercase tracking-wide text-ink transition-opacity hover:opacity-80">Open the dashboard</a>
-        <a href="/#features" class="chamfer-sm border border-line px-5 py-3 font-mono text-xs font-medium uppercase tracking-wide text-paper transition-colors hover:bg-surface-2">Explore features</a>
+      <div class="mt-10 flex flex-wrap items-center gap-3">
+        <a href="https://login.ollanode.com" class="chamfer-sm bg-accent px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-wide text-paper transition-opacity hover:opacity-90">Open the dashboard →</a>
+        <a href="/#platform" class="chamfer-sm border border-line px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-wide text-paper transition-colors hover:bg-surface-2">See everything</a>
       </div>
-      <pre class="chamfer mx-auto mt-14 max-w-xl overflow-x-auto border border-line bg-surface-1 p-5 text-left font-mono text-xs text-paper-dim"><code>{snippet}</code></pre>
-    </div>
-  </section>
 
-  <!-- Features -->
-  <section id="features" class="border-b border-line">
-    <div class="mx-auto max-w-content px-6 py-24">
-      <p class="text-center font-mono text-xs uppercase tracking-widest text-accent">// Capabilities</p>
-      <h2 class="mt-3 text-center text-3xl font-semibold tracking-tight text-paper">Everything to ship video</h2>
-      <p class="mx-auto mt-3 max-w-2xl text-center text-paper-muted">One platform for ingest, processing, delivery, and the control plane.</p>
-      <div class="mt-14 grid grid-cols-1 gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((f) => (
-          <div class="bg-ink p-7 transition-colors hover:bg-surface-1">
-            <div class={`font-mono text-2xl ${f.tone}`}>{f.icon}</div>
-            <h3 class="mt-4 font-medium text-paper">{f.title}</h3>
-            <p class="mt-2 text-sm text-paper-muted">{f.body}</p>
+      <!-- Stat strip -->
+      <div class="mt-16 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4">
+        {stats.map((s) => (
+          <div class="bg-ink px-6 py-7">
+            <div class="font-mono text-4xl font-bold text-paper sm:text-5xl">{s.n}</div>
+            <div class="mt-1 font-mono text-[11px] uppercase tracking-widest text-paper-faint">{s.l}</div>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- How it works -->
-  <section id="how" class="border-b border-line">
+  <!-- Platform pillars -->
+  <section id="platform" class="border-b border-line">
     <div class="mx-auto max-w-content px-6 py-24">
-      <p class="text-center font-mono text-xs uppercase tracking-widest text-accent">// Workflow</p>
-      <h2 class="mt-3 text-center text-3xl font-semibold tracking-tight text-paper">From upload to playback in three steps</h2>
-      <div class="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-        {steps.map((s) => (
-          <div class="chamfer border border-line bg-surface-1 p-7">
-            <div class="font-mono text-3xl font-semibold text-accent">{s.n}</div>
-            <h3 class="mt-4 font-medium text-paper">{s.title}</h3>
-            <p class="mt-2 text-sm text-paper-muted">{s.body}</p>
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// The platform</p>
+      <h2 class="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-paper sm:text-5xl">Everything to ship and deliver video</h2>
+      <p class="mt-4 max-w-2xl text-paper-muted">Four layers, one control plane. No stitching together five vendors.</p>
+
+      <div class="mt-16 space-y-px bg-line">
+        {pillars.map((p, i) => (
+          <div class="bg-ink">
+            <div class="grid grid-cols-1 gap-8 py-12 lg:grid-cols-[300px_1fr]">
+              <div>
+                <div class={`font-mono text-6xl font-bold ${p.tone}`}>{String(i + 1).padStart(2, '0')}</div>
+                <p class={`mt-4 font-mono text-xs uppercase tracking-[0.2em] ${p.tone}`}>{p.tag}</p>
+                <h3 class="mt-2 text-2xl font-bold tracking-tight text-paper">{p.title}</h3>
+                <p class="mt-2 max-w-xs text-sm text-paper-muted">{p.sub}</p>
+              </div>
+              <div class="grid grid-cols-1 gap-px self-start border border-line bg-line sm:grid-cols-2">
+                {p.items.map((it) => (
+                  <div class="bg-ink p-5 transition-colors hover:bg-surface-1">
+                    <div class="font-mono text-sm font-semibold text-paper">{it[0]}</div>
+                    <div class="mt-1 text-sm text-paper-muted">{it[1]}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="relative overflow-hidden">
-    <div class="grid-bg pointer-events-none absolute inset-0 opacity-60"></div>
-    <div class="relative mx-auto max-w-content px-6 py-24 text-center">
-      <h2 class="text-3xl font-semibold tracking-tight text-paper">Ready to run your own video platform?</h2>
-      <p class="mx-auto mt-3 max-w-xl text-paper-muted">Sign in to the dashboard and create your first video in minutes.</p>
-      <a href="https://login.ollanode.com" class="chamfer-sm mt-9 inline-block bg-accent px-6 py-3 font-mono text-xs font-semibold uppercase tracking-wide text-paper transition-opacity hover:opacity-90">Get started →</a>
+  <!-- API showcase -->
+  <section id="api" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-24">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// API-first</p>
+      <h2 class="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-paper sm:text-5xl">Every feature is an endpoint</h2>
+      <p class="mt-4 max-w-2xl text-paper-muted">~60 REST endpoints across videos, zones, storage, functions, webhooks, and the control plane — all scoped per project.</p>
+      <div class="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {snippets.map((s) => (
+          <div class="chamfer flex flex-col border border-line bg-surface-1">
+            <div class="border-b border-line px-5 py-3 font-mono text-[11px] uppercase tracking-widest text-paper-faint">{s.label}</div>
+            <pre class="overflow-x-auto p-5 font-mono text-xs text-paper-dim"><code>{s.code}</code></pre>
+          </div>
+        ))}
+      </div>
+      <a href="https://login.ollanode.com/api" class="mt-8 inline-block font-mono text-xs uppercase tracking-wide text-accent hover:underline">Full API reference →</a>
+    </div>
+  </section>
+
+  <!-- Compare -->
+  <section class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-24">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Why own it</p>
+      <h2 class="mt-4 text-4xl font-bold tracking-tight text-paper sm:text-5xl">Mux-class features, none of the lock-in</h2>
+      <div class="chamfer mt-12 overflow-hidden border border-line">
+        <div class="grid grid-cols-3 bg-surface-2 font-mono text-[11px] uppercase tracking-widest text-paper-faint">
+          <div class="p-4"></div>
+          <div class="p-4">Hosted SaaS</div>
+          <div class="p-4 text-accent">Ollanode</div>
+        </div>
+        {compare.map((row) => (
+          <div class="grid grid-cols-3 border-t border-line text-sm">
+            <div class="p-4 font-medium text-paper">{row[0]}</div>
+            <div class="p-4 text-paper-faint">{row[1]}</div>
+            <div class="p-4 text-paper">{row[2]}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA band (full-bleed red) -->
+  <section class="bg-accent">
+    <div class="mx-auto max-w-content px-6 py-20 text-center">
+      <h2 class="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-paper sm:text-6xl">Run your own video platform.</h2>
+      <p class="mx-auto mt-4 max-w-xl text-paper/80">Sign in and create your first video in minutes. Bring your VMs and storage — keep your data and your margins.</p>
+      <a href="https://login.ollanode.com" class="chamfer-sm mt-9 inline-block bg-ink px-7 py-4 font-mono text-xs font-semibold uppercase tracking-wide text-paper transition-opacity hover:opacity-90">Get started →</a>
     </div>
   </section>
 </Site>

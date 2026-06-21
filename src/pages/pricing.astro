@@ -1,27 +1,28 @@
 ---
 import Site from '../layouts/Site.astro';
 const tiers = [
-  { name: 'Self-host', price: 'Free', tagline: 'Run it on your own infrastructure.', features: ['Full source, MIT/permissive stack', 'Unlimited videos & projects', 'CDN control plane included', 'Community support'], cta: 'Open dashboard', href: 'https://login.ollanode.com', highlight: false },
-  { name: 'Managed', price: 'Talk to us', tagline: 'We operate it on your cloud.', features: ['Everything in Self-host', 'Provisioning & upgrades', 'Multi-region PoPs', 'SLA & priority support'], cta: 'Contact sales', href: 'mailto:hello@ollanode.com', highlight: true },
+  { name: 'Self-host', price: 'Free', tagline: 'Run the whole stack on your own infrastructure.', features: ['Full source, MIT/permissive stack', 'Video pipeline + CDN + storage + edge functions', 'Unlimited videos, zones & projects', '~60 REST endpoints, webhooks, audit', 'Community support'], cta: 'Open dashboard', href: 'https://login.ollanode.com', highlight: false },
+  { name: 'Managed', price: 'Talk to us', tagline: 'We operate it on your cloud, you keep your data.', features: ['Everything in Self-host', 'Provisioning, upgrades & monitoring', 'Multi-region edge PoPs', 'SLA & priority support'], cta: 'Contact sales', href: 'mailto:hello@ollanode.com', highlight: true },
 ];
 ---
 <Site title="Pricing — Ollanode">
   <section class="mx-auto max-w-5xl px-6 py-24">
-    <p class="text-center font-mono text-xs uppercase tracking-widest text-accent">// Pricing</p>
-    <h1 class="mt-3 text-center text-4xl font-semibold tracking-tight text-paper">Simple, ownership-first pricing</h1>
-    <p class="mx-auto mt-3 max-w-xl text-center text-paper-muted">No per-minute fees. No egress surprises. You bring the VMs and storage.</p>
+    <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Pricing</p>
+    <h1 class="mt-4 text-5xl font-bold tracking-tight text-paper sm:text-6xl">Ownership-first pricing</h1>
+    <p class="mt-4 max-w-xl text-lg text-paper-muted">No per-minute fees. No egress surprises. You bring the VMs and storage — we bring the platform.</p>
     <div class="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
       {tiers.map((t) => (
         <div class={`chamfer border p-8 ${t.highlight ? 'border-accent bg-surface-2' : 'border-line bg-surface-1'}`}>
-          <h3 class="font-mono text-xs font-semibold uppercase tracking-widest text-accent">{t.name}</h3>
-          <div class="mt-3 text-3xl font-semibold text-paper">{t.price}</div>
-          <p class="mt-1 text-sm text-paper-muted">{t.tagline}</p>
-          <ul class="mt-6 space-y-2 text-sm text-paper-dim">
-            {t.features.map((f) => <li class="flex gap-2"><span class="text-green">✓</span>{f}</li>)}
+          <h3 class="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-accent">{t.name}</h3>
+          <div class="mt-3 text-5xl font-bold tracking-tight text-paper">{t.price}</div>
+          <p class="mt-2 text-sm text-paper-muted">{t.tagline}</p>
+          <ul class="mt-7 space-y-2.5 text-sm text-paper-dim">
+            {t.features.map((f) => <li class="flex gap-2.5"><span class="text-green">✓</span>{f}</li>)}
           </ul>
-          <a href={t.href} class={`chamfer-sm mt-8 block px-4 py-2.5 text-center font-mono text-xs font-medium uppercase tracking-wide transition-opacity hover:opacity-80 ${t.highlight ? 'bg-accent text-paper' : 'bg-paper text-ink'}`}>{t.cta}</a>
+          <a href={t.href} class={`chamfer-sm mt-9 block px-4 py-3 text-center font-mono text-xs font-semibold uppercase tracking-wide transition-opacity hover:opacity-80 ${t.highlight ? 'bg-accent text-paper' : 'bg-paper text-ink'}`}>{t.cta}</a>
         </div>
       ))}
     </div>
+    <p class="mt-10 font-mono text-xs text-paper-faint">Both tiers are the same platform — Managed just means we run the ops. <a href="/#platform" class="text-accent hover:underline">See everything included →</a></p>
   </section>
 </Site>
