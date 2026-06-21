@@ -1,0 +1,48 @@
+/* Design tokens lifted from rig.ai — dark, warm-paper-on-ink, mono-forward, chamfered.
+   Values (oklch + paper alphas + chamfer) are taken verbatim from the source system. */
+:root {
+  --ink: oklch(0.1448 0 0);
+  --paper: oklch(0.9465 0.0099 87.47);
+  --paper-02: rgba(240, 237, 230, 0.02);
+  --paper-04: rgba(240, 237, 230, 0.04);
+  --paper-06: rgba(240, 237, 230, 0.06);
+  --paper-12: rgba(240, 237, 230, 0.12);
+  --paper-15: rgba(240, 237, 230, 0.15);
+  --paper-25: rgba(240, 237, 230, 0.25);
+  --paper-40: rgba(240, 237, 230, 0.4);
+  --paper-60: rgba(240, 237, 230, 0.6);
+  --paper-70: rgba(240, 237, 230, 0.7);
+  --border: oklch(0.9465 0.0099 87.47 / 14%);
+  --border-dim: oklch(0.9465 0.0099 87.47 / 10%);
+  --blue: oklch(0.5312 0.260273 266.7713);
+  --green: oklch(0.8003 0.1821 151.71);
+  --red: oklch(0.6329 0.2075 31.49);
+  --red-glow: oklch(0.6329 0.2075 31.49 / 40%);
+  --chamfer: 14px;
+}
+
+html { color-scheme: dark; }
+body { background: var(--ink); }
+
+::selection { background: var(--red-glow); color: var(--paper); }
+
+/* Signature chamfered corners (top-left + bottom-right). */
+.chamfer {
+  clip-path: polygon(
+    var(--chamfer) 0, 100% 0, 100% calc(100% - var(--chamfer)),
+    calc(100% - var(--chamfer)) 100%, 0 100%, 0 var(--chamfer)
+  );
+}
+.chamfer-sm {
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+/* Technical grid backdrop. */
+.grid-bg {
+  background-image:
+    linear-gradient(var(--paper-04) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+}

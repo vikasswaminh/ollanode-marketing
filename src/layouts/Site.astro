@@ -1,4 +1,5 @@
 ---
+import '../styles/tokens.css';
 const { title = 'Ollanode — Self-hosted video infrastructure & CDN', description = 'Upload, transcode, stream, and deliver video at scale on infrastructure you own. An API-first video platform with a global CDN.' } = Astro.props;
 const nav = [
   { href: '/#features', label: 'Features' },
@@ -17,25 +18,30 @@ const nav = [
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-white text-slate-800 antialiased">
-    <header class="sticky top-0 z-20 border-b border-slate-100 bg-white/80 backdrop-blur">
-      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <a href="/" class="text-lg font-semibold text-brand-700">◢ Ollanode</a>
-        <nav class="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
-          {nav.map((n) => <a href={n.href} class="hover:text-slate-900">{n.label}</a>)}
+  <body class="bg-ink font-sans text-paper antialiased">
+    <header class="sticky top-0 z-20 border-b border-line bg-[#0a0a0a]/80 backdrop-blur">
+      <div class="mx-auto flex max-w-content items-center justify-between px-6 py-4">
+        <a href="/" class="flex items-center gap-2 font-mono text-sm font-semibold tracking-tight text-paper">
+          <span class="text-accent">◢</span> ollanode
+        </a>
+        <nav class="hidden items-center gap-8 font-mono text-xs uppercase tracking-wide text-paper-muted md:flex">
+          {nav.map((n) => <a href={n.href} class="transition-colors hover:text-paper">{n.label}</a>)}
         </nav>
-        <a href="https://login.ollanode.com" class="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Sign in</a>
+        <a href="https://login.ollanode.com" class="chamfer-sm bg-paper px-4 py-2 font-mono text-xs font-medium uppercase tracking-wide text-ink transition-opacity hover:opacity-80">Sign in</a>
       </div>
     </header>
     <main><slot /></main>
-    <footer class="border-t border-slate-100 bg-slate-50">
-      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 text-sm text-slate-500 sm:flex-row">
-        <div>© {new Date().getFullYear()} Ollanode. Self-hosted video, your infrastructure.</div>
-        <div class="flex gap-6">
-          <a href="/pricing" class="hover:text-slate-800">Pricing</a>
-          <a href="https://login.ollanode.com" class="hover:text-slate-800">Dashboard</a>
-          <a href="mailto:hello@ollanode.com" class="hover:text-slate-800">Contact</a>
+    <footer class="border-t border-line">
+      <div class="mx-auto flex max-w-content flex-col items-center justify-between gap-4 px-6 py-10 text-sm text-paper-faint sm:flex-row">
+        <div class="font-mono text-xs">© {new Date().getFullYear()} ollanode — self-hosted video, your infrastructure.</div>
+        <div class="flex gap-6 font-mono text-xs uppercase tracking-wide">
+          <a href="/pricing" class="transition-colors hover:text-paper">Pricing</a>
+          <a href="https://login.ollanode.com" class="transition-colors hover:text-paper">Dashboard</a>
+          <a href="mailto:hello@ollanode.com" class="transition-colors hover:text-paper">Contact</a>
         </div>
       </div>
     </footer>
