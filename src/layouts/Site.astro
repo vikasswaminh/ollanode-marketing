@@ -1,0 +1,43 @@
+---
+const { title = 'Ollanode — Self-hosted video infrastructure & CDN', description = 'Upload, transcode, stream, and deliver video at scale on infrastructure you own. An API-first video platform with a global CDN.' } = Astro.props;
+const nav = [
+  { href: '/#features', label: 'Features' },
+  { href: '/#how', label: 'How it works' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: 'https://login.ollanode.com', label: 'Dashboard' },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased">
+    <header class="sticky top-0 z-20 border-b border-slate-100 bg-white/80 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="/" class="text-lg font-semibold text-brand-700">◢ Ollanode</a>
+        <nav class="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
+          {nav.map((n) => <a href={n.href} class="hover:text-slate-900">{n.label}</a>)}
+        </nav>
+        <a href="https://login.ollanode.com" class="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Sign in</a>
+      </div>
+    </header>
+    <main><slot /></main>
+    <footer class="border-t border-slate-100 bg-slate-50">
+      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 text-sm text-slate-500 sm:flex-row">
+        <div>© {new Date().getFullYear()} Ollanode. Self-hosted video, your infrastructure.</div>
+        <div class="flex gap-6">
+          <a href="/pricing" class="hover:text-slate-800">Pricing</a>
+          <a href="https://login.ollanode.com" class="hover:text-slate-800">Dashboard</a>
+          <a href="mailto:hello@ollanode.com" class="hover:text-slate-800">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

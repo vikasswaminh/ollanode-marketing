@@ -1,0 +1,26 @@
+---
+import Site from '../layouts/Site.astro';
+const tiers = [
+  { name: 'Self-host', price: 'Free', tagline: 'Run it on your own infrastructure.', features: ['Full source, MIT/permissive stack', 'Unlimited videos & projects', 'CDN control plane included', 'Community support'], cta: 'Open dashboard', href: 'https://login.ollanode.com', highlight: false },
+  { name: 'Managed', price: 'Talk to us', tagline: 'We operate it on your cloud.', features: ['Everything in Self-host', 'Provisioning & upgrades', 'Multi-region PoPs', 'SLA & priority support'], cta: 'Contact sales', href: 'mailto:hello@ollanode.com', highlight: true },
+];
+---
+<Site title="Pricing — Ollanode">
+  <section class="mx-auto max-w-5xl px-6 py-20">
+    <h1 class="text-center text-4xl font-bold tracking-tight text-slate-900">Simple, ownership-first pricing</h1>
+    <p class="mx-auto mt-3 max-w-xl text-center text-slate-600">No per-minute fees. No egress surprises. You bring the VMs and storage.</p>
+    <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+      {tiers.map((t) => (
+        <div class={`rounded-2xl border p-8 ${t.highlight ? 'border-brand-600 ring-1 ring-brand-600' : 'border-slate-200'}`}>
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-700">{t.name}</h3>
+          <div class="mt-2 text-3xl font-bold text-slate-900">{t.price}</div>
+          <p class="mt-1 text-sm text-slate-600">{t.tagline}</p>
+          <ul class="mt-6 space-y-2 text-sm text-slate-600">
+            {t.features.map((f) => <li class="flex gap-2"><span class="text-brand-600">✓</span>{f}</li>)}
+          </ul>
+          <a href={t.href} class={`mt-8 block rounded-md px-4 py-2.5 text-center text-sm font-medium ${t.highlight ? 'bg-brand-600 text-white hover:bg-brand-700' : 'border border-slate-300 text-slate-700 hover:bg-slate-50'}`}>{t.cta}</a>
+        </div>
+      ))}
+    </div>
+  </section>
+</Site>
