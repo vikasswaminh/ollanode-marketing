@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ollanode">
+  <rect width="64" height="64" rx="12" fill="#0a0a0a"/>
+  <!-- ◢ wordmark mark: lower-right triangle in warm paper -->
+  <path d="M16 48 L48 48 L48 16 Z" fill="#f0ede6"/>
+</svg>
