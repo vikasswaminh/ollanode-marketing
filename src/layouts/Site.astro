@@ -7,6 +7,7 @@ const ogImage = new URL('/og-image.png', Astro.site).href;
 const nav = [
   { href: '/#platform', label: 'Platform' },
   { href: '/#api', label: 'API' },
+  { href: '/docs/edge-functions', label: 'Docs' },
   { href: '/pricing', label: 'Pricing' },
   { href: 'https://login.ollanode.com', label: 'Dashboard' },
 ];
@@ -53,6 +54,7 @@ const nav = [
       <div class="mx-auto flex max-w-content flex-col items-center justify-between gap-4 px-6 py-10 text-sm text-paper-faint sm:flex-row">
         <div class="font-mono text-xs">© {new Date().getFullYear()} ollanode — self-hosted video, your infrastructure.</div>
         <div class="flex gap-6 font-mono text-xs uppercase tracking-wide">
+          <a href="/docs/edge-functions" class="transition-colors hover:text-paper">Docs</a>
           <a href="/pricing" class="transition-colors hover:text-paper">Pricing</a>
           <a href="https://login.ollanode.com" class="transition-colors hover:text-paper">Dashboard</a>
           <a href="mailto:hello@ollanode.com" class="transition-colors hover:text-paper">Contact</a>

@@ -1,0 +1,436 @@
+---
+import Site from '../../layouts/Site.astro';
+
+// ── API reference: one card per endpoint (method, path, scope, blurb, curl, optional response) ──
+const api = [
+  {
+    method: 'POST', path: '/v1/functions', scope: 'functions:write',
+    desc: 'Create + deploy a function. `code` is the index.ts entry point; optional `files`, `env`, `limits`, `schedule`.',
+    curl: `curl -X POST https://api.ollanode.com/v1/functions \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{
+    "name": "hello",
+    "code": "Deno.serve(() => new Response(JSON.stringify({ ok: true }), { headers: { \\"content-type\\": \\"application/json\\" } }))"
+  }'`,
+    resp: `{ "id": "fn_019f6cb5dfd9...", "name": "hello", "active": true,
+  "files": {}, "env_keys": [], "limits": {}, "schedule": null,
+  "created_at": "2026-07-17T03:47:54Z" }`,
+  },
+  {
+    method: 'GET', path: '/v1/functions', scope: 'functions:read',
+    desc: 'List every function in the project (paginated).',
+    curl: `curl https://api.ollanode.com/v1/functions?limit=100 \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY"`,
+  },
+  {
+    method: 'GET', path: '/v1/functions/:id', scope: 'functions:read',
+    desc: 'Fetch one function, including its current code + config.',
+    curl: `curl https://api.ollanode.com/v1/functions/\$FID \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY"`,
+  },
+  {
+    method: 'PATCH', path: '/v1/functions/:id', scope: 'functions:write',
+    desc: 'Update + redeploy. Send any of `name`, `code`, `files`, `env`, `limits`, `schedule`, `active`. A new revision goes live in seconds.',
+    curl: `curl -X PATCH https://api.ollanode.com/v1/functions/\$FID \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{"code":"Deno.serve(()=>new Response(\\"v2\\"))"}'`,
+  },
+  {
+    method: 'DELETE', path: '/v1/functions/:id', scope: 'functions:delete',
+    desc: 'Delete a function. Edges drop it immediately.',
+    curl: `curl -X DELETE https://api.ollanode.com/v1/functions/\$FID \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY"`,
+  },
+  {
+    method: 'GET', path: '/v1/functions/:id/versions', scope: 'functions:read',
+    desc: 'Deploy history, newest first. Each `version` is an epoch-millisecond id — use it verbatim for rollback.',
+    curl: `curl https://api.ollanode.com/v1/functions/\$FID/versions \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY"`,
+    resp: `[ { "version": 1784235380545, "created_at": "2026-07-16T20:56:20Z" },
+  { "version": 1784235375479, "created_at": "2026-07-16T20:56:15Z" } ]`,
+  },
+  {
+    method: 'POST', path: '/v1/functions/:id/rollback', scope: 'functions:write',
+    desc: 'Republish a stored version as the new current revision. Pass the exact `version` id from /versions.',
+    curl: `curl -X POST https://api.ollanode.com/v1/functions/\$FID/rollback \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{"version":1784235375479}'`,
+  },
+  {
+    method: 'GET', path: '/v1/functions/:id/stats', scope: 'functions:read',
+    desc: 'Live invocation metrics: count, error rate, average latency, egress bytes.',
+    curl: `curl https://api.ollanode.com/v1/functions/\$FID/stats \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY"`,
+    resp: `{ "invocations": 128, "ok": 126, "errors_4xx": 0, "errors_5xx": 2,
+  "rate_limited_429": 0, "error_rate": 0.0156, "avg_ms": 9.4,
+  "bytes": 48211, "last_seen_unix": 1784261220 }`,
+  },
+  {
+    method: 'GET|POST', path: '/__fn/:id', scope: 'public',
+    desc: 'Invoke the function. Anything after the id is passed through as the request path. No auth required (the function decides its own auth).',
+    curl: `curl "https://api.ollanode.com/__fn/\$FID/any/path?q=1"`,
+    resp: `{ "ok": true }`,
+  },
+  {
+    method: 'PUT|GET|DELETE', path: '/v1/kv/:key', scope: 'x-kv-token',
+    desc: 'Per-project key/value store. Functions reach it with the auto-injected OLLANODE_KV_URL + OLLANODE_KV_TOKEN (no key management). Values up to 256KB.',
+    curl: `// inside a function:
+const base = Deno.env.get("OLLANODE_KV_URL");
+const tok  = Deno.env.get("OLLANODE_KV_TOKEN");
+await fetch(\\\`\${base}/visits\\\`, { method: "PUT",
+  headers: { "x-kv-token": tok }, body: "42" });
+const n = await (await fetch(\\\`\${base}/visits\\\`,
+  { headers: { "x-kv-token": tok } })).text();`,
+  },
+];
+
+// ── Configuration knobs ──
+const config = {
+  curl: `curl -X POST https://api.ollanode.com/v1/functions \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{
+    "name": "worker",
+    "code": "Deno.serve(() => new Response(Deno.env.get(\\"REGION\\")))",
+    "files": { "util.ts": "export const v = 1;" },
+    "env":   { "API_SECRET": "s3cr3t", "REGION": "det-03" },
+    "limits": { "memory_mb": 128, "timeout_ms": 5000,
+                "cpu_soft_ms": 2000, "cpu_hard_ms": 4000 },
+    "schedule": "*/5 * * * *"
+  }'`,
+};
+
+// ── Security & governance snippets ──
+const agentFlow = `# 1) An AI agent key hits a gated action -> 202, no change yet
+curl -i -X POST https://api.ollanode.com/v1/functions \\
+  -H "authorization: Bearer \$AGENT_KEY" -d '{"name":"x","code":"..."}'
+# HTTP/1.1 202  {"approval_id":"apr_...","status":"pending_approval"}
+
+# 2) A human approves
+curl -X POST https://api.ollanode.com/v1/approvals/\$APR/decide \\
+  -H "authorization: Bearer \$OWNER_TOKEN" -d '{"decision":"approved"}'
+
+# 3) The agent retries with the approval id -> 200, function created
+curl -X POST https://api.ollanode.com/v1/functions \\
+  -H "authorization: Bearer \$AGENT_KEY" -H "x-approval-id: \$APR" \\
+  -d '{"name":"x","code":"..."}'`;
+
+// ── Top 20 use cases (title, tag, one-liner, short snippet) ──
+const useCases = [
+  { n: 1, title: 'Signed playback URLs', tag: 'auth', desc: 'Mint short-lived, HMAC-signed video URLs at the edge so links can’t be shared or hotlinked.',
+    code: `const exp = Math.floor(Date.now()/1000) + 300;
+const sig = await hmac(secret, \\\`\${id}.\${exp}\\\`);
+return Response.json({ url: \\\`/v/\${id}?e=\${exp}&s=\${sig}\\\` });` },
+  { n: 2, title: 'Webhook receiver → Slack', tag: 'integrate', desc: 'Accept a provider webhook, transform it, and fan out to Slack / Discord / email.',
+    code: `const e = await req.json();
+await fetch(Deno.env.get("SLACK_URL"), { method:"POST",
+  body: JSON.stringify({ text: \\\`\${e.type}: \${e.id}\\\` }) });
+return new Response("ok");` },
+  { n: 3, title: 'Feature flags & A/B', tag: 'kv', desc: 'Serve config / flags / experiment buckets from KV without a redeploy.',
+    code: `const flags = JSON.parse(await kvGet("flags"));
+return Response.json({ newPlayer: flags.newPlayer ?? false });` },
+  { n: 4, title: 'Geo routing & blocking', tag: 'geo', desc: 'Read Cloudflare’s CF-IPCountry header to localize, route, or geo-block — free, no lookup service.',
+    code: `const cc = req.headers.get("cf-ipcountry");
+if (["RU","KP"].includes(cc)) return new Response("blocked",{status:451});
+return Response.json({ country: cc });` },
+  { n: 5, title: 'Header rewriting', tag: 'proxy', desc: 'Inject CORS, security, or cache-control headers on responses from an origin.',
+    code: `const r = await fetch(origin + new URL(req.url).pathname);
+const h = new Headers(r.headers);
+h.set("access-control-allow-origin", "*");
+return new Response(r.body, { headers: h });` },
+  { n: 6, title: 'API gateway / BFF', tag: 'proxy', desc: 'Aggregate several backend calls into one edge response tailored to your frontend.',
+    code: `const [a,b] = await Promise.all([
+  fetch(api+"/videos/"+id).then(r=>r.json()),
+  fetch(api+"/analytics/"+id).then(r=>r.json())]);
+return Response.json({ ...a, views: b.views });` },
+  { n: 7, title: 'Per-key rate limiting', tag: 'kv', desc: 'Count requests per API key / IP in KV and throttle abusers before they hit your origin.',
+    code: `const k = "rl:" + req.headers.get("x-api-key");
+const n = Number(await kvGet(k) || 0) + 1;
+await kvPut(k, String(n));
+if (n > 100) return new Response("slow down",{status:429});` },
+  { n: 8, title: 'URL shortener', tag: 'kv', desc: 'Map short slugs to long URLs in KV and 302 at the edge.',
+    code: `const slug = new URL(req.url).pathname.split("/").pop();
+const dest = await kvGet("u:" + slug);
+return dest ? Response.redirect(dest, 302)
+            : new Response("not found", { status: 404 });` },
+  { n: 9, title: 'Video metadata / OG API', tag: 'video', desc: 'Return dynamic Open-Graph / oEmbed JSON for a video so social cards render correctly.',
+    code: `const v = await fetch(api+"/videos/"+id).then(r=>r.json());
+return Response.json({ title: v.title, thumbnail: v.poster,
+  duration: v.duration_secs, type: "video" });` },
+  { n: 10, title: 'JWT auth gateway', tag: 'auth', desc: 'Validate a JWT (via a remote-imported lib) and gate access to protected content.',
+    code: `import { verify } from "https://esm.sh/@tsndr/cloudflare-worker-jwt";
+const ok = await verify(token, Deno.env.get("JWT_SECRET"));
+if (!ok) return new Response("401", { status: 401 });` },
+  { n: 11, title: 'Scheduled cache warming', tag: 'cron', desc: 'A cron function that pre-fetches hot manifests so viewers never hit a cold cache.',
+    code: `// schedule: "*/10 * * * *"
+Deno.serve(async () => {
+  for (const id of hotIds) await fetch(cdn + "/v/" + id + ".m3u8");
+  return new Response("warmed");
+});` },
+  { n: 12, title: 'Form / lead capture', tag: 'kv', desc: 'Accept a form POST, store it in KV, and notify — no backend to run.',
+    code: `const f = await req.formData();
+await kvPut("lead:" + Date.now(), JSON.stringify(Object.fromEntries(f)));
+return Response.redirect("/thanks", 303);` },
+  { n: 13, title: 'Playlist / manifest rewrite', tag: 'video', desc: 'Rewrite an HLS/DASH manifest per viewer — inject ads, reorder renditions, or watermark.',
+    code: `let m = await fetch(origin + path).then(r => r.text());
+m = m.replace(/#EXT-X-STREAM-INF.*\\n.*1080.*\\n/g, "");
+return new Response(m, { headers: { "content-type": "application/vnd.apple.mpegurl" } });` },
+  { n: 14, title: 'Analytics beacon', tag: 'kv', desc: 'Collect lightweight play/heartbeat events into KV counters, poll them from /stats-style endpoints.',
+    code: `const { videoId } = await req.json();
+await kvIncr("plays:" + videoId);
+return new Response(null, { status: 204 });` },
+  { n: 15, title: 'Localized responses (i18n)', tag: 'geo', desc: 'Pick a language from Accept-Language / country and return localized copy.',
+    code: `const lang = (req.headers.get("accept-language")||"en").slice(0,2);
+return Response.json(strings[lang] ?? strings.en);` },
+  { n: 16, title: 'Coupon / license check', tag: 'kv', desc: 'Validate and atomically redeem coupon or license keys stored in KV.',
+    code: `const used = await kvGet("lic:" + key);
+if (used) return new Response("used", { status: 409 });
+await kvPut("lic:" + key, new Date().toISOString());
+return new Response("valid");` },
+  { n: 17, title: 'JSON transform / filter', tag: 'proxy', desc: 'Reshape or field-filter an upstream JSON payload so clients download less.',
+    code: `const data = await fetch(api + "/videos").then(r => r.json());
+return Response.json(data.items.map(v => ({ id: v.id, title: v.title })));` },
+  { n: 18, title: 'Bot / UA filtering', tag: 'auth', desc: 'Block or challenge suspicious user-agents before they reach your origin.',
+    code: `const ua = req.headers.get("user-agent") || "";
+if (/curl|scrapy|bot/i.test(ua)) return new Response("no", { status: 403 });` },
+  { n: 19, title: 'Scheduled data sync', tag: 'cron', desc: 'A heartbeat/cron function that syncs an external source into KV on a schedule.',
+    code: `// schedule: "0 * * * *"  (hourly)
+Deno.serve(async () => {
+  const rows = await fetch(Deno.env.get("SRC")).then(r => r.json());
+  await kvPut("catalog", JSON.stringify(rows));
+  return new Response("synced " + rows.length);
+});` },
+  { n: 20, title: 'Status aggregator', tag: 'proxy', desc: 'Probe several services and return one health JSON for an uptime page.',
+    code: `const checks = await Promise.all(urls.map(async u => ({
+  u, ok: (await fetch(u).catch(() => ({ ok: false }))).ok })));
+return Response.json({ healthy: checks.every(c => c.ok), checks });` },
+];
+
+const limits = [
+  ['Memory', '150 MB', 'per invocation; configurable via limits.memory_mb'],
+  ['Wall-clock timeout', '30 s', 'limits.timeout_ms'],
+  ['CPU time', '5 s soft / 10 s hard', 'limits.cpu_soft_ms / cpu_hard_ms'],
+  ['Request rate', '100 req/s', 'per function, burst 200 → HTTP 429'],
+  ['Source size', '2 MB total', 'index.ts + all files, max 64 files'],
+  ['KV value', '256 KB', 'per key; keys up to 512 bytes'],
+  ['Cold start', '~35 ms', 'warm invocations ~2 ms'],
+];
+
+const tagColor = {
+  auth: 'text-accent', kv: 'text-green', geo: 'text-blue',
+  proxy: 'text-paper-muted', video: 'text-accent', cron: 'text-green', integrate: 'text-blue',
+};
+---
+<Site
+  title="Edge Functions — Ollanode Docs"
+  description="Deploy JavaScript/TypeScript that runs at the edge in a V8 isolate. Full API reference, curl examples, KV, cron, versions, observability, and 20 real-world use cases."
+>
+  <!-- Hero -->
+  <section class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Docs / Edge Functions</p>
+      <h1 class="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-paper sm:text-6xl">Run code at the edge.</h1>
+      <p class="mt-5 max-w-2xl text-lg text-paper-muted">
+        Deploy <span class="text-paper">JavaScript &amp; TypeScript</span> that runs in a
+        <span class="text-paper">V8 isolate</span> next to your CDN. Write a standard
+        <code class="font-mono text-paper">Deno.serve(handler)</code>, we route
+        <code class="font-mono text-paper">/__fn/&lt;id&gt;</code> to it, and deploys propagate in seconds.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-2 font-mono text-[11px] uppercase tracking-widest text-paper-faint">
+        {['V8 isolates','Deno.serve','KV store','Cron','Secrets','Versions','Egress-isolated','~35ms cold start'].map((t) => (
+          <span class="chamfer-sm border border-line px-3 py-1.5">{t}</span>
+        ))}
+      </div>
+      <p class="mt-6 max-w-2xl text-sm text-paper-faint">
+        Runtime: Deno / V8 (Supabase Edge Runtime under the hood). It is <span class="text-paper-muted">JavaScript/TypeScript</span> —
+        there is no Rust/WASM function runtime; Rust is what the platform backend is written in.
+      </p>
+    </div>
+  </section>
+
+  <!-- Quickstart -->
+  <section id="quickstart" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Quickstart</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-paper sm:text-4xl">Zero to deployed in three calls</h2>
+      <p class="mt-4 max-w-2xl text-paper-muted">Create an API key in the dashboard, then:</p>
+      <div class="chamfer mt-8 border border-line bg-surface-1">
+        <div class="border-b border-line px-5 py-3 font-mono text-[11px] uppercase tracking-widest text-paper-faint">bash</div>
+        <pre class="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-paper-dim"><code>{`# 1) deploy a function
+FID=$(curl -s -X POST https://api.ollanode.com/v1/functions \\
+  -H "authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{"name":"hello","code":"Deno.serve(()=>new Response(JSON.stringify({hello:\\"from the edge\\"}),{headers:{\\"content-type\\":\\"application/json\\"}}))"}' \\
+  | jq -r .id)
+
+# 2) invoke it (public, no auth)
+curl https://api.ollanode.com/__fn/$FID
+# -> {"hello":"from the edge"}
+
+# 3) watch it live
+curl https://api.ollanode.com/v1/functions/$FID/stats \\
+  -H "authorization: Bearer $OLLANODE_API_KEY"`}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Runtime model -->
+  <section id="runtime" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Runtime</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-paper sm:text-4xl">How the runtime works</h2>
+      <div class="mt-10 grid grid-cols-1 gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+        {[
+          ['Entry point', 'Your `code` is the index.ts entry. Export a Deno.serve(handler) — that’s the whole contract.'],
+          ['Multi-file', 'Add helpers via the `files` map (path → content). index.ts imports them with relative paths.'],
+          ['TypeScript', 'TS runs as-is — no build step. Types are erased at load.'],
+          ['Remote imports', 'import anything from https://esm.sh/… or deno.land — fetched + cached on first run.'],
+          ['Secrets', 'Set `env`; read with Deno.env.get(). Sealed at rest, decrypted only in the isolate.'],
+          ['Egress-isolated', 'Functions reach the public internet + the KV binding, but NOT your internal services. SSRF-safe by construction.'],
+        ].map((c) => (
+          <div class="bg-ink p-5">
+            <div class="font-mono text-sm font-semibold text-paper">{c[0]}</div>
+            <div class="mt-1.5 text-sm text-paper-muted">{c[1]}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- API reference -->
+  <section id="api" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// API reference</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-paper sm:text-4xl">Every operation is one call</h2>
+      <p class="mt-4 max-w-2xl text-paper-muted">Base URL <code class="font-mono text-paper">https://api.ollanode.com</code>. Authenticate with <code class="font-mono text-paper">Authorization: Bearer &lt;api-key&gt;</code> (or a dashboard session token).</p>
+      <div class="mt-10 space-y-5">
+        {api.map((e) => (
+          <div class="chamfer border border-line bg-surface-1">
+            <div class="flex flex-wrap items-center gap-3 border-b border-line px-5 py-3">
+              <span class="font-mono text-[11px] font-semibold uppercase tracking-widest text-accent">{e.method}</span>
+              <span class="font-mono text-sm text-paper">{e.path}</span>
+              <span class="ml-auto font-mono text-[10px] uppercase tracking-widest text-paper-faint">{e.scope}</span>
+            </div>
+            <div class="px-5 pt-4 text-sm text-paper-muted" set:html={e.desc.replace(/`([^`]+)`/g, '<code class="font-mono text-paper">$1</code>')}></div>
+            <pre class="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-paper-dim"><code>{e.curl}</code></pre>
+            {e.resp && (
+              <div class="border-t border-line-dim px-5 py-4">
+                <div class="mb-2 font-mono text-[10px] uppercase tracking-widest text-paper-faint">Response</div>
+                <pre class="overflow-x-auto font-mono text-xs leading-relaxed text-green"><code>{e.resp}</code></pre>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Config -->
+  <section id="config" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Configuration</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-paper sm:text-4xl">Files, secrets, limits &amp; cron</h2>
+      <p class="mt-4 max-w-2xl text-paper-muted">Everything a function needs is set on create or PATCH:</p>
+      <div class="chamfer mt-8 border border-line bg-surface-1">
+        <div class="border-b border-line px-5 py-3 font-mono text-[11px] uppercase tracking-widest text-paper-faint">POST /v1/functions — full body</div>
+        <pre class="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-paper-dim"><code>{config.curl}</code></pre>
+      </div>
+      <div class="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div class="chamfer border border-line bg-surface-1 p-5">
+          <div class="font-mono text-sm font-semibold text-paper">Versions &amp; rollback</div>
+          <p class="mt-2 text-sm text-paper-muted">Every deploy is stored. <code class="font-mono text-paper">GET /versions</code> lists epoch-millisecond ids; roll back with the exact id (not a sequential index).</p>
+        </div>
+        <div class="chamfer border border-line bg-surface-1 p-5">
+          <div class="font-mono text-sm font-semibold text-paper">Scheduled (cron)</div>
+          <p class="mt-2 text-sm text-paper-muted">Set a 5-field cron in <code class="font-mono text-paper">schedule</code>. The platform invokes the function on that cadence (checked every minute).</p>
+        </div>
+        <div class="chamfer border border-line bg-surface-1 p-5">
+          <div class="font-mono text-sm font-semibold text-paper">Observability</div>
+          <p class="mt-2 text-sm text-paper-muted"><code class="font-mono text-paper">GET /stats</code> returns invocations, error rate, avg latency and egress. Also live on the dashboard Metrics panel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security & governance -->
+  <section id="security" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Security &amp; governance</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-paper sm:text-4xl">Safe for humans and AI agents</h2>
+      <div class="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div class="space-y-5">
+          {[
+            ['Egress isolation', 'Functions run on an isolated network. They can call the public internet and the KV binding, but cannot reach your database, object store, or other services.'],
+            ['Per-function rate limit', 'Each function is capped at 100 req/s (burst 200). Sustained abuse returns HTTP 429 — one hammered function can’t starve the shared runtime.'],
+            ['WAF passthrough', 'The OWASP-CRS WAF fronts the API but treats /v1/functions as detection-only, so legitimate code (which may contain SQL/HTML) is never falsely blocked.'],
+          ].map((c) => (
+            <div class="chamfer border border-line bg-surface-1 p-5">
+              <div class="font-mono text-sm font-semibold text-paper">{c[0]}</div>
+              <div class="mt-1.5 text-sm text-paper-muted">{c[1]}</div>
+            </div>
+          ))}
+        </div>
+        <div class="chamfer border border-line bg-surface-1">
+          <div class="border-b border-line px-5 py-3 font-mono text-[11px] uppercase tracking-widest text-paper-faint">Agent approval gating</div>
+          <pre class="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-paper-dim"><code>{agentFlow}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 20 use cases -->
+  <section id="use-cases" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Patterns</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-paper sm:text-4xl">Top 20 things to build</h2>
+      <p class="mt-4 max-w-2xl text-paper-muted">Real edge patterns — most need nothing but a function and the KV store.</p>
+      <div class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2">
+        {useCases.map((u) => (
+          <div class="chamfer flex flex-col border border-line bg-surface-1">
+            <div class="flex items-center gap-3 border-b border-line px-5 py-3">
+              <span class="font-mono text-xs text-paper-faint">{String(u.n).padStart(2, '0')}</span>
+              <span class="font-mono text-sm font-semibold text-paper">{u.title}</span>
+              <span class={`ml-auto font-mono text-[10px] uppercase tracking-widest ${tagColor[u.tag] || 'text-paper-faint'}`}>{u.tag}</span>
+            </div>
+            <div class="px-5 pt-4 text-sm text-paper-muted">{u.desc}</div>
+            <pre class="mt-3 overflow-x-auto p-5 font-mono text-[11px] leading-relaxed text-paper-dim"><code>{u.code}</code></pre>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Limits -->
+  <section id="limits" class="border-b border-line">
+    <div class="mx-auto max-w-content px-6 py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">// Limits &amp; quotas</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-paper sm:text-4xl">Defaults you can raise</h2>
+      <div class="chamfer mt-8 overflow-hidden border border-line">
+        <div class="grid grid-cols-3 bg-surface-2 font-mono text-[11px] uppercase tracking-widest text-paper-faint">
+          <div class="p-4">Resource</div>
+          <div class="p-4">Default</div>
+          <div class="p-4">Notes</div>
+        </div>
+        {limits.map((row) => (
+          <div class="grid grid-cols-3 border-t border-line text-sm">
+            <div class="p-4 font-medium text-paper">{row[0]}</div>
+            <div class="p-4 font-mono text-paper-dim">{row[1]}</div>
+            <div class="p-4 text-paper-muted">{row[2]}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-accent">
+    <div class="mx-auto max-w-content px-6 py-20 text-center">
+      <h2 class="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-paper sm:text-6xl">Deploy your first function.</h2>
+      <p class="mx-auto mt-4 max-w-xl text-paper/80">Create an API key in the dashboard and ship JavaScript to the edge in minutes.</p>
+      <a href="https://login.ollanode.com/edge-functions" class="chamfer-sm mt-9 inline-block bg-ink px-7 py-4 font-mono text-xs font-semibold uppercase tracking-wide text-paper transition-opacity hover:opacity-90">Open the dashboard →</a>
+    </div>
+  </section>
+</Site>
