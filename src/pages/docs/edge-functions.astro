@@ -31,11 +31,24 @@ const api = [
   },
   {
     method: 'PATCH', path: '/v1/functions/:id', scope: 'functions:write',
-    desc: 'Update + redeploy. Send any of `name`, `code`, `files`, `env`, `limits`, `schedule`, `active`. A new revision goes live in seconds.',
-    curl: `curl -X PATCH https://api.ollanode.com/v1/functions/\$FID \\
+    desc: 'Update + redeploy. Send any of `name`, `code`, `files`, `env`, `limits`, `schedule`, `active`, `require_auth`. A new revision goes live in seconds. For secrets prefer `env_patch` (merge one key) / `env_remove` (drop keys) over `env`, which replaces the whole set.',
+    curl: `# redeploy new code
+curl -X PATCH https://api.ollanode.com/v1/functions/\$FID \\
   -H "authorization: Bearer \$OLLANODE_API_KEY" \\
   -H "content-type: application/json" \\
-  -d '{"code":"Deno.serve(()=>new Response(\\"v2\\"))"}'`,
+  -d '{"code":"Deno.serve(()=>new Response(\\"v2\\"))"}'
+
+# change ONE secret, leave the rest untouched
+curl -X PATCH https://api.ollanode.com/v1/functions/\$FID \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{"env_patch":{"API_SECRET":"new-value"}}'
+
+# drop a secret
+curl -X PATCH https://api.ollanode.com/v1/functions/\$FID \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{"env_remove":["OLD_KEY"]}'`,
   },
   {
     method: 'DELETE', path: '/v1/functions/:id', scope: 'functions:delete',
@@ -67,6 +80,21 @@ const api = [
     resp: `{ "invocations": 128, "ok": 126, "errors_4xx": 0, "errors_5xx": 2,
   "rate_limited_429": 0, "error_rate": 0.0156, "avg_ms": 9.4,
   "bytes": 48211, "last_seen_unix": 1784261220 }`,
+  },
+  {
+    method: 'GET', path: '/v1/functions/:id/runs', scope: 'functions:read',
+    desc: 'Scheduled (cron) run history — status + duration for each fire, newest first.',
+    curl: `curl https://api.ollanode.com/v1/functions/\$FID/runs \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY"`,
+    resp: `[ { "ran_at": "2026-07-17T03:50:03Z", "status": 200, "ms": 12, "error": null },
+  { "ran_at": "2026-07-17T03:49:03Z", "status": 200, "ms": 9,  "error": null } ]`,
+  },
+  {
+    method: 'GET', path: '/v1/functions/:id/logs', scope: 'functions:read',
+    desc: 'Recent `console.*` output for this function, newest first. Add `?limit=` (default 200, max 1000).',
+    curl: `curl "https://api.ollanode.com/v1/functions/\$FID/logs?limit=50" \\
+  -H "authorization: Bearer \$OLLANODE_API_KEY"`,
+    resp: `[ { "time": "2026-07-17T04:12:01.933Z", "message": "handling request /x" } ]`,
   },
   {
     method: 'GET|POST', path: '/__fn/:id', scope: 'public',
@@ -290,6 +318,10 @@ curl https://api.ollanode.com/v1/functions/$FID/stats \\
           ['Remote imports', 'import anything from https://esm.sh/… or deno.land — fetched + cached on first run.'],
           ['Secrets', 'Set `env`; read with Deno.env.get(). Sealed at rest, decrypted only in the isolate.'],
           ['Egress-isolated', 'Functions reach the public internet + the KV binding, but NOT your internal services. SSRF-safe by construction.'],
+          ['KV binding', 'OLLANODE_KV_URL + OLLANODE_KV_TOKEN are injected automatically — a per-project key/value store with no credential to manage.'],
+          ['API binding', 'OLLANODE_API_URL + OLLANODE_API_TOKEN are injected too: call /v1/... for your own project with no API key. Read-only by design.'],
+          ['Auth gate', 'Set require_auth and the edge rejects unkeyed calls before your code runs — no auth boilerplate inside the function.'],
+          ['Response caching', 'Send a Cache-Control header and the edge caches that response. Opt-in: send nothing and every call runs your code.'],
         ].map((c) => (
           <div class="bg-ink p-5">
             <div class="font-mono text-sm font-semibold text-paper">{c[0]}</div>
@@ -349,7 +381,38 @@ curl https://api.ollanode.com/v1/functions/$FID/stats \\
         </div>
         <div class="chamfer border border-line bg-surface-1 p-5">
           <div class="font-mono text-sm font-semibold text-paper">Observability</div>
-          <p class="mt-2 text-sm text-paper-muted"><code class="font-mono text-paper">GET /stats</code> returns invocations, error rate, avg latency and egress. Also live on the dashboard Metrics panel.</p>
+          <p class="mt-2 text-sm text-paper-muted"><code class="font-mono text-paper">GET /stats</code> returns invocations, error rate, avg latency and egress; <code class="font-mono text-paper">GET /logs</code> tails console output; <code class="font-mono text-paper">GET /runs</code> shows cron history. All three are on the dashboard too.</p>
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="chamfer border border-line bg-surface-1">
+          <div class="border-b border-line px-5 py-3 font-mono text-[11px] uppercase tracking-widest text-paper-faint">Auth gate — no auth code in your function</div>
+          <pre class="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-paper-dim"><code>{`# turn the gate on; the response carries the key
+curl -X PATCH https://api.ollanode.com/v1/functions/$FID \\
+  -H "authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "content-type: application/json" \\
+  -d '{"require_auth":true}'
+# -> { ..., "require_auth": true, "auth_token": "fn_019f….<sig>" }
+
+curl https://api.ollanode.com/__fn/$FID                      # 401
+curl -H "x-fn-key: $KEY" https://api.ollanode.com/__fn/$FID   # 200
+# also accepted: Authorization: Bearer <key>, or ?key=<key>`}</code></pre>
+        </div>
+        <div class="chamfer border border-line bg-surface-1">
+          <div class="border-b border-line px-5 py-3 font-mono text-[11px] uppercase tracking-widest text-paper-faint">Edge caching — opt in with Cache-Control</div>
+          <pre class="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-paper-dim"><code>{`Deno.serve(async () => {
+  const data = await expensiveUpstream();
+  return new Response(JSON.stringify(data), {
+    headers: {
+      'content-type': 'application/json',
+      'cache-control': 'max-age=300',   // <- edge caches for 5 min
+    },
+  });
+});
+
+// Send no cache-control and nothing is ever cached — every
+// call runs your code. Check the X-Cache-Status response header.`}</code></pre>
         </div>
       </div>
     </div>
