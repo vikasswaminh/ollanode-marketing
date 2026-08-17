@@ -1,0 +1,73 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const eps = [
+  { method: 'POST', path: '/v1/webhooks', scope: 'webhooks:write',
+    desc: 'Subscribe an endpoint to events. The URL is SSRF-vetted. Returns the signing `secret` once — store it to verify deliveries.',
+    curl: `curl -X POST https://api.ollanode.com/v1/webhooks \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"url":"https://hooks.example.com/olla","events":["video.asset.ready","video.asset.errored"]}'`,
+    response: `{ "id":"wh_...", "url":"https://hooks.example.com/olla",
+  "events":["video.asset.ready","video.asset.errored"],
+  "active":true, "secret":"<shown once>" }` },
+  { method: 'GET', path: '/v1/webhooks', scope: 'webhooks:read', desc: 'List webhooks (no secret).' },
+  { method: 'PATCH', path: '/v1/webhooks/{id}', scope: 'webhooks:write', desc: 'Update `url`, `events`, or `active`.' },
+  { method: 'DELETE', path: '/v1/webhooks/{id}', scope: 'webhooks:write', desc: 'Remove a webhook.' },
+  { method: 'GET', path: '/v1/webhooks/{id}/deliveries', scope: 'webhooks:read', desc: 'Recent delivery attempts (newest first) with status and response code.' },
+];
+
+const payload = `POST https://hooks.example.com/olla
+X-VB-Signature: sha256=<HMAC-SHA256(secret, raw_body)>
+X-VB-Event: video.asset.ready
+X-VB-Delivery-Id: <id>
+
+{ "id":"<uuid>", "type":"video.asset.ready", "api_version":"2026-06-01",
+  "created_at":"...", "project_id":"proj_...", "video_id":"vid_...", "data":{ } }`;
+
+const verify = `import crypto from "node:crypto";
+function verify(rawBody, header, secret) {
+  const expected = "sha256=" + crypto.createHmac("sha256", secret)
+    .update(rawBody).digest("hex");
+  return crypto.timingSafeEqual(Buffer.from(header), Buffer.from(expected));
+}`;
+---
+<DocsLayout active="webhooks" title="Webhooks — Ollanode Docs" description="HMAC-signed event delivery with retries and a dead-letter queue.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Platform</span>
+    <h1>Webhooks</h1>
+    <p class="lede">Subscribe an HTTPS endpoint to domain events. Each delivery is HMAC-signed, retried with backoff, and dead-lettered after six attempts — so you can drive downstream pipelines off the platform's own lifecycle.</p>
+  </div>
+
+  <h2>Manage subscriptions</h2>
+  {eps.map((e) => <Endpoint {...e} />)}
+
+  <h2>Events</h2>
+  <p>The public event vocabulary (Mux-compatible naming). Subscribe to specific names, or <code>"*"</code> for all.</p>
+  <div class="docs-table-wrap">
+    <table>
+      <thead><tr><th>Event</th><th>Fires when</th></tr></thead>
+      <tbody>
+        <tr><td><code>video.asset.created</code></td><td>A video record is created</td></tr>
+        <tr><td><code>video.asset.processing</code></td><td>The pipeline starts</td></tr>
+        <tr><td><code>video.asset.transcoded</code></td><td>The ladder is encoded</td></tr>
+        <tr><td><code>video.asset.ready</code></td><td>The video is playable</td></tr>
+        <tr><td><code>video.asset.errored</code></td><td>Processing failed</td></tr>
+        <tr><td><code>video.asset.thumbnail.ready</code></td><td>Thumbnails/storyboard are ready</td></tr>
+        <tr><td><code>video.asset.track.ready</code></td><td>A transcript/subtitle track is ready</td></tr>
+        <tr><td><code>function.error_spike</code></td><td>An edge function's error rate spikes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Delivery payload &amp; signature</h2>
+  <p>Every delivery carries <code>X-VB-Signature: sha256=…</code> (HMAC-SHA256 of the raw body with your webhook secret), plus <code>X-VB-Event</code> and <code>X-VB-Delivery-Id</code>.</p>
+  <CodeBlock code={payload} label="delivery" />
+  <CodeBlock code={verify} label="verify (Node.js)" />
+
+  <h2>Retries &amp; dead-letter</h2>
+  <p>Failed deliveries retry with backoff at <code>10s, 30s, 2m, 10m, 30m, 2h</code> — up to <b>6 attempts</b>, after which the delivery is <code>dead_lettered</code>. Statuses: <code>pending, delivering, delivered, failed, dead_lettered</code>. Fan-out is deduped per <code>(event_id, webhook_id)</code>.</p>
+  <div class="note">Use cases: kick a publishing pipeline when <code>video.asset.ready</code> fires; page on-call when <code>function.error_spike</code> fires.</div>
+</DocsLayout>

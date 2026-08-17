@@ -1,0 +1,53 @@
+---
+import Site from './Site.astro';
+// Docs shell: reuses the Site header/footer/theme and adds a grouped, active-aware
+// sticky sidebar + a content column. Pages pass `active` (the item key) + title/description.
+const { title, description, active, wide } = Astro.props;
+
+const groups = [
+  { label: 'Getting started', items: [
+    { href: '/docs', label: 'Overview', key: 'overview' },
+    { href: '/docs/quickstart', label: 'Quickstart', key: 'quickstart' },
+    { href: '/docs/authentication', label: 'Authentication & scopes', key: 'authentication' },
+  ] },
+  { label: 'Video', items: [
+    { href: '/docs/videos', label: 'Videos & ingest', key: 'videos' },
+    { href: '/docs/processing', label: 'Processing & AI', key: 'processing' },
+    { href: '/docs/playback', label: 'Playback & delivery', key: 'playback' },
+  ] },
+  { label: 'Delivery', items: [
+    { href: '/docs/cdn', label: 'CDN pull zones', key: 'cdn' },
+    { href: '/docs/storage', label: 'Storage & images', key: 'storage' },
+    { href: '/docs/dns', label: 'DNS', key: 'dns' },
+  ] },
+  { label: 'Compute', items: [
+    { href: '/docs/edge-functions', label: 'Edge functions', key: 'edge-functions' },
+    { href: '/docs/kv', label: 'KV store', key: 'kv' },
+  ] },
+  { label: 'Platform', items: [
+    { href: '/docs/webhooks', label: 'Webhooks', key: 'webhooks' },
+    { href: '/docs/agents', label: 'AI agents & governance', key: 'agents' },
+  ] },
+];
+---
+<Site title={title} description={description}>
+  <div class="docs-shell">
+    <aside class="docs-nav" aria-label="Documentation">
+      <nav>
+        {groups.map((g) => (
+          <div class="docs-nav-group">
+            <div class="docs-nav-label">{g.label}</div>
+            <ul>
+              {g.items.map((it) => (
+                <li><a href={it.href} class={active === it.key ? 'active' : ''} aria-current={active === it.key ? 'page' : undefined}>{it.label}</a></li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </aside>
+    <article class={wide ? 'docs-body docs-wide' : 'docs-body'}>
+      <slot />
+    </article>
+  </div>
+</Site>

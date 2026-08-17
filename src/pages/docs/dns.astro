@@ -1,0 +1,49 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const zones = [
+  { method: 'POST', path: '/v1/dns/zones', scope: 'dns:write', desc: 'Create a DNS zone. `name` must be a valid domain. Agent keys are approval-gated.',
+    curl: `curl -X POST https://api.ollanode.com/v1/dns/zones \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" -d '{"name":"example.com"}'`,
+    response: `{ "id":"dnsz_...", "name":"example.com", "created_at":"..." }` },
+  { method: 'GET', path: '/v1/dns/zones', scope: 'dns:read', desc: 'List DNS zones (paginated).' },
+  { method: 'DELETE', path: '/v1/dns/zones/{id}', scope: 'dns:delete', desc: 'Delete a zone (and its records). Agent keys are approval-gated.' },
+];
+
+const records = [
+  { method: 'POST', path: '/v1/dns/zones/{id}/records', scope: 'dns:write',
+    desc: 'Add a record. `rtype` ∈ A/AAAA/CNAME/TXT/MX/NS; `ttl` defaults to 300; `priority` is for MX. Agent keys are approval-gated.',
+    curl: `# A record
+curl -X POST https://api.ollanode.com/v1/dns/zones/dnsz_abc/records \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"www","rtype":"A","value":"203.0.113.10","ttl":300}'
+
+# MX record (priority)
+curl -X POST https://api.ollanode.com/v1/dns/zones/dnsz_abc/records \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"@","rtype":"MX","value":"mail.example.com","priority":10,"ttl":3600}'`,
+    response: `{ "id":"dnsr_...", "name":"www", "rtype":"A", "value":"203.0.113.10", "ttl":300, "priority":null }` },
+  { method: 'GET', path: '/v1/dns/zones/{id}/records', scope: 'dns:read', desc: 'List every record in the zone (plain array, not paginated).' },
+  { method: 'DELETE', path: '/v1/dns/zones/{id}/records/{rid}', scope: 'dns:delete', desc: 'Delete a record. Agent keys are approval-gated.' },
+];
+---
+<DocsLayout active="dns" title="DNS — Ollanode Docs" description="Authoritative DNS: zones and records (A/AAAA/CNAME/TXT/MX/NS) served from Postgres on :53.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Delivery</span>
+    <h1>DNS</h1>
+    <p class="lede">Ollanode runs an authoritative DNS server (Hickory) on <code>:53</code> that answers straight from Postgres. These endpoints are the write path; changes propagate to the in-memory authorities in about 15 seconds.</p>
+    <div class="docs-chips"><span class="chip">authoritative</span><span class="chip">A/AAAA/CNAME/TXT/MX/NS</span><span class="chip">UDP + TCP :53</span></div>
+  </div>
+
+  <h2>Zones</h2>
+  {zones.map((e) => <Endpoint {...e} />)}
+
+  <h2>Records</h2>
+  {records.map((e) => <Endpoint {...e} />)}
+
+  <div class="note">Use cases: manage authoritative DNS for a customer domain alongside its CDN zones; script bulk record provisioning during onboarding.</div>
+</DocsLayout>

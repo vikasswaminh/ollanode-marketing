@@ -1,0 +1,45 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const eps = [
+  { method: 'PUT', path: '/v1/kv/{key}', scope: 'kv:write',
+    desc: 'Write a value (raw request body). Limits: key ≤ 512 chars, value ≤ 256 KB.',
+    curl: `curl -X PUT https://api.ollanode.com/v1/kv/feature-flags/beta \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" --data 'on'` },
+  { method: 'GET', path: '/v1/kv/{key}', scope: 'kv:read',
+    desc: 'Read a value (raw string body; 404 if missing).',
+    curl: `curl https://api.ollanode.com/v1/kv/feature-flags/beta \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"` },
+  { method: 'GET', path: '/v1/kv?prefix=…', scope: 'kv:read',
+    desc: 'List keys under a prefix (up to 1000).',
+    curl: `curl "https://api.ollanode.com/v1/kv?prefix=feature-flags/" \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"` },
+  { method: 'DELETE', path: '/v1/kv/{key}', scope: 'kv:write', desc: 'Delete a key.' },
+];
+
+const fromFn = `// Inside an edge function — OLLANODE_KV_URL + OLLANODE_KV_TOKEN are auto-injected,
+// scoped to this function's project. No key management.
+const base = Deno.env.get("OLLANODE_KV_URL");
+const tok  = Deno.env.get("OLLANODE_KV_TOKEN");
+await fetch(base + "/visits", { method:"PUT", headers:{ "x-kv-token": tok }, body:"42" });
+const n = await (await fetch(base + "/visits", { headers:{ "x-kv-token": tok } })).text();`;
+---
+<DocsLayout active="kv" title="KV store — Ollanode Docs" description="A per-project key/value store your edge functions and dashboard share.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Platform</span>
+    <h1>KV store</h1>
+    <p class="lede">A small per-project key/value store. Reach it with a normal API key (scope-checked as <code>kv:*</code>), or from inside an <a href="/docs/edge-functions">edge function</a> via the auto-injected token — no credential to manage.</p>
+    <div class="docs-chips"><span class="chip">per-project</span><span class="chip">edge-native</span><span class="chip">values ≤ 256 KB</span></div>
+  </div>
+
+  <h2>Endpoints</h2>
+  {eps.map((e) => <Endpoint {...e} />)}
+
+  <h2>From an edge function</h2>
+  <p>Functions get a scoped KV binding automatically — read and write with the injected <code>OLLANODE_KV_URL</code> + <code>OLLANODE_KV_TOKEN</code> and the <code>x-kv-token</code> header.</p>
+  <CodeBlock code={fromFn} label="edge function" />
+
+  <div class="note">Use cases: per-project feature flags read at the edge; small config a function and the dashboard both touch; per-key counters and rate-limit state. Limits: keys ≤ 512 chars, values ≤ 256 KB, list returns up to 1000 keys.</div>
+</DocsLayout>

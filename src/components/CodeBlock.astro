@@ -1,0 +1,14 @@
+---
+// Dark code panel. `code` is passed as a string (rendered as text — safe from Astro
+// expression parsing of { } and $ in curl bodies). Optional header label.
+const { code, label } = Astro.props;
+---
+<div class="code">
+  {label && (
+    <div class="code-head">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="lbl">{label}</span>
+    </div>
+  )}
+  <pre><code>{code}</code></pre>
+</div>

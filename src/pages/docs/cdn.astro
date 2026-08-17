@@ -1,0 +1,120 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const create = {
+  method: 'POST', path: '/v1/zones', scope: 'zones:write',
+  desc: 'Map a hostname to an upstream. Supply either `origin_url` (external origin — SSRF-vetted at creation) or `storage_zone_id` to back the zone with one of your storage zones. `signed:true` mints a hotlink signing secret returned once. Defaults: `default_ttl_secs` 3600, `cache_version` 1.',
+  curl: `curl -X POST https://api.ollanode.com/v1/zones \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "hostname": "cdn.example.com",
+    "origin_url": "https://origin.example.com",
+    "default_ttl_secs": 86400,
+    "cache_bypass": ["/api/"],
+    "signed": true,
+    "cors": "*"
+  }'`,
+  response: `{ "id":"zone_...", "hostname":"cdn.example.com",
+  "origin_url":"https://origin.example.com", "default_ttl_secs":86400,
+  "cache_version":1, "cache_bypass":["/api/"], "signed":true, "cors":"*",
+  "rules":[], "active":true, "token_secret":"vbk_<shown once>" }`,
+  responseLabel: '201 (secret shown once)',
+  useCases: ['Front a static-asset origin with edge caching.', 'Put a cacheable, hotlink-protected hostname in front of a storage zone (`storage_zone_id`).'],
+};
+
+const rw = [
+  { method: 'GET', path: '/v1/zones', scope: 'zones:read', desc: 'List zones (paginated).' },
+  { method: 'GET', path: '/v1/zones/{id}', scope: 'zones:read', desc: 'Get the full zone, including its ordered `rules` and current `cache_version` (secret omitted).' },
+  { method: 'DELETE', path: '/v1/zones/{id}', scope: 'zones:delete', desc: 'Delete the zone and tell edges to drop it. Agent keys are approval-gated.' },
+];
+
+const update = {
+  method: 'PATCH', path: '/v1/zones/{id}', scope: 'zones:write',
+  desc: 'Update any field. `cors:""` clears the header; `signed:true/false` enables/disables signing; `rules` **replaces** the whole ordered edge-rule set (max 50). Changes re-publish to all edges over NATS.',
+  curl: `curl -X PATCH https://api.ollanode.com/v1/zones/zone_abc \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "default_ttl_secs": 3600,
+    "cache_bypass": ["/api/", "/live/"],
+    "cors": "https://app.example.com",
+    "rules": [
+      { "prefix":"/downloads/", "action":{"type":"block"} },
+      { "prefix":"/old/", "action":{"type":"redirect","status":301,"location":"https://example.com/new/"} },
+      { "action":{"type":"set_header","name":"X-Frame-Options","value":"DENY"} }
+    ]
+  }'`,
+};
+
+const rotate = {
+  method: 'POST', path: '/v1/zones/{id}/rotate-token', scope: 'zones:rotate',
+  desc: 'Mint a fresh per-zone signing secret (invalidating all previously signed URLs). Returned once in `token_secret`.',
+  curl: `curl -X POST https://api.ollanode.com/v1/zones/zone_abc/rotate-token \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+  useCases: ['Rotate after a leak, or on a schedule.'],
+};
+
+const purge = {
+  method: 'POST', path: '/v1/zones/{id}/purge', scope: 'zones:purge',
+  desc: 'No body / empty `paths` → full purge (bumps `cache_version`, instantly invalidating everything). A `paths` array (each must start with `/`) → granular purge of those exact paths (no version bump).',
+  curl: `# full purge
+curl -X POST https://api.ollanode.com/v1/zones/zone_abc/purge \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"
+# -> { "purged":"all", "cache_version":2 }
+
+# granular
+curl -X POST https://api.ollanode.com/v1/zones/zone_abc/purge \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"paths":["/index.html","/assets/app.css"]}'
+# -> { "purged": 2 }`,
+  useCases: ['Bust the whole cache on a deploy.', 'Invalidate just the paths that changed.'],
+};
+
+const analytics = {
+  method: 'GET', path: '/v1/zones/{id}/analytics', scope: 'analytics:read',
+  desc: 'Live per-zone counters scraped from the edge (returns zeros if the edge is unreachable). Note the scope is `analytics:read`, not `zones:read`.',
+  curl: `curl https://api.ollanode.com/v1/zones/zone_abc/analytics \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+  response: `{ "requests":10432, "bytes":5837482910, "hits":9987, "misses":445, "hit_ratio":0.957 }`,
+  useCases: ['A cache-efficiency widget.', 'Alert when `hit_ratio` drops.'],
+};
+
+const signScheme = `# For a hotlink-protected zone every edge request needs ?exp=&token=
+# token = hex(HMAC_SHA256(zone_token_secret, "<request_uri>.<exp>"))
+# Missing / expired / mismatched -> 403 at the edge.
+GET https://cdn.example.com/video.mp4?exp=1735689600&token=<hex>`;
+---
+<DocsLayout active="cdn" title="CDN pull zones — Ollanode Docs" description="Multi-tenant pull zones on an OpenResty edge: caching, purge, hotlink signing, edge rules, CORS, and analytics.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Delivery</span>
+    <h1>CDN pull zones</h1>
+    <p class="lede">A pull zone maps an inbound hostname to an origin (or a storage zone) and defines how the OpenResty edge caches and gates that traffic — with per-zone TTL, CORS, ordered edge rules, hotlink signing, and instant purge.</p>
+    <div class="docs-chips"><span class="chip">cache + purge</span><span class="chip">hotlink signing</span><span class="chip">edge rules</span><span class="chip">analytics</span></div>
+  </div>
+
+  <h2>Create a zone</h2>
+  <Endpoint {...create} />
+
+  <h2>List, get, delete</h2>
+  {rw.map((e) => <Endpoint {...e} />)}
+
+  <h2>Update: caching, CORS &amp; edge rules</h2>
+  <Endpoint {...update} />
+  <p><b>Edge rules</b> are an ordered list of <code>{'{ prefix?, action }'}</code>. An empty/absent <code>prefix</code> matches all paths. Actions: <code>set_header {'{name,value}'}</code>, <code>redirect {'{status, location}'}</code>, and <code>block</code> (→ 403). Evaluated in order; the first block/redirect short-circuits.</p>
+
+  <h2>Hotlink signing</h2>
+  <Endpoint {...rotate} />
+  <p>Signed URLs are computed client-side — no API call. For a protected zone, every edge request must carry <code>?exp=&amp;token=</code>:</p>
+  <CodeBlock code={signScheme} label="signed-URL scheme" />
+
+  <h2>Purge</h2>
+  <Endpoint {...purge} />
+
+  <h2>Analytics</h2>
+  <Endpoint {...analytics} />
+  <div class="note">The edge tags every response on the zone's hostname with <code>X-Cache-Status: HIT | MISS | …</code>. Config/purge propagate to edges over NATS — eventually-consistent, sub-minute.</div>
+</DocsLayout>

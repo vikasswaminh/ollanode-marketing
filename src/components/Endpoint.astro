@@ -1,0 +1,25 @@
+---
+import CodeBlock from './CodeBlock.astro';
+// One documented endpoint: method badge + path + scope pill + description, then an
+// optional curl block, response block, and a use-cases callout. Fully prop-driven so
+// pages stay data-first (frontmatter arrays → <Endpoint {...e} />).
+const { method, path, scope, desc, curl, response, responseLabel = 'Response', useCases } = Astro.props;
+const m = String(method || '').split(/[^A-Za-z]/)[0].toLowerCase();
+const descHtml = desc ? desc.replace(/`([^`]+)`/g, '<code>$1</code>') : '';
+---
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class={`method method-${m}`}>{method}</span>
+    <code class="endpoint-path">{path}</code>
+    {scope && <span class="scope-pill">{scope}</span>}
+  </div>
+  {desc && <p class="endpoint-desc" set:html={descHtml}></p>}
+  {curl && <CodeBlock code={curl} label="curl" />}
+  {response && <CodeBlock code={response} label={responseLabel} />}
+  {useCases && useCases.length > 0 && (
+    <div class="usecase">
+      <span class="usecase-label">Use cases</span>
+      <ul>{useCases.map((u) => <li set:html={u.replace(/`([^`]+)`/g, '<code>$1</code>')}></li>)}</ul>
+    </div>
+  )}
+</div>

@@ -1,0 +1,83 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const whoami = {
+  method: 'GET', path: '/v1/whoami', scope: 'bearer',
+  desc: 'Identity plus a per-action map of allowed | approval | denied, so an agent can self-discover what it may do without trial and error. The map reuses the real authorization check, so it can never drift from enforcement.',
+  curl: `curl https://api.ollanode.com/v1/whoami \\
+  -H "Authorization: Bearer $AGENT_KEY"`,
+  response: `{ "actor_type":"agent", "role":"api_key", "is_owner":false,
+  "scopes":["read","write"], "extra_scopes":["videos:read"],
+  "capabilities":{ "videos:write":"allowed", "videos:delete":"approval",
+    "dns:write":"approval", "functions:write":"approval",
+    "logs:read":"allowed", "approvals:create":"allowed" } }`,
+  useCases: ['An agent inspects its own capabilities before planning actions.', 'A UI renders what an agent key can and can’t do.'],
+};
+
+const flow = `# 1) agent attempts a gated action -> 202, nothing changed
+curl -i -X DELETE https://api.ollanode.com/v1/videos/vid_123 \\
+  -H "Authorization: Bearer $AGENT_KEY"
+# HTTP/1.1 202  { "status":"pending_approval", "approval_id":"apr_abc", "message":"...resubmit with X-Approval-Id..." }
+
+# 2) a human approves (an API/agent key can never decide)
+curl -X POST https://api.ollanode.com/v1/approvals/apr_abc/decide \\
+  -H "Authorization: Bearer $SESSION" \\
+  -H "Content-Type: application/json" -d '{"decision":"approved"}'
+
+# 3) agent replays the SAME request once, with the approval id
+curl -X DELETE https://api.ollanode.com/v1/videos/vid_123 \\
+  -H "Authorization: Bearer $AGENT_KEY" -H "X-Approval-Id: apr_abc"`;
+
+const approvals = [
+  { method: 'POST', path: '/v1/approvals', scope: 'approvals:create', desc: 'File an approval request explicitly (`action`, optional `resource_id`, `payload`).' },
+  { method: 'GET', path: '/v1/approvals', scope: 'approvals:read', desc: 'List approval requests and their state.' },
+  { method: 'POST', path: '/v1/approvals/{id}/decide', scope: 'admin (human)', desc: 'Approve or reject. Requires a signed-in human admin — never an API/agent key — and the decider cannot approve their own request. The decision is fail-closed audited.' },
+];
+
+const audit = [
+  { method: 'GET', path: '/v1/audit', scope: 'admin · agent · logs:read', desc: 'Recent audit entries (actor, action, resource, request id), newest first.',
+    curl: `curl "https://api.ollanode.com/v1/audit?limit=50" -H "Authorization: Bearer $OLLANODE_API_KEY"` },
+  { method: 'GET', path: '/v1/audit/verify', scope: 'bearer', desc: 'Verify this project’s per-entry hash-chain integrity.',
+    curl: `curl https://api.ollanode.com/v1/audit/verify -H "Authorization: Bearer $SESSION"`,
+    response: `{ "scope":"project", "checked":128, "skipped_legacy":0, "intact":true, "tampered":[] }` },
+];
+
+const kill = {
+  method: 'POST', path: '/v1/admin/disable-agents?project_id=…', scope: 'X-Admin-Token',
+  desc: 'Kill-switch: revoke ALL agent keys for a project at once (platform-operator credential, fail-closed audited).',
+  curl: `curl -X POST "https://api.ollanode.com/v1/admin/disable-agents?project_id=proj_abc" \\
+  -H "X-Admin-Token: $ADMIN_TOKEN"
+# -> { "agents_revoked": N }`,
+};
+---
+<DocsLayout active="agents" title="AI agents & governance — Ollanode Docs" description="Capability discovery, approval-gated destructive actions, human-only guardrails, tamper-evident audit, and a kill-switch.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Platform</span>
+    <h1>AI agents &amp; governance</h1>
+    <p class="lede">Agents are API-first citizens with guardrails. They discover their own capabilities, run product actions freely, but route destructive and code actions through a human — once — with a tamper-evident audit trail and a kill-switch behind it all.</p>
+    <div class="docs-chips"><span class="chip">whoami map</span><span class="chip">approval-gated</span><span class="chip">hash-chain audit</span><span class="chip">kill-switch</span></div>
+  </div>
+
+  <h2>Capability discovery</h2>
+  <p>Mint an agent key with <code>role:"agent"</code> (read+write, never admin). It sees a product-only surface; account-admin actions are hidden.</p>
+  <Endpoint {...whoami} />
+
+  <h2>Approval gating</h2>
+  <p>For agents, any <code>delete</code> plus <code>functions:write</code> (code deploy) and <code>dns:write</code> are gated: the call returns <b>202</b> without running, a human decides, and the agent replays the exact same request once with <code>X-Approval-Id</code>. The approval is bound to a request digest (key + action + resource + body hash), so replays or payload substitutions match nothing and are rejected.</p>
+  <CodeBlock code={flow} label="the 202 → decide → replay flow" />
+  {approvals.map((e) => <Endpoint {...e} />)}
+
+  <h2>Human-only guardrails</h2>
+  <p>Team/user management, API-key lifecycle, approval decisions, and owner-only org actions are never agent-grantable — they return <code>403</code> for agents and show as <code>denied</code> in the capability map. Agent keys are structurally prevented from holding <code>admin</code>. Billing is intentionally not an API capability at all.</p>
+
+  <h2>Tamper-evident audit</h2>
+  <p>Every mutation is recorded in a hash-chain (<code>prev_hash</code>/<code>entry_hash</code> over all immutable fields), so tampering is detectable.</p>
+  {audit.map((e) => <Endpoint {...e} />)}
+
+  <h2>Kill-switch</h2>
+  <Endpoint {...kill} />
+
+  <div class="note">Agents can drive the API directly, or via the <b>MCP server</b> which exposes these endpoints as typed tools (<code>list_videos</code>, <code>ingest_video</code>, <code>create_zone</code>, <code>request_approval</code>, …). The full contract is at <code>GET /openapi.json</code> (OpenAPI 3.1).</div>
+</DocsLayout>

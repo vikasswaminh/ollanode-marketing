@@ -1,5 +1,5 @@
 ---
-import Site from '../../layouts/Site.astro';
+import DocsLayout from '../../layouts/DocsLayout.astro';
 
 // ── API reference: one card per endpoint (method, path, scope, blurb, curl, optional response) ──
 const api = [
@@ -252,7 +252,9 @@ const tagColor = {
   proxy: 'text-paper-muted', video: 'text-accent', cron: 'text-green', integrate: 'text-blue',
 };
 ---
-<Site
+<DocsLayout
+  active="edge-functions"
+  wide
   title="Edge Functions — Ollanode Docs"
   description="Deploy JavaScript/TypeScript that runs at the edge in a V8 isolate. Full API reference, curl examples, KV, cron, versions, observability, and 20 real-world use cases."
 >
@@ -496,4 +498,4 @@ curl -H "x-fn-key: $KEY" https://api.ollanode.com/__fn/$FID   # 200
       <a href="https://login.ollanode.com/edge-functions" class="chamfer-sm mt-9 inline-block bg-ink px-7 py-4 font-mono text-xs font-semibold uppercase tracking-wide text-paper transition-opacity hover:opacity-90">Open the dashboard →</a>
     </div>
   </section>
-</Site>
+</DocsLayout>

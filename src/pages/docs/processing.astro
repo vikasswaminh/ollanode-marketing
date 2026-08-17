@@ -1,0 +1,112 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const assets = {
+  method: 'GET', path: '/v1/videos/{id}/assets', scope: 'videos:read',
+  desc: 'The full inventory of what transcode produced — rendition playlists, the HLS master, progressive MP4, audio-only MP3, and the storyboard sprite — with sizes, dimensions, and bitrate.',
+  curl: `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../assets \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+  response: `[ {"kind":"hls_master","content_type":"application/vnd.apple.mpegurl"},
+  {"kind":"hls_rendition","label":"1080p","width":1920,"height":1080,"bitrate_kbps":5000},
+  {"kind":"mp4","label":"1080p","size_bytes":48213000,"content_type":"video/mp4"},
+  {"kind":"audio","label":"audio","content_type":"audio/mpeg"} ]`,
+  useCases: ['Confirm which ladder rungs were produced.', 'Find the progressive MP4 / MP3 for a downstream tool.'],
+};
+
+const clip = {
+  method: 'POST', path: '/v1/videos/{id}/clip', scope: 'videos:write',
+  desc: 'Create a new child video from a frame-accurate `[start,end]` trim of the parent, run through the full pipeline. Validated against the parent duration.',
+  curl: `curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../clip \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"start":12.0,"end":42.5,"title":"Highlight"}'`,
+  response: `{ "id":"vid_NEWchild...", "status":"created", ... }`,
+  useCases: ['Highlight reels and teasers cut from a master.', 'Chop a long recording into shareable segments.'],
+};
+
+const thumbs = [
+  { method: 'GET', path: '/v1/videos/{id}/thumbnails', scope: 'videos:read', desc: 'All generated stills — poster, sampled frames, and the storyboard `sprite_sheet` — as short-lived presigned URLs.' },
+  { method: 'GET', path: '/v1/videos/{id}/thumbnail?time=12.5', scope: 'videos:read', desc: 'The generated frame nearest a timestamp.' },
+];
+
+const transcript = {
+  method: 'GET', path: '/v1/videos/{id}/transcript', scope: 'videos:read',
+  desc: 'The WhisperX transcript: status, detected `language`, presigned VTT + SRT URLs, and word/segment timings. `404` until the transcript stage completes.',
+  curl: `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../transcript \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+  response: `{ "status":"ready", "language":"en",
+  "vtt_url":"https://...presigned.vtt", "srt_url":"https://...presigned.srt",
+  "segments":[{"start":0.0,"end":3.2,"text":"Welcome to the all-hands"}] }`,
+  useCases: ['Burn-in or side-car captions.', 'Index spoken content for search; feed the AI-metadata step.'],
+};
+
+const subs = [
+  { method: 'POST', path: '/v1/videos/{id}/subtitles', scope: 'videos:write', desc: 'Upload a WebVTT track for a language (content must start with `WEBVTT`; re-uploading a language replaces it).' },
+  { method: 'GET', path: '/v1/videos/{id}/subtitles', scope: 'videos:read', desc: 'List the video’s subtitle tracks.' },
+  { method: 'DELETE', path: '/v1/videos/{id}/subtitles/{lang}', scope: 'videos:write', desc: 'Remove a language track.' },
+];
+
+const subCurl = `curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../subtitles \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"language":"en","label":"English","content":"WEBVTT\\n\\n00:00:00.000 --> 00:00:03.000\\nHello"}'`;
+
+const chapters = {
+  method: 'PUT', path: '/v1/videos/{id}/chapters', scope: 'videos:write',
+  desc: 'Replace the chapter markers. Served to players as WebVTT and shown in the embed player.',
+  curl: `curl -X PUT https://api.ollanode.com/v1/videos/vid_7Qk3.../chapters \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"chapters":[{"start_seconds":0,"title":"Intro"},{"start_seconds":95.5,"title":"Roadmap"}]}'`,
+};
+
+const ai = {
+  method: 'POST', path: '/v1/videos/{id}/ai-metadata', scope: 'videos:write',
+  desc: 'Send the transcript to an external OpenAI-compatible LLM and get back a suggested title, description, tags, and chapters. `apply:true` writes them onto the video. Requires an existing transcript.',
+  curl: `curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../ai-metadata \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" -d '{"apply":true}'`,
+  response: `{ "title":"Q3 All-Hands: Roadmap & Wins",
+  "description":"Leadership reviews Q3 results and the Q4 roadmap.",
+  "tags":["all-hands","roadmap","q3"],
+  "chapters":[{"start_seconds":0,"title":"Intro"}], "applied":true }`,
+  useCases: ['Auto-title and tag an uploaded library.', 'Generate chapter markers without manual scrubbing.'],
+};
+---
+<DocsLayout active="processing" title="Processing & AI — Ollanode Docs" description="Transcode ladder, HLS/MP4/audio assets, sub-clips, thumbnails, transcripts, subtitles, chapters, and AI metadata.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Video</span>
+    <h1>Processing &amp; AI</h1>
+    <p class="lede">What happens after the bytes land: an adaptive HLS ladder, thumbnails and storyboards, word-level transcripts, subtitles and chapters, and optional AI-generated metadata.</p>
+  </div>
+
+  <h2>Transcode options</h2>
+  <p>Encoding is driven by three per-video fields set on <a href="/docs/videos">create</a>: <code>quality_preset</code> (<code>low</code> 0.6× · <code>standard</code> 1.0× · <code>high</code> 1.5× · <code>av1</code> royalty-free SVT-AV1), <code>max_height</code>, and <code>encrypt</code> (AES-128). The pipeline builds an adaptive ladder capped at the source height (no upscaling) and fits it to the source's real bitrate.</p>
+  <div class="note"><b>Server-config, not API fields (⚙️ off by default):</b> the codec (<code>libx264</code> default; <code>libx265</code>/NVENC) and EBU R128 loudness normalization are set in the pipeline config, not per request. Non-encrypted output is CMAF/fMP4 (<code>.m4s</code>); encrypted output is MPEG-TS (<code>.ts</code>) with <code>#EXT-X-KEY</code>.</div>
+
+  <h2>Assets</h2>
+  <Endpoint {...assets} />
+
+  <h2>Sub-clips</h2>
+  <Endpoint {...clip} />
+
+  <h2>Thumbnails, poster &amp; storyboard</h2>
+  {thumbs.map((e) => <Endpoint {...e} />)}
+
+  <h2>Transcripts</h2>
+  <p>WhisperX generates word-level transcripts automatically. <span class="mono">⚙️</span> Speaker diarization needs <code>HF_TOKEN</code> and is off by default; an external faster-whisper backend is available via <code>WHISPER_URL</code>.</p>
+  <Endpoint {...transcript} />
+
+  <h2>Subtitles</h2>
+  {subs.map((e) => <Endpoint {...e} />)}
+  <CodeBlock code={subCurl} label="curl — upload a track" />
+
+  <h2>Chapters</h2>
+  <Endpoint {...chapters} />
+
+  <h2>AI metadata</h2>
+  <p><span class="mono">⚙️</span> Config-gated: returns <code>503</code> unless <code>VB_AI__API_KEY</code> is set, and requires an existing transcript.</p>
+  <Endpoint {...ai} />
+</DocsLayout>

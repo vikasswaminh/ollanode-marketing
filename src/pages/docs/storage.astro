@@ -1,0 +1,72 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const zones = [
+  { method: 'POST', path: '/v1/storage-zones', scope: 'storage:write', desc: 'Create a storage zone (a project-scoped, S3-style bucket).',
+    curl: `curl -X POST https://api.ollanode.com/v1/storage-zones \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" -d '{"name":"site-assets"}'`,
+    response: `{ "id":"stz_...", "name":"site-assets", "project_id":"proj_...", "created_at":"..." }` },
+  { method: 'GET', path: '/v1/storage-zones', scope: 'storage:read', desc: 'List storage zones (paginated).' },
+  { method: 'GET', path: '/v1/storage-zones/{id}', scope: 'storage:read', desc: 'Get a zone with computed `bytes_used` and `file_count`.' },
+  { method: 'DELETE', path: '/v1/storage-zones/{id}', scope: 'storage:delete', desc: 'Delete the zone and all its objects. Agent keys are approval-gated.' },
+];
+
+const upload = {
+  method: 'POST', path: '/v1/storage-zones/{id}/upload-url', scope: 'storage:write',
+  desc: 'Mint a short-lived presigned PUT URL for a path in the zone, then upload bytes directly to it. Enforces the project storage quota (409 if over); paths are sanitized.',
+  curl: `curl -X POST https://api.ollanode.com/v1/storage-zones/stz_abc/upload-url \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"path":"images/hero.jpg","content_type":"image/jpeg"}'
+# -> { "url":"https://...presigned PUT...", "path":"images/hero.jpg" }
+
+curl -X PUT --upload-file hero.jpg -H "Content-Type: image/jpeg" "<url>"`,
+};
+
+const files = [
+  { method: 'GET', path: '/v1/storage-zones/{id}/files', scope: 'storage:read', desc: 'List files (cursor-paginated: `?limit=` 1–1000 default 100, `?cursor=`). Each item carries a short-lived presigned GET `url`.',
+    curl: `curl "https://api.ollanode.com/v1/storage-zones/stz_abc/files?limit=100" \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+    response: `{ "items":[{"path":"images/hero.jpg","size_bytes":30512,"url":"https://...presigned-GET..."}],
+  "next_cursor": null }` },
+  { method: 'DELETE', path: '/v1/storage-zones/{id}/files?path=…', scope: 'storage:delete', desc: 'Delete a file by path. Agent keys are approval-gated, bound to the exact path.',
+    curl: `curl -X DELETE "https://api.ollanode.com/v1/storage-zones/stz_abc/files?path=images/hero.jpg" \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"` },
+];
+
+const image = {
+  method: 'GET', path: '/v1/storage-zones/{id}/image-url', scope: 'storage:read',
+  desc: 'Return a signed imgproxy URL that resizes/reformats/recompresses a stored image on the fly. Params: `path` (required), `w`, `h`, `resize` (`fit`|`fill`|`force`), `q` (1–100), `format` (`webp`|`avif`|`jpg`).',
+  curl: `curl "https://api.ollanode.com/v1/storage-zones/stz_abc/image-url?path=images/hero.jpg&w=200&format=webp&q=80" \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"
+# -> { "url":"https://api.ollanode.com/<sig>/rs:fit:200:0:0/q:80/f:webp/<enc-source>" }`,
+  useCases: ['Generate a responsive `srcset` from a single stored master.', 'Serve AVIF/WebP to modern browsers, JPEG to the rest.'],
+};
+---
+<DocsLayout active="storage" title="Storage & images — Ollanode Docs" description="S3-style storage zones with presigned upload, file management, CDN-fronting, and an on-the-fly image optimizer.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Delivery</span>
+    <h1>Storage &amp; images</h1>
+    <p class="lede">Per-tenant S3-style buckets: upload with short-lived presigned PUTs, list and delete files, front a zone with a CDN pull zone, and transform images on the fly through a signed optimizer.</p>
+    <div class="docs-chips"><span class="chip">presigned upload</span><span class="chip">CDN-frontable</span><span class="chip">image optimizer</span></div>
+  </div>
+
+  <h2>Storage zones</h2>
+  {zones.map((e) => <Endpoint {...e} />)}
+
+  <h2>Presigned upload</h2>
+  <Endpoint {...upload} />
+
+  <h2>Files</h2>
+  {files.map((e) => <Endpoint {...e} />)}
+
+  <h2>CDN-fronted access</h2>
+  <p>There's no separate endpoint — create a <a href="/docs/cdn">pull zone</a> with <code>storage_zone_id</code> instead of <code>origin_url</code>, and the edge serves the zone's files with caching, <code>X-Cache-Status</code>, optional hotlink signing, CORS, and edge rules.</p>
+
+  <h2>Image optimizer</h2>
+  <p><span class="mono">⚙️</span> Config-gated: requires <code>IMGPROXY_KEY</code> + <code>IMGPROXY_SALT</code>. Verified live: a 30&nbsp;KB JPEG → 2.9&nbsp;KB WebP at 200px.</p>
+  <Endpoint {...image} />
+</DocsLayout>

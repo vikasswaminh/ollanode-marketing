@@ -1,0 +1,87 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const createVideo = `curl -X POST https://api.ollanode.com/v1/videos \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"title":"My first video","playback_policy":"signed"}'
+# -> { "id": "vid_7Qk3...", "status": "created", "upload_token": "..." }`;
+
+const uploadUrl = `# 1) mint a presigned PUT URL
+curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../upload-url \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"content_type":"video/mp4"}'
+# -> { "url": "https://...presigned...", "source_key": "...", "expires_in": 3600 }
+
+# 2) upload the file straight to that URL
+curl -X PUT --upload-file ./movie.mp4 -H "Content-Type: video/mp4" "<url from above>"`;
+
+const complete = `curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../upload-complete \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"size_bytes": 52428800}'
+# -> { "id": "vid_7Qk3...", "status": "uploaded" }`;
+
+const poll = `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../status \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"
+# -> { "id": "vid_7Qk3...", "status": "processing", "progress": 63 }
+# poll until status == "ready"`;
+
+const playback = `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../playback \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"
+# -> { "master_url": ".../manifest?token=...", "token": "...", "policy": "signed",
+#      "expires_at": "...", "poster_url": "...", "subtitles": [] }`;
+
+const embed = `<iframe
+  src="https://<playback-host>/embed/vid_7Qk3...?token=<token>"
+  allow="autoplay; fullscreen"
+  style="border:0;width:100%;aspect-ratio:16/9"></iframe>`;
+
+const pullIngest = `curl -X POST https://api.ollanode.com/v1/videos \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"title":"Imported","source_url":"https://cdn.example.com/master.mp4"}'`;
+---
+<DocsLayout active="quickstart" title="Quickstart — Ollanode Docs" description="From an API key to a playing video in a few calls: create, upload, poll, and play.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Getting started</span>
+    <h1>Quickstart</h1>
+    <p class="lede">Create a video, upload the file, wait for processing, and play it back — the whole control-plane loop in a few calls. Grab an API key from the dashboard under <b>API Keys</b> first.</p>
+  </div>
+
+  <h2>1. Set your key</h2>
+  <p>Every call carries a bearer credential. Export it once:</p>
+  <CodeBlock code={'export OLLANODE_API_KEY="vbk_..."'} label="shell" />
+
+  <h2>2. Create a video</h2>
+  <p>Register the video first — this returns a <code>vid_…</code> id (and a one-time <code>upload_token</code> for resumable uploads). <code>playback_policy</code> defaults to <code>signed</code>; pass <code>"public"</code> for a shareable, token-free video.</p>
+  <CodeBlock code={createVideo} label="curl" />
+
+  <h2>3. Upload the file</h2>
+  <p>Mint a presigned <code>PUT</code> URL and upload the bytes directly to object storage (they never pass through the API). For large files use <a href="/docs/videos">multipart or resumable TUS</a> instead.</p>
+  <CodeBlock code={uploadUrl} label="curl" />
+
+  <h2>4. Finalize the upload</h2>
+  <p>Commit the source and kick off the pipeline. (Multipart uploads start the pipeline on <code>complete</code>, so they skip this step.)</p>
+  <CodeBlock code={complete} label="curl" />
+
+  <h2>5. Poll until ready</h2>
+  <p>Processing runs asynchronously through the VOD pipeline (validate → transcode → HLS → thumbnails → transcript → …). Poll the cheap status endpoint for live progress.</p>
+  <CodeBlock code={poll} label="curl" />
+
+  <h2>6. Get a playback URL</h2>
+  <p>Once <code>ready</code>, ask for a playback URL. For a <code>signed</code> video this mints a short-lived HMAC token and appends it to the private-origin HLS manifest.</p>
+  <CodeBlock code={playback} label="curl" />
+
+  <h2>7. Embed the player</h2>
+  <p>Drop the hosted Vidstack player into any page — quality selector, storyboard scrubbing, chapters and captions are pre-wired.</p>
+  <CodeBlock code={embed} label="html" />
+
+  <h2>Shortcut: pull-from-URL</h2>
+  <p>Already have the file on a public URL? Skip steps 3–4 entirely — pass <code>source_url</code> on create and the platform fetches and processes it for you.</p>
+  <CodeBlock code={pullIngest} label="curl" />
+
+  <div class="note">Next: <a href="/docs/videos">Videos &amp; ingest</a> for every upload path, <a href="/docs/processing">Processing &amp; AI</a> for the transcode ladder and transcripts, and <a href="/docs/playback">Playback &amp; delivery</a> for signed tokens and the embed player.</div>
+</DocsLayout>

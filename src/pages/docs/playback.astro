@@ -1,0 +1,87 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const getPlayback = {
+  method: 'GET', path: '/v1/videos/{id}/playback', scope: 'videos:read',
+  desc: 'Start here. Returns the ready-to-play HLS `master_url`. For a `signed` video it mints and appends a short-lived HMAC token; for a `public` video the URL is shareable and token-free. Also returns the poster and subtitle tracks. Video must be `ready` (else `409`).',
+  curl: `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../playback \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+  response: `{ "master_url": "https://<playback-host>/v1/playback/vid_7Qk3.../manifest?token=eyJ...",
+  "token": "eyJ...", "policy": "signed", "expires_at": "...",
+  "poster_url": "https://...", "subtitles": [{"language":"en","label":"English","url":"..."}] }`,
+  useCases: ['Fetch a fresh signed URL per viewer/session server-side.', 'Get the poster + tracks to build a custom player.'],
+};
+
+const manifest = {
+  method: 'GET', path: '/v1/playback/{id}/manifest?token=…', scope: 'token-gated',
+  desc: 'Served by the playback host (a separate data plane, not API-key auth). Fetches the master playlist from private storage and rewrites every variant URI back through itself carrying the token, and sets an HttpOnly `vb_pb` cookie scoped to the video so segment requests carry auth automatically — which is what lets a CDN edge cache segments. Geo rules are enforced here for both signed and public playback.',
+  curl: `curl "https://<playback-host>/v1/playback/vid_7Qk3.../manifest?token=eyJ..."
+# Content-Type: application/vnd.apple.mpegurl
+# Set-Cookie: vb_pb=...; Path=/v1/playback/vid_7Qk3.../; HttpOnly; Secure; SameSite=None`,
+};
+
+const seg = {
+  method: 'GET', path: '/v1/playback/{id}/seg/*path?token=…', scope: 'token-gated',
+  desc: 'Serves a variant playlist (URIs rewritten with the caller’s token) or streams a media segment straight from private storage — `.ts` (encrypted/MPEG-TS) or `.m4s`/`init.mp4` (CMAF). Honors `Range` for seeking. AES-128 keys are delivered through this same route (the `#EXT-X-KEY` URI is rewritten to a token-gated `seg/` path — there is no separate key endpoint). `401` without a valid token.',
+  curl: `curl "https://<playback-host>/v1/playback/vid_7Qk3.../seg/1080p/seg_00000.ts?token=eyJ..."`,
+  useCases: ['Adaptive playback in hls.js / Safari.', 'CDN caches segments by path while every request re-validates the token at the edge.'],
+};
+
+const sidecar = [
+  { method: 'GET', path: '/v1/playback/{id}/subtitle/{lang}?token=…', scope: 'token-gated', desc: 'An uploaded WebVTT subtitle track.' },
+  { method: 'GET', path: '/v1/playback/{id}/chapters?token=…', scope: 'token-gated', desc: 'WebVTT chapter cues built from the stored markers.' },
+  { method: 'GET', path: '/v1/playback/{id}/storyboard.vtt?token=…', scope: 'token-gated', desc: 'The scrub-preview cue file for hover thumbnails.' },
+  { method: 'GET', path: '/v1/playback/{id}/storyboard.jpg?token=…', scope: 'token-gated', desc: 'The storyboard sprite sheet.' },
+];
+
+const embed = `<iframe
+  src="https://<playback-host>/embed/vid_7Qk3...?token=eyJ..."
+  allow="autoplay; fullscreen"
+  style="border:0;width:100%;aspect-ratio:16/9"></iframe>`;
+
+const download = {
+  method: 'GET', path: '/v1/videos/{id}/download', scope: 'videos:read',
+  desc: 'Presigned URLs for the progressive MP4/MP3 — only for public, non-encrypted videos. A signed or encrypted video returns `403` by design (a plaintext MP4 would defeat the gating). This is a deliberate restriction, not a bug.',
+  curl: `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../download \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+};
+
+const analytics = [
+  { method: 'GET', path: '/v1/videos/{id}/views', scope: 'videos:read', desc: 'Raw per-video view count.' },
+  { method: 'GET', path: '/v1/analytics/audience?days=30', scope: 'analytics:read', desc: 'Project-wide rollup: views over time, top countries, device mix, and referrers (captured off the playback path; `days` clamped 1–365).' },
+];
+---
+<DocsLayout active="playback" title="Playback & delivery — Ollanode Docs" description="Signed expiring tokens over a private origin, AES-128, the embed player, sidecar tracks, and audience analytics.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Video</span>
+    <h1>Playback &amp; delivery</h1>
+    <p class="lede">Bytes are never served direct — the playback service proxies and rewrites every HLS URI through itself, gated by a signed, expiring token (or the cookie it sets). Here's how to get a URL, embed a player, and read analytics.</p>
+    <div class="docs-chips"><span class="chip">signed HMAC token</span><span class="chip">private origin</span><span class="chip">AES-128</span><span class="chip">Vidstack embed</span></div>
+  </div>
+
+  <h2>Get a playback URL + token</h2>
+  <Endpoint {...getPlayback} />
+  <div class="note">Everything below is served by the <b>playback host</b> (<code>public_playback_url</code>) — a separate host from <code>api.ollanode.com</code>, gated by token/cookie rather than an API key, and intentionally absent from <code>openapi.json</code>.</div>
+
+  <h2>HLS manifest &amp; cookie</h2>
+  <Endpoint {...manifest} />
+
+  <h2>Segments &amp; AES-128 keys</h2>
+  <Endpoint {...seg} />
+
+  <h2>Sidecar tracks (subtitles, chapters, storyboard)</h2>
+  <p>Same token/cookie gate — the embed player wires these up automatically.</p>
+  {sidecar.map((e) => <Endpoint {...e} />)}
+
+  <h2>Embeddable player</h2>
+  <p>A self-contained Vidstack player with quality selector, storyboard hover-scrub, chapters, and captions pre-wired. Framing is allowed anywhere; a parent page can drive seeks via <code>{'postMessage({ type: "ollanode-seek", seconds })'}</code>.</p>
+  <CodeBlock code={embed} label="html" />
+
+  <h2>Progressive download (restricted)</h2>
+  <Endpoint {...download} />
+
+  <h2>Analytics</h2>
+  {analytics.map((e) => <Endpoint {...e} />)}
+</DocsLayout>

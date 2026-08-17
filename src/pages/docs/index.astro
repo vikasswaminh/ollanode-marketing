@@ -1,0 +1,52 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+
+const firstCall = `curl https://api.ollanode.com/v1/whoami \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`;
+
+const areas = [
+  { href: '/docs/quickstart', t: 'Quickstart', d: 'From signup to your first playing video in a handful of calls.' },
+  { href: '/docs/authentication', t: 'Authentication & scopes', d: 'API keys, roles, the fine-grained resource:action model, errors, rate limits.' },
+  { href: '/docs/videos', t: 'Videos & ingest', d: 'Create videos and get bytes in — presigned, multipart, resumable, or pull-from-URL.' },
+  { href: '/docs/processing', t: 'Processing & AI', d: 'Transcode ladder, thumbnails, transcripts, subtitles, chapters, AI metadata.' },
+  { href: '/docs/playback', t: 'Playback & delivery', d: 'Signed tokens, private-origin HLS, AES-128, the embed player, analytics.' },
+  { href: '/docs/cdn', t: 'CDN pull zones', d: 'Cache at the edge, purge, hotlink signing, edge rules, per-zone analytics.' },
+  { href: '/docs/storage', t: 'Storage & images', d: 'S3-style zones, presigned upload, and the on-the-fly image optimizer.' },
+  { href: '/docs/dns', t: 'DNS', d: 'Authoritative zones and records (A/AAAA/CNAME/TXT/MX/NS) served on :53.' },
+  { href: '/docs/edge-functions', t: 'Edge functions', d: 'Deploy JS/TS that runs in a V8 isolate next to your cache.' },
+  { href: '/docs/kv', t: 'KV store', d: 'A per-project key/value store your functions and dashboard share.' },
+  { href: '/docs/webhooks', t: 'Webhooks', d: 'HMAC-signed events with retries and a dead-letter queue.' },
+  { href: '/docs/agents', t: 'AI agents & governance', d: 'Capability discovery, approval-gated actions, hash-chain audit, kill-switch.' },
+];
+---
+<DocsLayout active="overview" title="Ollanode API Docs" description="Reference and guides for the Ollanode API — video, CDN, storage, DNS, edge functions, webhooks, and AI-agent governance, all behind one project-scoped REST API.">
+  <div class="docs-hero">
+    <span class="eyebrow">Documentation</span>
+    <h1>Build on Ollanode.</h1>
+    <p class="lede">One project-scoped REST API for video, CDN, storage, DNS, edge compute, and governance. Every feature is an endpoint; every example below is a real call you can run against your own deployment.</p>
+    <div class="docs-chips">
+      <span class="chip">Base <span class="mono">https://api.ollanode.com</span></span>
+      <span class="chip">OpenAPI 3.1</span>
+      <span class="chip">MCP for agents</span>
+    </div>
+  </div>
+
+  <h2>Base URL &amp; authentication</h2>
+  <p>All control-plane requests go to <code>https://api.ollanode.com</code> and carry a bearer credential — either a <code>vbk_</code> API key or a dashboard session token — in the <code>Authorization</code> header (the <code>x-api-key</code> header is also accepted). Create keys in the dashboard under API Keys.</p>
+  <CodeBlock code={firstCall} label="your first request" />
+  <p><code>GET /v1/whoami</code> returns who you are and a per-action capability map — the fastest way to confirm a key works and see what it can do.</p>
+
+  <h2>Conventions in 30 seconds</h2>
+  <p><b>Scopes</b> are coarse (<code>read</code>, <code>write</code>, <code>admin</code>) or fine-grained (<code>resource:action</code>, e.g. <code>videos:write</code>); a coarse preset satisfies the matching fine-grained checks. <b>Errors</b> are <code>{'{ "error": { "code", "message" } }'}</code> with conventional HTTP statuses. <b>Lists</b> page with <code>?limit=</code> (default 25, max 100) &amp; <code>?offset=</code> and return <code>{'{ items, total, limit, offset }'}</code>. Writes accept an <code>Idempotency-Key</code>; every response carries <code>X-Request-Id</code> and rate-limit headers. Full detail on the <a href="/docs/authentication">Authentication &amp; scopes</a> page.</p>
+
+  <h2>Explore the API</h2>
+  <div class="docs-cards">
+    {areas.map((a) => (
+      <a class="docs-card" href={a.href}>
+        <h3>{a.t}</h3>
+        <p>{a.d}</p>
+      </a>
+    ))}
+  </div>
+</DocsLayout>

@@ -1,0 +1,125 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const create = {
+  method: 'POST', path: '/v1/videos', scope: 'videos:write',
+  desc: 'Create the `vid_…` record before any bytes exist. Returns a one-time `upload_token` (for resumable TUS). All fields are optional: `playback_policy` = `signed` (default) | `public`; `quality_preset` = `low` | `standard` | `high` | `av1`; `max_height` caps the ladder; `encrypt:true` turns on AES-128 HLS; `access_rules` gates by country/referrer.',
+  curl: `curl -X POST https://api.ollanode.com/v1/videos \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "title": "Q3 All-Hands",
+    "playback_policy": "signed",
+    "quality_preset": "high",
+    "max_height": 1080,
+    "encrypt": true,
+    "access_rules": { "allowed_countries": ["US","IN"] }
+  }'`,
+  response: `{ "id": "vid_7Qk3...", "status": "created",
+  "playback_policy": "signed", "encrypted": true,
+  "quality_preset": "high", "max_height": 1080,
+  "upload_token": "<shown once — TUS metadata>", "chapters": [],
+  "created_at": "..." }`,
+  responseLabel: '201 Created',
+  useCases: ['Pre-register a video and hand the client an upload target.', 'Gate a video to specific countries at create time.'],
+};
+
+const pull = {
+  method: 'POST', path: '/v1/videos', scope: 'videos:write',
+  desc: 'Pull-from-URL: set `source_url` and the platform fetches the file itself (SSRF-vetted, size-capped) and starts processing — no separate upload step. Returns immediately; the fetch runs in the background.',
+  curl: `curl -X POST https://api.ollanode.com/v1/videos \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"title":"Imported clip","source_url":"https://cdn.example.com/master.mp4"}'`,
+  useCases: ['One-call import of an existing remote MP4.', 'Migrate a back-catalogue by pointing at your current origin.'],
+};
+
+const crud = {
+  method: 'GET', path: '/v1/videos', scope: 'videos:read',
+  desc: 'List videos (paginated; filter with `?library_id=`). Ready videos include a short-lived presigned `poster_url`.',
+  curl: `curl "https://api.ollanode.com/v1/videos?limit=20&offset=0" \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+};
+
+const others = [
+  { method: 'GET', path: '/v1/videos/{id}', scope: 'videos:read', desc: 'Fetch a single video with its full metadata, chapters, and access rules.' },
+  { method: 'PATCH', path: '/v1/videos/{id}', scope: 'videos:write', desc: 'Update `title`, `playback_policy`, `metadata`, `library_id` (empty string detaches), or `access_rules`.' },
+  { method: 'DELETE', path: '/v1/videos/{id}', scope: 'videos:delete', desc: 'Soft-delete the video and async-purge its storage. Agent keys get `202 {approval_id}` (approval-gated).' },
+];
+
+const status = {
+  method: 'GET', path: '/v1/videos/{id}/status', scope: 'videos:read',
+  desc: 'Cheap poll: current lifecycle state (`created → upload_pending → uploaded → processing → ready | errored`) plus live transcode `progress` (0–100). Poll this after upload instead of the full GET.',
+  curl: `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../status \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+  response: `{ "id":"vid_7Qk3...", "status":"processing", "error_reason":null, "progress":63 }`,
+};
+
+const single = `# 1) mint a presigned PUT URL
+curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../upload-url \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"content_type":"video/mp4"}'
+# -> { "url":"https://...presigned PUT...", "source_key":"...", "expires_in":3600 }
+
+# 2) upload the whole file to that URL
+curl -X PUT --upload-file ./movie.mp4 -H "Content-Type: video/mp4" "<url>"
+
+# 3) finalize -> starts the pipeline
+curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../upload-complete \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" -d '{"size_bytes":52428800}'`;
+
+const multipart = `# 1) begin
+curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../multipart \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" -d '{"content_type":"video/mp4"}'
+# -> { "upload_id":"...", "source_key":"..." }
+
+# 2) presign + PUT each part (capture the ETag from each response)
+curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../multipart/<upload_id>/parts/1 \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY"
+# -> { "url":"https://...presigned PUT for part 1..." }
+
+# 3) complete -> starts the pipeline (no upload-complete needed)
+curl -X POST https://api.ollanode.com/v1/videos/vid_7Qk3.../multipart/<upload_id>/complete \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"parts":[{"part_number":1,"etag":"<etag-1>"},{"part_number":2,"etag":"<etag-2>"}]}'`;
+---
+<DocsLayout active="videos" title="Videos & ingest — Ollanode Docs" description="Create videos and get bytes in — presigned single-shot, multipart, resumable TUS, or pull-from-URL.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Video</span>
+    <h1>Videos &amp; ingest</h1>
+    <p class="lede">The entry point to the whole pipeline: create a video record, then get bytes in by whatever path fits — direct presigned upload, S3-style multipart, resumable TUS, or a server-side pull from a URL.</p>
+    <div class="docs-chips"><span class="chip">presigned</span><span class="chip">multipart</span><span class="chip">resumable (TUS)</span><span class="chip">pull-from-URL</span></div>
+  </div>
+
+  <h2>Create a video</h2>
+  <p>Everything starts here. Create the record, then choose an ingest path below — or pass <code>source_url</code> and skip uploading entirely.</p>
+  <Endpoint {...create} />
+  <Endpoint {...pull} />
+
+  <h2>Lifecycle: list, get, update, delete</h2>
+  <p>Standard tenant-scoped CRUD — every call is scoped to your project.</p>
+  <Endpoint {...crud} />
+  {others.map((e) => <Endpoint {...e} />)}
+  <div class="note">There is <b>no reprocess endpoint</b>. Stuck or lost jobs are recovered automatically by background redispatch/reaper loops; "re-process from errored" is a state-machine property, not a public route.</div>
+
+  <h2>Poll status</h2>
+  <Endpoint {...status} />
+
+  <h2>Ingest A — direct presigned upload</h2>
+  <p>Best for small/medium files: mint a presigned <code>PUT</code>, upload the whole file straight to object storage, then finalize. Bytes never pass through the API.</p>
+  <CodeBlock code={single} label="curl" />
+
+  <h2>Ingest B — multipart (large files)</h2>
+  <p>S3-style multipart for large or chunked uploads: begin → presign each part → complete. The <code>complete</code> call finalizes the object and starts the pipeline itself.</p>
+  <CodeBlock code={multipart} label="curl" />
+
+  <h2>Ingest C — resumable (TUS)</h2>
+  <p>For browser uploads that must survive flaky networks or page reloads, use the <b>TUS protocol</b> against <code>tusd</code> at <code>/files/</code> (not a gateway route). Send TUS metadata <code>videoId=&lt;vid_…&gt;</code> and <code>uploadToken=&lt;token from create&gt;</code>. tusd stores the object and calls a secret-gated completion hook that binds the upload to the video via that one-time token — a wrong or absent <code>uploadToken</code> is silently ignored, which is what keeps uploads tenant-isolated.</p>
+  <div class="note">Use any TUS client (e.g. <code>tus-js-client</code>) pointed at <code>https://&lt;your-host&gt;/files/</code>. Next: <a href="/docs/processing">Processing &amp; AI</a> covers what happens after the bytes land.</div>
+</DocsLayout>

@@ -6,10 +6,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL('/og-image.png', Astro.site).href;
 const nav = [
   { href: '/#capabilities', label: 'Platform' },
-  { href: '/#pipeline', label: 'Pipeline' },
-  { href: '/#agents', label: 'Agents' },
-  { href: '/docs/edge-functions', label: 'Docs' },
+  { href: '/docs', label: 'Docs' },
   { href: '/pricing', label: 'Pricing' },
+  { href: 'https://login.ollanode.com', label: 'Dashboard' },
 ];
 ---
 <!doctype html>

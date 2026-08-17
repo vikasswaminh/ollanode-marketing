@@ -1,0 +1,119 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const authHeader = `# either header works; a bearer key or a dashboard session token
+curl https://api.ollanode.com/v1/whoami -H "Authorization: Bearer vbk_..."
+curl https://api.ollanode.com/v1/whoami -H "x-api-key: vbk_..."`;
+
+const keys = [
+  {
+    method: 'POST', path: '/v1/api-keys', scope: 'admin',
+    desc: 'Create a key. Role presets: `owner` → `[admin]`; `agent` → `[read,write]` (actor_type=agent, and forbidden from holding admin); `viewer` → `[read]`; default → `[read,write]`. Add least-privilege grants with `extra_scopes`, and constrain with `expires_in_secs`, `allowed_ip`, and `daily_request_limit`. The secret is shown once.',
+    curl: `curl -X POST https://api.ollanode.com/v1/api-keys \\
+  -H "Authorization: Bearer $SESSION" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"ci-agent","role":"agent",
+       "extra_scopes":["videos:read","zones:purge"],
+       "expires_in_secs":86400,"allowed_ip":"203.0.113.7",
+       "daily_request_limit":5000}'`,
+    response: `{ "id":"key_...", "name":"ci-agent", "prefix":"vbk_1234abcd...",
+  "scopes":["read","write"], "extra_scopes":["videos:read","zones:purge"],
+  "actor_type":"agent", "expires_at":"...", "daily_request_limit":5000,
+  "key":"vbk_<48 hex — shown once>" }`,
+    responseLabel: '201 (secret shown once)',
+    useCases: ['Mint a short-lived, IP-pinned, quota-capped key for an AI agent or CI job.', 'Issue a read-only key (`role:"viewer"`) for a reporting dashboard.'],
+  },
+  {
+    method: 'GET', path: '/v1/api-keys', scope: 'admin',
+    desc: 'List keys for the project. Secrets are never returned — only the id, name, `prefix`, scopes, and lifecycle fields.',
+    curl: `curl https://api.ollanode.com/v1/api-keys -H "Authorization: Bearer $SESSION"`,
+  },
+  {
+    method: 'DELETE', path: '/v1/api-keys/{id}', scope: 'admin',
+    desc: 'Revoke a key. Revocation is immediate — the per-request prefix lookup filters revoked keys on the very next call.',
+    curl: `curl -X DELETE https://api.ollanode.com/v1/api-keys/key_abc -H "Authorization: Bearer $SESSION"`,
+    useCases: ['Rotate a key by creating a new one, then revoking the old — there is no dedicated rotate endpoint for API keys.'],
+  },
+];
+---
+<DocsLayout active="authentication" title="Authentication & scopes — Ollanode Docs" description="API keys, roles, the fine-grained resource:action scope model, errors, idempotency, rate limits, and pagination.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Getting started</span>
+    <h1>Authentication &amp; scopes</h1>
+    <p class="lede">How you authenticate, what a key is allowed to do, and the cross-cutting conventions — errors, idempotency, rate limits, and pagination — that every endpoint follows.</p>
+  </div>
+
+  <h2>Credentials</h2>
+  <p>Send a bearer credential on every request: a <code>vbk_</code> <b>API key</b> (Argon2id-verified, created in the dashboard) or a <b>session token</b> from login. Both go in <code>Authorization: Bearer …</code>; the <code>x-api-key</code> header is also accepted. API keys show their secret only once at creation — only a hash and a 16-char prefix are stored.</p>
+  <CodeBlock code={authHeader} label="curl" />
+
+  <h2>API keys</h2>
+  <p>Key management requires the coarse <code>admin</code> scope and is <b>human-only</b> — agent keys can never manage keys.</p>
+  {keys.map((e) => <Endpoint {...e} />)}
+
+  <h2>Roles</h2>
+  <p>Human users hold one org role, which derives their coarse scopes. Owner-only powers (delete org, transfer ownership) key off the project's owner marker, so owner and admin share scopes.</p>
+  <div class="docs-table-wrap">
+    <table>
+      <thead><tr><th>Role</th><th>Coarse scopes</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>owner</code></td><td><code>read, write, admin</code></td><td>Plus org delete &amp; ownership transfer</td></tr>
+        <tr><td><code>admin</code></td><td><code>read, write, admin</code></td><td>Team, keys, approvals decisions</td></tr>
+        <tr><td><code>member</code></td><td><code>read, write</code></td><td>Product work, no admin</td></tr>
+        <tr><td><code>viewer</code></td><td><code>read</code></td><td>Read-only</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Scopes: coarse and fine-grained</h2>
+  <p>A call is authorized if the key has the coarse <code>admin</code> scope, <b>or</b> the exact fine-grained <code>resource:action</code> grant (or a <code>resource:*</code> wildcard), <b>or</b> the matching coarse preset — <code>read</code> satisfies any read/list/get; <code>write</code> satisfies every other action. So document the fine-grained scope as the least-privilege grant; a broad <code>write</code>/<code>read</code> key also passes.</p>
+  <div class="docs-table-wrap">
+    <table>
+      <thead><tr><th>Resource</th><th>Fine-grained scopes</th></tr></thead>
+      <tbody>
+        <tr><td>Videos &amp; libraries</td><td><code>videos:read</code> · <code>videos:write</code> · <code>videos:delete</code> · <code>libraries:write</code> · <code>libraries:delete</code></td></tr>
+        <tr><td>CDN zones</td><td><code>zones:write</code> · <code>zones:purge</code> · <code>zones:rotate</code> · <code>zones:delete</code></td></tr>
+        <tr><td>Storage</td><td><code>storage:read</code> · <code>storage:write</code> · <code>storage:delete</code></td></tr>
+        <tr><td>DNS</td><td><code>dns:read</code> · <code>dns:write</code> · <code>dns:delete</code></td></tr>
+        <tr><td>Edge functions</td><td><code>functions:read</code> · <code>functions:write</code> · <code>functions:delete</code></td></tr>
+        <tr><td>KV store</td><td><code>kv:read</code> · <code>kv:write</code></td></tr>
+        <tr><td>Webhooks / analytics / logs</td><td><code>webhooks:read</code> · <code>webhooks:write</code> · <code>analytics:read</code> · <code>logs:read</code></td></tr>
+        <tr><td>Governance</td><td><code>approvals:create</code> · <code>approvals:read</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><b>Human-only</b> pseudo-scopes — <code>team:write</code>, <code>keys:write</code>, <code>org:delete</code> — appear in the capability map but can never be granted to an agent key. See <a href="/docs/agents">AI agents &amp; governance</a>.</div>
+
+  <h2>Errors</h2>
+  <p>Every error is a stable JSON body — <code>{'{ "error": { "code", "message" } }'}</code> — with a conventional status. Internal errors never leak detail.</p>
+  <div class="docs-table-wrap">
+    <table>
+      <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>400</code></td><td>Validation — malformed or invalid input</td></tr>
+        <tr><td><code>401</code></td><td>Unauthorized — missing/invalid/expired credential</td></tr>
+        <tr><td><code>403</code></td><td>Forbidden — authenticated but not allowed (or human-only)</td></tr>
+        <tr><td><code>404</code></td><td>Not found (also cross-tenant isolation)</td></tr>
+        <tr><td><code>409</code></td><td>Conflict — e.g. owner can't self-delete before handling the org</td></tr>
+        <tr><td><code>429</code></td><td>Rate limited — see <code>Retry-After</code></td></tr>
+        <tr><td><code>202</code></td><td>Approval pending — an agent action is queued for a human</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Idempotency</h2>
+  <p>Send an <code>Idempotency-Key</code> header on any <code>POST/PATCH/PUT/DELETE</code>. It's DB-backed and keyed by caller + method + path + query + body digest: a retry replays the original 2xx (response carries <code>idempotency-replayed: true</code>), a concurrent duplicate gets <code>409</code>, and the same key with a different body gets <code>422</code>.</p>
+  <CodeBlock code={'curl -X POST https://api.ollanode.com/v1/videos \\\n  -H "Authorization: Bearer $OLLANODE_API_KEY" \\\n  -H "Idempotency-Key: 3f9c-launch-video" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"title":"Launch"}\''} label="curl" />
+
+  <h2>Rate limits</h2>
+  <p>Requests are token-bucketed per key (or per IP for unauthenticated calls). Every response carries <code>X-RateLimit-Limit</code> and <code>X-RateLimit-Remaining</code>; a <code>429</code> also sets <code>Retry-After</code> and <code>X-RateLimit-Reset</code> (seconds). Per-key daily caps surface as <code>429</code> too.</p>
+
+  <h2>Request IDs</h2>
+  <p>Pass <code>X-Request-Id</code> to correlate a call across logs and audit, or read the one the API mints back on every response (including errors). Audit entries store it.</p>
+
+  <h2>Pagination</h2>
+  <p>Collection <code>GET</code>s take <code>?limit=</code> (default 25, max 100) and <code>?offset=</code>, and return <code>{'{ items, total, limit, offset }'}</code>. Storage <b>file</b> listing is the one cursor-based exception (<code>?cursor=</code> → <code>next_cursor</code>).</p>
+  <CodeBlock code={'curl "https://api.ollanode.com/v1/videos?limit=25&offset=50" \\\n  -H "Authorization: Bearer $OLLANODE_API_KEY"'} label="curl" />
+</DocsLayout>
