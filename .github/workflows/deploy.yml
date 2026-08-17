@@ -1,0 +1,35 @@
+name: deploy
+
+# Push to `main` -> build on the NH self-hosted runner (LXC 505, label nh-marketing)
+# and publish to the Cloudflare Pages project `ollanode-marketing`. Managed by NH Ops.
+# wrangler is invoked via npx (NOT cloudflare/wrangler-action, which mis-selects bun on this runner).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, nh-marketing]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          npm ci || npm install
+          npm run build
+
+      - name: Deploy to Cloudflare Pages
+        if: github.ref == 'refs/heads/main'
+        run: npx --yes wrangler@4 pages deploy dist --project-name ollanode-marketing --branch main --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
