@@ -2,10 +2,12 @@
 import Site from '../layouts/Site.astro';
 ---
 <Site title="404 — Page not found · Ollanode" description="The page you were looking for does not exist.">
-  <section class="mx-auto flex max-w-content flex-col items-center justify-center gap-6 px-6 py-32 text-center">
-    <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent">Error 404</p>
-    <h1 class="text-4xl font-semibold tracking-tight text-paper sm:text-5xl">Page not found</h1>
-    <p class="max-w-md text-paper-muted">The page you were looking for doesn’t exist or has moved.</p>
-    <a href="/" class="chamfer-sm bg-paper px-5 py-2.5 font-mono text-xs font-medium uppercase tracking-wide text-ink transition-opacity hover:opacity-80">Back to home</a>
+  <section class="band dot-bg" style="text-align:center">
+    <div class="wrap" style="max-width:560px;display:flex;flex-direction:column;align-items:center;gap:18px">
+      <span class="eyebrow">Error 404</span>
+      <h1 style="font-size:clamp(2.4rem,6vw,3.4rem)">Page not found</h1>
+      <p class="lede" style="color:var(--muted)">The page you were looking for doesn’t exist or has moved.</p>
+      <a class="btn btn-primary btn-lg chamfer-sm" href="/">Back to home</a>
+    </div>
   </section>
 </Site>
