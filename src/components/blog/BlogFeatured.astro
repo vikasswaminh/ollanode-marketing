@@ -1,0 +1,90 @@
+---
+import type { BlogArticle } from '../../data/blogArticles';
+
+interface Props {
+  mainFeatured: BlogArticle;
+  secondaryFeatured: BlogArticle[];
+}
+
+const { mainFeatured, secondaryFeatured } = Astro.props;
+---
+
+<section class="blog-featured-sec" id="featured">
+  <div class="wrap">
+    <div class="sec-head-sm">
+      <span class="eyebrow">EDITORIAL SPOTLIGHT</span>
+      <h2>Featured Infrastructure Insights</h2>
+    </div>
+
+    <div class="blog-featured-grid">
+      <!-- LEFT MAIN FEATURED HERO CARD -->
+      <article class="featured-main-card" data-category={mainFeatured.category} data-title={mainFeatured.title.toLowerCase()} data-excerpt={mainFeatured.excerpt.toLowerCase()}>
+        <div class="featured-visual-banner" style={`background: ${mainFeatured.gradient}`}>
+          <div class="banner-icon-bg" set:html={mainFeatured.iconSvg} />
+          <span class="featured-main-badge">★ MAIN FEATURE</span>
+          <span class="cat-pill">{mainFeatured.category}</span>
+        </div>
+
+        <div class="featured-main-body">
+          <div class="article-meta">
+            <span class="meta-date">{mainFeatured.date}</span>
+            <span class="meta-dot">•</span>
+            <span class="meta-time">{mainFeatured.readingTime}</span>
+          </div>
+
+          <h3 class="featured-main-h3">
+            <a href={`/blog/${mainFeatured.slug}`}>{mainFeatured.title}</a>
+          </h3>
+
+          <p class="featured-main-excerpt">{mainFeatured.excerpt}</p>
+
+          <div class="tags-row">
+            {mainFeatured.tags.map((tag) => (
+              <span class="tag-chip">#{tag}</span>
+            ))}
+          </div>
+
+          <div class="author-footer">
+            <div class="author-avatar">{mainFeatured.author.avatar}</div>
+            <div class="author-info">
+              <span class="author-name">{mainFeatured.author.name}</span>
+              <span class="author-role">{mainFeatured.author.role}</span>
+            </div>
+            <a href={`/blog/${mainFeatured.slug}`} class="read-btn">Read Article →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- RIGHT SECONDARY FEATURED SIDEBAR -->
+      <div class="featured-secondary-col">
+        {secondaryFeatured.map((art) => (
+          <article class="featured-side-card" data-category={art.category} data-title={art.title.toLowerCase()} data-excerpt={art.excerpt.toLowerCase()}>
+            <div class="side-visual" style={`background: ${art.gradient}`}>
+              <div class="side-icon" set:html={art.iconSvg} />
+              <span class="cat-pill-sm">{art.category}</span>
+            </div>
+
+            <div class="side-content">
+              <div class="article-meta-sm">
+                <span>{art.date}</span>
+                <span>•</span>
+                <span>{art.readingTime}</span>
+              </div>
+
+              <h4 class="side-h4">
+                <a href={`/blog/${art.slug}`}>{art.title}</a>
+              </h4>
+
+              <p class="side-excerpt">{art.excerpt}</p>
+
+              <div class="author-mini">
+                <span class="author-mini-name">By {art.author.name}</span>
+                <a href={`/blog/${art.slug}`} class="read-link-sm">Read →</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

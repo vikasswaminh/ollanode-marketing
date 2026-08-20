@@ -1,0 +1,205 @@
+---
+import type { BlogArticle } from '../../data/blogArticles';
+import { BLOG_CATEGORIES } from '../../data/blogArticles';
+
+interface Props {
+  articles: BlogArticle[];
+}
+
+const { articles } = Astro.props;
+---
+
+<section class="blog-archive-sec" id="articles">
+  <div class="wrap">
+    <!-- CATEGORY FILTER TABS -->
+    <div class="category-filter-wrap">
+      <div class="category-scroll-container">
+        <div class="category-filter-list" role="tablist" aria-label="Blog categories">
+          {BLOG_CATEGORIES.map((cat, idx) => (
+            <button
+              class={`cat-tab ${idx === 0 ? 'active' : ''}`}
+              data-category={cat}
+              role="tab"
+              aria-selected={idx === 0 ? 'true' : 'false'}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="results-meta">
+        <span id="results-count-text">Showing all {articles.length} articles</span>
+      </div>
+    </div>
+
+    <!-- ARTICLE CARDS ARCHIVE GRID -->
+    <div class="blog-grid" id="blog-articles-grid">
+      {articles.map((art) => (
+        <article
+          class="blog-card"
+          data-category={art.category}
+          data-title={art.title.toLowerCase()}
+          data-excerpt={art.excerpt.toLowerCase()}
+          data-tags={art.tags.join(' ').toLowerCase()}
+        >
+          <div class="card-image-banner" style={`background: ${art.gradient}`}>
+            <div class="card-icon" set:html={art.iconSvg} />
+            <span class="card-cat-badge">{art.category}</span>
+          </div>
+
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="meta-date">{art.date}</span>
+              <span class="meta-dot">•</span>
+              <span class="meta-time">{art.readingTime}</span>
+            </div>
+
+            <h3 class="card-h3">
+              <a href={`/blog/${art.slug}`}>{art.title}</a>
+            </h3>
+
+            <p class="card-excerpt">{art.excerpt}</p>
+
+            <div class="card-tags">
+              {art.tags.map((tag) => (
+                <span class="tag-pill">#{tag}</span>
+              ))}
+            </div>
+
+            <div class="card-author-row">
+              <div class="author-avatar-sm">{art.author.avatar}</div>
+              <div class="author-details">
+                <span class="author-name">{art.author.name}</span>
+                <span class="author-role">{art.author.role}</span>
+              </div>
+              <a href={`/blog/${art.slug}`} class="card-read-link">Read →</a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <!-- EMPTY SEARCH STATE -->
+    <div id="blog-empty-state" class="blog-empty-card" style="display: none;">
+      <div class="empty-icon">🔍</div>
+      <h3 class="empty-h3">No matching articles found</h3>
+      <p class="empty-p">We couldn't find any articles matching your search query or category filter. Try clearing your search or picking a different topic.</p>
+      <button id="reset-filters-btn" class="btn btn-primary chamfer-sm">
+        Reset Search &amp; Filters
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- REAL-TIME CLIENT-SIDE SEARCH & CATEGORY FILTERING SCRIPT -->
+<script is:inline>
+  (function () {
+    var searchInput = document.getElementById('blog-search-input');
+    var searchClear = document.getElementById('blog-search-clear');
+    var catTabs = document.querySelectorAll('.cat-tab');
+    var articles = document.querySelectorAll('.blog-card, .featured-main-card, .featured-side-card');
+    var emptyState = document.getElementById('blog-empty-state');
+    var countText = document.getElementById('results-count-text');
+    var resetBtn = document.getElementById('reset-filters-btn');
+
+    var currentCategory = 'All';
+    var currentQuery = '';
+
+    function filterArticles() {
+      var visibleCount = 0;
+      var totalArticles = articles.length;
+
+      articles.forEach(function (card) {
+        var cardCat = card.getAttribute('data-category') || '';
+        var cardTitle = card.getAttribute('data-title') || '';
+        var cardExcerpt = card.getAttribute('data-excerpt') || '';
+        var cardTags = card.getAttribute('data-tags') || '';
+
+        var matchesCategory = currentCategory === 'All' || cardCat.toLowerCase() === currentCategory.toLowerCase();
+        var matchesQuery = !currentQuery || 
+          cardTitle.indexOf(currentQuery) !== -1 || 
+          cardExcerpt.indexOf(currentQuery) !== -1 || 
+          cardCat.toLowerCase().indexOf(currentQuery) !== -1 ||
+          cardTags.indexOf(currentQuery) !== -1;
+
+        if (matchesCategory && matchesQuery) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (emptyState) {
+        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+
+      if (countText) {
+        if (currentCategory === 'All' && !currentQuery) {
+          countText.textContent = 'Showing all ' + totalArticles + ' articles';
+        } else {
+          countText.textContent = 'Showing ' + visibleCount + ' of ' + totalArticles + ' articles';
+        }
+      }
+    }
+
+    // Category Tabs Event Listeners
+    catTabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        catTabs.forEach(function (t) {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        currentCategory = tab.getAttribute('data-category') || 'All';
+        filterArticles();
+      });
+    });
+
+    // Search Input Event Listener
+    if (searchInput) {
+      searchInput.addEventListener('input', function (e) {
+        currentQuery = (e.target.value || '').trim().toLowerCase();
+        if (searchClear) {
+          searchClear.style.display = currentQuery ? 'block' : 'none';
+        }
+        filterArticles();
+      });
+    }
+
+    // Clear Search Button
+    if (searchClear && searchInput) {
+      searchClear.addEventListener('click', function () {
+        searchInput.value = '';
+        currentQuery = '';
+        searchClear.style.display = 'none';
+        filterArticles();
+      });
+    }
+
+    // Reset Filters Button
+    if (resetBtn && searchInput) {
+      resetBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        currentQuery = '';
+        if (searchClear) searchClear.style.display = 'none';
+
+        catTabs.forEach(function (t, idx) {
+          if (idx === 0) {
+            t.classList.add('active');
+            t.setAttribute('aria-selected', 'true');
+          } else {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          }
+        });
+
+        currentCategory = 'All';
+        filterArticles();
+      });
+    }
+  })();
+</script>
