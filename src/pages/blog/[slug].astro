@@ -1,0 +1,116 @@
+---
+import Site from '../../layouts/Site.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('blog');
+  return articles.map((article) => ({
+    params: { slug: article.slug || article.id },
+    props: { article },
+  }));
+}
+
+interface Props {
+  article: CollectionEntry<'blog'>;
+}
+
+const { article } = Astro.props;
+const { Content } = await article.render();
+
+const allArticles = await getCollection('blog');
+const relatedArticles = allArticles
+  .filter((a) => a.id !== article.id && (a.data.category === article.data.category || a.data.tags.some((t) => article.data.tags.includes(t))))
+  .slice(0, 3);
+---
+
+<Site
+  title={`${article.data.title} — Ollanode Blog`}
+  description={article.data.excerpt}
+>
+  <article class="post-detail-sec">
+    <!-- POST HERO HEADER -->
+    <header class="post-hero" style="background: #FFFDFB;">
+      <div class="wrap">
+        <a href="/blog" class="back-link">← Back to Blog</a>
+
+        <div class="post-hero-body">
+          <div class="post-meta">
+            <span class="cat-pill">{article.data.category}</span>
+            <span class="meta-dot">•</span>
+            <span>{article.data.publishedDate}</span>
+            <span class="meta-dot">•</span>
+            <span>{article.data.readingTime}</span>
+          </div>
+
+          <h1 class="post-title">{article.data.title}</h1>
+
+          <p class="post-excerpt-lead">{article.data.excerpt}</p>
+
+          <div class="post-author-box">
+            <div class="author-avatar">{article.data.author.avatar || '⚡'}</div>
+            <div class="author-info">
+              <span class="author-name">{article.data.author.name}</span>
+              <span class="author-role">{article.data.author.role}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {article.data.image && (
+      <div class="post-hero-banner-wrap">
+        <div class="wrap">
+          <img src={article.data.image} alt={article.data.title} class="post-hero-banner-img" />
+        </div>
+      </div>
+    )}
+
+    <!-- COMPLETE RENDERED MARKDOWN ARTICLE CONTENT -->
+    <div class="post-body-container">
+      <div class="wrap">
+        <div class="post-body-grid">
+          <div class="post-content-main prose">
+            <Content />
+          </div>
+
+          {article.data.tags && article.data.tags.length > 0 && (
+            <div class="post-tags-footer">
+              <span class="tags-label">Tags:</span>
+              {article.data.tags.map((tag) => (
+                <span class="tag-chip">#{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </article>
+
+  {relatedArticles.length > 0 && (
+    <!-- RELATED ARTICLES -->
+    <section class="related-sec">
+      <div class="wrap">
+        <div class="sec-head-sm">
+          <span class="eyebrow">CONTINUE READING</span>
+          <h2>Related Engineering Insights</h2>
+        </div>
+
+        <div class="newest-grid">
+          {relatedArticles.map((art) => (
+            <article class="grid-card">
+              <span class="pill-badge pill-category-sm">{art.data.category}</span>
+              <h3 class="grid-card-title">
+                <a href={`/blog/${art.slug || art.id}`}>{art.data.title}</a>
+              </h3>
+              <p class="grid-card-excerpt">{art.data.excerpt}</p>
+              <div class="grid-card-footer">
+                <span class="grid-card-readtime">{art.data.readingTime}</span>
+                <a href={`/blog/${art.slug || art.id}`} class="read-more-sm">Read →</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</Site>
