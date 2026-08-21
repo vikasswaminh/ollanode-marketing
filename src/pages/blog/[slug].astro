@@ -15,12 +15,15 @@ interface Props {
 }
 
 const { article } = Astro.props;
-const { Content } = await article.render();
+const { Content, headings } = await article.render();
 
+// Extract H2 headings for the "ON THIS PAGE" sticky left sidebar
+const tocHeadings = headings.filter((h) => h.depth === 2 && h.slug !== 'table-of-contents');
+
+// Fetch related articles for the "RELATED READING" sticky right sidebar
 const allArticles = await getCollection('blog');
-const relatedArticles = allArticles
-  .filter((a) => a.id !== article.id && (a.data.category === article.data.category || a.data.tags.some((t) => article.data.tags.includes(t))))
-  .slice(0, 3);
+const otherArticles = allArticles.filter((a) => a.id !== article.id);
+const relatedArticles = (otherArticles.length > 0 ? otherArticles : allArticles).slice(0, 5);
 ---
 
 <Site
@@ -29,7 +32,7 @@ const relatedArticles = allArticles
 >
   <article class="post-detail-sec">
     <!-- POST HERO HEADER -->
-    <header class="post-hero" style="background: #FFFDFB;">
+    <header class="post-hero">
       <div class="wrap">
         <a href="/blog" class="back-link">← Back to Blog</a>
 
@@ -65,52 +68,70 @@ const relatedArticles = allArticles
       </div>
     )}
 
-    <!-- COMPLETE RENDERED MARKDOWN ARTICLE CONTENT -->
+    <!-- COMPLETE 3-COLUMN POST DETAIL LAYOUT GRID -->
     <div class="post-body-container">
-      <div class="wrap">
-        <div class="post-body-grid">
-          <div class="post-content-main prose">
-            <Content />
-          </div>
+      <div class="wrap post-detail-max-wrap">
+        <div class="post-detail-grid">
 
-          {article.data.tags && article.data.tags.length > 0 && (
-            <div class="post-tags-footer">
-              <span class="tags-label">Tags:</span>
-              {article.data.tags.map((tag) => (
-                <span class="tag-chip">#{tag}</span>
-              ))}
+          <!-- 1. LEFT SIDEBAR: STICKY "ON THIS PAGE" TABLE OF CONTENTS -->
+          <aside class="post-sidebar-left">
+            <div class="toc-card">
+              <div class="toc-badge">ON THIS PAGE</div>
+              <nav class="toc-nav">
+                {tocHeadings.length > 0 ? (
+                  <ul>
+                    {tocHeadings.map((h) => (
+                      <li>
+                        <a href={`#${h.slug}`} class="toc-link">
+                          {h.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p class="toc-empty">Overview &amp; details</p>
+                )}
+              </nav>
             </div>
-          )}
+          </aside>
+
+          <!-- 2. CENTER COLUMN: ARTICLE BODY CONTENT -->
+          <main class="post-content-main prose">
+            <Content />
+
+            {article.data.tags && article.data.tags.length > 0 && (
+              <div class="post-tags-footer">
+                <span class="tags-label">Tags:</span>
+                {article.data.tags.map((tag) => (
+                  <span class="tag-chip">#{tag}</span>
+                ))}
+              </div>
+            )}
+          </main>
+
+          <!-- 3. RIGHT SIDEBAR: STICKY "RELATED READING" CARDS -->
+          <aside class="post-sidebar-right">
+            <div class="related-sidebar-card">
+              <div class="related-badge">RELATED READING</div>
+              <div class="related-sidebar-list">
+                {relatedArticles.map((art) => (
+                  <article class="related-mini-card">
+                    <span class="related-mini-cat">{art.data.category}</span>
+                    <h4 class="related-mini-title">
+                      <a href={`/blog/${art.slug || art.id}`}>{art.data.title}</a>
+                    </h4>
+                    <div class="related-mini-footer">
+                      <span class="related-mini-time">{art.data.readingTime}</span>
+                      <a href={`/blog/${art.slug || art.id}`} class="related-mini-arrow">Read →</a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </aside>
+
         </div>
       </div>
     </div>
   </article>
-
-  {relatedArticles.length > 0 && (
-    <!-- RELATED ARTICLES -->
-    <section class="related-sec">
-      <div class="wrap">
-        <div class="sec-head-sm">
-          <span class="eyebrow">CONTINUE READING</span>
-          <h2>Related Engineering Insights</h2>
-        </div>
-
-        <div class="newest-grid">
-          {relatedArticles.map((art) => (
-            <article class="grid-card">
-              <span class="pill-badge pill-category-sm">{art.data.category}</span>
-              <h3 class="grid-card-title">
-                <a href={`/blog/${art.slug || art.id}`}>{art.data.title}</a>
-              </h3>
-              <p class="grid-card-excerpt">{art.data.excerpt}</p>
-              <div class="grid-card-footer">
-                <span class="grid-card-readtime">{art.data.readingTime}</span>
-                <a href={`/blog/${art.slug || art.id}`} class="read-more-sm">Read →</a>
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
 </Site>
