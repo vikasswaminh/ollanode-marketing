@@ -53,13 +53,12 @@ export async function getRightSidebarArticles(): Promise<BlogEntry[]> {
 
 export const OLLANODE_BLOG_CATEGORIES = [
   'All',
-  'AI',
-  'Infrastructure',
+  'Guides',
+  'Comparisons',
+  'Video & CDN',
+  'AI & Agents',
   'Engineering',
-  'Cloud',
-  'Video',
-  'CDN',
-  'Developer Tools',
-  'Security',
-  'Product',
+  'Security, Edge & Performance',
+  'Product & Changelog',
 ] as const;
+
