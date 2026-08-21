@@ -3,14 +3,12 @@ import {
   getAllBlogArticles,
   getFeaturedBlogArticle,
   getLeftSidebarArticles,
-  getRightSidebarArticles,
   OLLANODE_BLOG_CATEGORIES,
 } from '../../data/blogArticles';
 
 const articles = await getAllBlogArticles();
 const mainFeatured = await getFeaturedBlogArticle();
 const leftSidebarArticles = await getLeftSidebarArticles();
-const rightSidebarArticles = await getRightSidebarArticles();
 const gridArticles = mainFeatured
   ? articles.filter((a) => a.id !== mainFeatured.id)
   : articles;
@@ -18,20 +16,38 @@ const gridArticles = mainFeatured
 
 <div class="blog-page-wrapper">
   
-  <!-- CATEGORY STRIP BELOW HEADER -->
+  <!-- CATEGORY STRIP BELOW HEADER WITH RIGHT-ALIGNED SEARCH BAR -->
   <div class="blog-category-strip">
     <div class="net-blog-container">
-      <div class="category-strip-inner" role="tablist" aria-label="Blog categories">
-        {OLLANODE_BLOG_CATEGORIES.map((cat, idx) => (
-          <button
-            class={`cat-strip-btn ${idx === 0 ? 'active' : ''}`}
-            data-category={cat}
-            role="tab"
-            aria-selected={idx === 0 ? 'true' : 'false'}
-          >
-            {cat}
-          </button>
-        ))}
+      <div class="category-strip-inner">
+        <!-- LEFT: CATEGORIES NAVIGATION -->
+        <div class="cat-strip-links" role="tablist" aria-label="Blog categories">
+          {OLLANODE_BLOG_CATEGORIES.map((cat, idx) => (
+            <button
+              class={`cat-strip-btn ${idx === 0 ? 'active' : ''}`}
+              data-category={cat}
+              role="tab"
+              aria-selected={idx === 0 ? 'true' : 'false'}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <!-- RIGHT: SEARCH BAR -->
+        <div class="blog-search-wrap">
+          <svg class="blog-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            id="blog-search-input"
+            class="blog-search-input"
+            placeholder="Search articles..."
+            aria-label="Search articles"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -41,7 +57,7 @@ const gridArticles = mainFeatured
     <div class="net-blog-container">
       <div class="net-blog-grid">
 
-        <!-- LEFT COLUMN: FEATURED INSIGHTS -->
+        <!-- LEFT COLUMN: FEATURED INSIGHTS (STICKY) -->
         <aside class="net-col-left">
           <div class="pill-badge pill-orange">FEATURED</div>
           
@@ -73,7 +89,7 @@ const gridArticles = mainFeatured
           <!-- LATEST ARTICLES BADGE STRIP -->
           <div class="section-label-strip">
             <span class="pill-badge pill-orange-filled">🔥 LATEST ARTICLES</span>
-            <span class="strip-text">Showing {articles.length} article{articles.length === 1 ? '' : 's'}</span>
+            <span class="strip-text" id="article-count-label">Showing {articles.length} article{articles.length === 1 ? '' : 's'}</span>
           </div>
 
           <!-- HERO FEATURED ARTICLE CARD (Automatic from Content Collection) -->
@@ -145,69 +161,97 @@ const gridArticles = mainFeatured
             ))}
           </div>
 
-          <!-- EMPTY CATEGORY FILTER STATE -->
+          <!-- EMPTY CATEGORY / SEARCH FILTER STATE -->
           <div id="blog-empty-state" class="blog-empty-card" style="display: none;">
-            <div class="empty-icon">📂</div>
-            <h3 class="empty-h3">No articles in this category</h3>
-            <p class="empty-p">No articles published in the selected category yet.</p>
-            <button id="reset-filters-btn" class="reset-btn">Show All Categories</button>
+            <div class="empty-icon">🔍</div>
+            <h3 class="empty-h3">No matching articles found</h3>
+            <p class="empty-p">Try adjusting your search query or selecting a different category filter.</p>
+            <button id="reset-filters-btn" class="reset-btn">Clear Search &amp; Show All</button>
           </div>
 
         </main>
 
-        <!-- RIGHT COLUMN: AI & EDGE -->
+        <!-- RIGHT COLUMN: RESTRUCTURED STICKY SIDEBAR -->
         <aside class="net-col-right">
-          <div class="pill-badge pill-purple">AI &amp; EDGE</div>
-          
-          {rightSidebarArticles.length > 0 ? (
-            <ul class="net-link-list">
-              {rightSidebarArticles.map((item) => (
-                <li>
-                  <a href={`/blog/${item.slug || item.id}`} class="net-link">{item.data.title}</a>
-                </li>
-              ))}
+          <!-- A. QUICK JUMP LINKS -->
+          <div class="right-sidebar-block">
+            <div class="pill-badge pill-purple">QUICK JUMP</div>
+            <ul class="capsule-grid">
+              <li><a href="/#platform-capabilities" class="capsule-link">Video</a></li>
+              <li><a href="/docs/cdn" class="capsule-link">CDN &amp; Delivery</a></li>
+              <li><a href="/#agent-native" class="capsule-link">AI &amp; Agents</a></li>
+              <li><a href="/docs/edge-functions" class="capsule-link">Edge</a></li>
+              <li><a href="/#how-it-works" class="capsule-link">Engineering</a></li>
+              <li><a href="/docs" class="capsule-link">Security</a></li>
+              <li><a href="/#delivery-edge" class="capsule-link">Performance</a></li>
+              <li><a href="/#start" class="capsule-link">Updates</a></li>
             </ul>
-          ) : (
-            <ul class="net-link-list">
-              <li><span class="net-link-placeholder">No AI &amp; Edge articles yet</span></li>
-            </ul>
-          )}
+          </div>
 
-          <div class="right-col-bottom">
-            <a href="/docs/edge-functions" class="view-all-purple">Explore Edge Functions</a>
-            <a href="mailto:hello@ollanode.com" class="btn-counselling">+ Contact Engineering</a>
+          <!-- B. PRICING SECTION -->
+          <div class="right-sidebar-block">
+            <div class="pill-badge pill-purple">PRICING</div>
+            <ul class="capsule-grid">
+              <li><a href="/pricing" class="capsule-link">Self-Host: Free</a></li>
+              <li><a href="/pricing" class="capsule-link">Managed: Custom</a></li>
+              <li><a href="/pricing" class="capsule-link">No Per-Min Fees</a></li>
+              <li><a href="/pricing" class="capsule-link">Apache-2.0 OSS</a></li>
+              <li><a href="/pricing" class="capsule-link">Unlimited Videos</a></li>
+              <li><a href="/pricing" class="capsule-link">View Tiers →</a></li>
+            </ul>
+          </div>
+
+
+          <!-- C. CONTACT SECTION -->
+          <div class="right-sidebar-block contact-card">
+            <div class="pill-badge pill-purple">CONTACT</div>
+            <a href="mailto:hello@ollanode.com" class="btn-contact-eng">Contact Engineering</a>
           </div>
         </aside>
+
 
       </div>
     </div>
   </section>
 </div>
 
-<!-- CLIENT-SIDE CATEGORY STRIP FILTERING SCRIPT -->
+<!-- CLIENT-SIDE COMBINED CATEGORY STRIP & SEARCH FILTERING SCRIPT -->
 <script is:inline>
   (function () {
     var catBtns = document.querySelectorAll('.cat-strip-btn');
     var itemCards = document.querySelectorAll('.blog-item-card');
     var emptyState = document.getElementById('blog-empty-state');
     var resetBtn = document.getElementById('reset-filters-btn');
+    var searchInput = document.getElementById('blog-search-input');
+    var countLabel = document.getElementById('article-count-label');
 
     var currentCategory = 'All';
+    var searchQuery = '';
 
     function filterArticles() {
       var visibleCount = 0;
+      var query = searchQuery.trim().toLowerCase();
 
       itemCards.forEach(function (card) {
-        var cat = card.getAttribute('data-category') || '';
-        var matchesCategory = currentCategory === 'All' || cat.toLowerCase() === currentCategory.toLowerCase();
+        var cat = (card.getAttribute('data-category') || '').toLowerCase();
+        var title = (card.getAttribute('data-title') || '').toLowerCase();
+        var excerpt = (card.getAttribute('data-excerpt') || '').toLowerCase();
+        var tags = (card.getAttribute('data-tags') || '').toLowerCase();
 
-        if (matchesCategory) {
+        var matchesCategory = (currentCategory === 'All') || (cat === currentCategory.toLowerCase());
+        var matchesSearch = !query || title.indexOf(query) !== -1 || excerpt.indexOf(query) !== -1 || cat.indexOf(query) !== -1 || tags.indexOf(query) !== -1;
+
+        if (matchesCategory && matchesSearch) {
           card.style.display = '';
           visibleCount++;
         } else {
           card.style.display = 'none';
         }
       });
+
+      if (countLabel) {
+        countLabel.textContent = 'Showing ' + visibleCount + ' article' + (visibleCount === 1 ? '' : 's');
+      }
 
       if (emptyState) {
         emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
@@ -227,9 +271,19 @@ const gridArticles = mainFeatured
       });
     });
 
+    if (searchInput) {
+      searchInput.addEventListener('input', function (e) {
+        searchQuery = e.target.value || '';
+        filterArticles();
+      });
+    }
+
     if (resetBtn) {
       resetBtn.addEventListener('click', function () {
         currentCategory = 'All';
+        searchQuery = '';
+        if (searchInput) searchInput.value = '';
+
         catBtns.forEach(function (b, idx) {
           if (idx === 0) {
             b.classList.add('active');
@@ -239,8 +293,10 @@ const gridArticles = mainFeatured
             b.setAttribute('aria-selected', 'false');
           }
         });
+
         filterArticles();
       });
     }
   })();
 </script>
+
