@@ -6,7 +6,7 @@ author:
   name: "The OllaNode Team"
   role: "Core Team"
   avatar: "⚡"
-publishedDate: "2026-08-24"
+publishedDate: "August 24, 2026"
 readingTime: "12 min read"
 tags: ["Guides", "VOD", "HLS", "Self-Hosted", "Storage", "CDN", "NATS"]
 featured: false

@@ -6,7 +6,7 @@ author:
   name: "The OllaNode Team"
   role: "Core Team"
   avatar: "⚡"
-publishedDate: "2026-08-21"
+publishedDate: "August 24, 2026"
 readingTime: "10 min read"
 tags: ["Comparison", "Mux Alternative", "Rust", "Apache-2.0", "Self-Hosted", "VOD", "Pricing"]
 featured: false

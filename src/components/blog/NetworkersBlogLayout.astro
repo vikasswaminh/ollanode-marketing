@@ -98,6 +98,7 @@ const gridArticles = mainFeatured
           {mainFeatured ? (
             <div
               class="hero-article-card blog-item-card"
+              data-href={`/blog/${mainFeatured.slug || mainFeatured.id}`}
               data-category={mainFeatured.data.category}
               data-title={mainFeatured.data.title.toLowerCase()}
               data-excerpt={mainFeatured.data.excerpt.toLowerCase()}
@@ -145,6 +146,7 @@ const gridArticles = mainFeatured
             {gridArticles.map((art) => (
               <article
                 class="grid-card blog-item-card"
+                data-href={`/blog/${art.slug || art.id}`}
                 data-category={art.data.category}
                 data-title={art.data.title.toLowerCase()}
                 data-excerpt={art.data.excerpt.toLowerCase()}
@@ -287,6 +289,16 @@ const gridArticles = mainFeatured
           emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
         }
       }
+
+      itemCards.forEach(function (card) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function (e) {
+          var href = card.getAttribute('data-href');
+          if (href && !e.target.closest('a')) {
+            window.location.href = href;
+          }
+        });
+      });
 
       catBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
