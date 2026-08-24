@@ -54,7 +54,7 @@ export async function getRightSidebarArticles(): Promise<BlogEntry[]> {
 export const OLLANODE_BLOG_CATEGORIES = [
   'All',
   'Guides',
-  'Comparisons',
+  'Comparison',
   'Video & CDN',
   'AI & Agents',
   'Engineering',
