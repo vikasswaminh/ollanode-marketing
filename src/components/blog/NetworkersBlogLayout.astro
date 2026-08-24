@@ -233,25 +233,25 @@ const gridArticles = mainFeatured
       var currentCategory = 'All';
       var searchQuery = '';
 
-      function isCategoryMatch(cardCat, selectedCategory) {
-        if (selectedCategory === 'All') return true;
-
-        var sel = selectedCategory.toLowerCase().trim();
-        var c = cardCat.toLowerCase().trim();
-
-        if (c === sel) return true;
-
-        // Normalize plural / singular (e.g. Comparison vs Comparisons)
-        if ((sel === 'comparison' || sel === 'comparisons') && (c === 'comparison' || c === 'comparisons')) {
-          return true;
+      function normalizeCat(str) {
+        if (!str) return '';
+        var s = str.toLowerCase()
+          .replace(/&amp;/g, 'and')
+          .replace(/&/g, 'and')
+          .replace(/[^a-z0-9]/g, '')
+          .trim();
+        if (s.endsWith('s') && s.length > 3) {
+          s = s.slice(0, -1);
         }
+        return s;
+      }
 
-        // Normalize ampersand & spacing
-        var normSel = sel.replace(/&/g, 'and').replace(/\s+/g, ' ');
-        var normC = c.replace(/&/g, 'and').replace(/\s+/g, ' ');
-        if (normC === normSel) return true;
-
-        return false;
+      function isCategoryMatch(cardCat, selectedCategory) {
+        if (!selectedCategory || selectedCategory.toLowerCase().trim() === 'all') return true;
+        var normSel = normalizeCat(selectedCategory);
+        var normCard = normalizeCat(cardCat);
+        if (!normSel || !normCard) return false;
+        return normCard === normSel || normCard.indexOf(normSel) !== -1 || normSel.indexOf(normCard) !== -1;
       }
 
       function filterArticles() {
@@ -329,11 +329,11 @@ const gridArticles = mainFeatured
       }
     }
 
+    setupBlogFiltering();
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', setupBlogFiltering);
-    } else {
-      setupBlogFiltering();
     }
+    window.addEventListener('load', setupBlogFiltering);
     document.addEventListener('astro:page-load', setupBlogFiltering);
   })();
 </script>
