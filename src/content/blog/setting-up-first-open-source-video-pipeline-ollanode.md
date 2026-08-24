@@ -24,38 +24,6 @@ This is a technical walkthrough, not a marketing pitch. Every step includes the 
 
 ---
 
-## Table of Contents
-
-- [Quick Answer: What Do You Need to Set Up an Open-Source Video Pipeline?](#quick-answer-what-do-you-need-to-set-up-an-open-source-video-pipeline)
-- [Key Takeaways](#key-takeaways)
-- [What Is a Video Pipeline, and Why Build One Yourself?](#what-is-a-video-pipeline-and-why-build-one-yourself)
-- [Understanding the Ollanode Architecture](#understanding-the-ollanode-architecture)
-- [Before You Start: Prerequisites and System Requirements](#before-you-start-prerequisites-and-system-requirements)
-- [Step 1: Install Ollanode](#step-1-install-ollanode)
-- [Step 2: Configure Storage and Environment Variables](#step-2-configure-storage-and-environment-variables)
-- [Step 3: Set Up the Job Orchestration Layer](#step-3-set-up-the-job-orchestration-layer)
-- [Step 4: Create Your First Project and API Key](#step-4-create-your-first-project-and-api-key)
-- [Step 5: Upload and Validate Your First Video](#step-5-upload-and-validate-your-first-video)
-- [Step 6: Configure the Transcoding Pipeline](#step-6-configure-the-transcoding-pipeline)
-- [Step 7: Generate Adaptive HLS Renditions](#step-7-generate-adaptive-hls-renditions)
-- [Step 8: Add Thumbnails and Transcripts](#step-8-add-thumbnails-and-transcripts)
-- [Step 9: Connect a CDN for Delivery](#step-9-connect-a-cdn-for-delivery)
-- [Step 10: Set Up Webhooks and Playback Security](#step-10-set-up-webhooks-and-playback-security)
-- [Step 11: Test End-to-End Playback](#step-11-test-end-to-end-playback)
-- [Step 12: Move From Local Testing to Production](#step-12-move-from-local-testing-to-production)
-- [Common Setup Mistakes to Avoid](#common-setup-mistakes-to-avoid)
-- [Troubleshooting Reference](#troubleshooting-reference)
-- [Monitoring and Observability Checklist](#monitoring-and-observability-checklist)
-- [Security Hardening Checklist](#security-hardening-checklist)
-- [How to Scale Your Pipeline as Usage Grows](#how-to-scale-your-pipeline-as-usage-grows)
-- [Ollanode vs. Managed Video Platforms: When Self-Hosting Makes Sense](#ollanode-vs-managed-video-platforms-when-self-hosting-makes-sense)
-- [A Note on Costs at This Stage](#a-note-on-costs-at-this-stage)
-- [Who Should Follow This Guide](#who-should-follow-this-guide)
-- [Frequently Asked Questions](#frequently-asked-questions)
-- [Final Takeaway](#final-takeaway)
-
----
-
 ## Quick Answer: What Do You Need to Set Up an Open-Source Video Pipeline?
 
 ### At a Glance

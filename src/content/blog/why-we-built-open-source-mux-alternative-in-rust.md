@@ -30,35 +30,6 @@ This is not an article arguing that Mux is bad. It is a practical comparison of 
 
 ---
 
-## Table of Contents
-
-- [Quick Answer: Is Mux the Same as a Self-Hosted Video Platform?](#quick-answer-is-mux-the-same-as-a-self-hosted-video-platform)
-- [Key Takeaways](#key-takeaways)
-- [The Real Problem With Per-Minute Video Billing](#the-real-problem-with-per-minute-video-billing)
-- [What Does Mux Charge For?](#what-does-mux-charge-for)
-- [Per-Minute Billing vs. Infrastructure Cost](#per-minute-billing-vs-infrastructure-cost)
-- [A Simple Cost Model for Video Infrastructure](#a-simple-cost-model-for-video-infrastructure)
-- [Why We Chose Open Source](#why-we-chose-open-source)
-- [Why Rust?](#why-rust)
-- [OllaNode vs. Mux: The Architecture Difference](#ollanode-vs-mux-the-architecture-difference)
-- [The Hidden Cost of Vendor Lock-In](#the-hidden-cost-of-vendor-lock-in)
-- [The OllaNode VOD Pipeline](#the-ollanode-vod-pipeline)
-- [What About CDN and Delivery Costs?](#what-about-cdn-and-delivery-costs)
-- [When a Mux Alternative Actually Makes Sense](#when-a-mux-alternative-actually-makes-sense)
-- [When Mux May Still Be the Better Choice](#when-mux-may-still-be-the-better-choice)
-- [A Better Way to Compare Video Infrastructure](#a-better-way-to-compare-video-infrastructure)
-- [Why We Think the Mux Alternative Category Needs Open Source](#why-we-think-the-mux-alternative-category-needs-open-source)
-- [A Note on Pricing Comparisons](#a-note-on-pricing-comparisons)
-- [Cost Scenarios: Where the Economics Can Change](#cost-scenarios-where-the-economics-can-change)
-- [What Changes When You Own the Video Stack?](#what-changes-when-you-own-the-video-stack)
-- [A Practical Migration Checklist: Mux to a Self-Hosted Video Stack](#a-practical-migration-checklist-mux-to-a-self-hosted-video-stack)
-- [What OllaNode Does Not Promise](#what-ollanode-does-not-promise)
-- [Who Should Consider OllaNode?](#who-should-consider-ollanode)
-- [Frequently Asked Questions](#frequently-asked-questions)
-- [Final Takeaway](#final-takeaway)
-
----
-
 ## Quick Answer: Is Mux the Same as a Self-Hosted Video Platform?
 
 **No.** Mux is a managed video infrastructure service, while a self-hosted Mux alternative gives you control over the software and the infrastructure that runs it.
