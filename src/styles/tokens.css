@@ -3185,6 +3185,11 @@ h3 {
   align-items: start;
 }
 
+.net-col-left {
+  border-right: 1.5px solid #CBD5E1;
+  padding-right: 24px;
+}
+
 .net-col-left,
 .net-col-right {
   position: -webkit-sticky;
@@ -3199,6 +3204,39 @@ h3 {
   margin-bottom: 24px;
 }
 
+.bullet-list-cols {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 14px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bullet-link-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.bullet-link-item::before {
+  content: "•";
+  color: var(--color-primary);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.bullet-link-item:hover {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
 
 .capsule-grid {
   display: grid;
