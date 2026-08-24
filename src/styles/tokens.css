@@ -3185,9 +3185,12 @@ h3 {
   align-items: start;
 }
 
-.net-col-left {
-  border-right: 1.5px solid #CBD5E1;
-  padding-right: 24px;
+.featured-box-card {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+  padding: 20px 18px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .net-col-left,
