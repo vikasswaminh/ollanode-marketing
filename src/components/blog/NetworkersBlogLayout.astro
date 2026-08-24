@@ -231,40 +231,23 @@ const gridArticles = mainFeatured
       var currentCategory = 'All';
       var searchQuery = '';
 
-      function isCategoryMatch(cardCat, cardTags, cardTitle, cardExcerpt, selectedCategory) {
+      function isCategoryMatch(cardCat, selectedCategory) {
         if (selectedCategory === 'All') return true;
 
         var sel = selectedCategory.toLowerCase().trim();
         var c = cardCat.toLowerCase().trim();
-        var t = cardTags.toLowerCase().trim();
-        var ti = cardTitle.toLowerCase().trim();
-        var ex = cardExcerpt.toLowerCase().trim();
 
-        // Direct equality or substring match
-        if (c === sel || c.indexOf(sel) !== -1 || sel.indexOf(c) !== -1) return true;
+        if (c === sel) return true;
 
-        // Keyword mapping for navigation tabs
-        if (sel.indexOf('guide') !== -1) {
-          return c.indexOf('guide') !== -1 || t.indexOf('guide') !== -1 || ti.indexOf('step-by-step') !== -1 || ti.indexOf('setting up') !== -1 || ti.indexOf('guide') !== -1;
+        // Normalize plural / singular (e.g. Comparison vs Comparisons)
+        if ((sel === 'comparison' || sel === 'comparisons') && (c === 'comparison' || c === 'comparisons')) {
+          return true;
         }
-        if (sel.indexOf('comparison') !== -1) {
-          return c.indexOf('comparison') !== -1 || t.indexOf('comparison') !== -1 || t.indexOf('alternative') !== -1 || ti.indexOf('vs') !== -1 || ti.indexOf('mux') !== -1 || ex.indexOf('compare') !== -1;
-        }
-        if (sel.indexOf('video') !== -1 || sel.indexOf('cdn') !== -1) {
-          return c.indexOf('video') !== -1 || c.indexOf('cdn') !== -1 || t.indexOf('vod') !== -1 || t.indexOf('hls') !== -1 || t.indexOf('cdn') !== -1 || t.indexOf('video') !== -1 || ti.indexOf('video') !== -1 || ti.indexOf('hls') !== -1;
-        }
-        if (sel.indexOf('ai') !== -1 || sel.indexOf('agent') !== -1) {
-          return c.indexOf('ai') !== -1 || c.indexOf('agent') !== -1 || t.indexOf('ai') !== -1 || t.indexOf('agent') !== -1 || ti.indexOf('agent') !== -1;
-        }
-        if (sel.indexOf('engineering') !== -1) {
-          return c.indexOf('engineering') !== -1 || t.indexOf('rust') !== -1 || t.indexOf('engineering') !== -1 || ti.indexOf('rust') !== -1 || ti.indexOf('pipeline') !== -1 || ex.indexOf('rust') !== -1;
-        }
-        if (sel.indexOf('security') !== -1 || sel.indexOf('edge') !== -1 || sel.indexOf('performance') !== -1) {
-          return c.indexOf('security') !== -1 || c.indexOf('edge') !== -1 || t.indexOf('security') !== -1 || t.indexOf('edge') !== -1 || t.indexOf('dns') !== -1 || ti.indexOf('security') !== -1;
-        }
-        if (sel.indexOf('product') !== -1 || sel.indexOf('changelog') !== -1) {
-          return c.indexOf('product') !== -1 || c.indexOf('changelog') !== -1 || t.indexOf('changelog') !== -1 || ti.indexOf('introducing') !== -1 || ex.indexOf('introducing') !== -1;
-        }
+
+        // Normalize ampersand & spacing
+        var normSel = sel.replace(/&/g, 'and').replace(/\s+/g, ' ');
+        var normC = c.replace(/&/g, 'and').replace(/\s+/g, ' ');
+        if (normC === normSel) return true;
 
         return false;
       }
@@ -279,7 +262,7 @@ const gridArticles = mainFeatured
           var excerpt = card.getAttribute('data-excerpt') || '';
           var tags = card.getAttribute('data-tags') || '';
 
-          var matchesCategory = isCategoryMatch(cat, tags, title, excerpt, currentCategory);
+          var matchesCategory = isCategoryMatch(cat, currentCategory);
           var matchesSearch = !query ||
             title.toLowerCase().indexOf(query) !== -1 ||
             excerpt.toLowerCase().indexOf(query) !== -1 ||
