@@ -19,22 +19,20 @@ export async function getAllBlogArticles(): Promise<BlogEntry[]> {
 }
 
 /**
- * Get featured article (article with featured: true, or the newest article)
+ * Get featured article for the main big long card (always the single most recent article)
  */
 export async function getFeaturedBlogArticle(): Promise<BlogEntry | null> {
   const articles = await getAllBlogArticles();
   if (articles.length === 0) return null;
-  const featured = articles.find((a) => a.data.featured === true);
-  return featured || articles[0];
+  return articles[0];
 }
 
 /**
- * Get left sidebar featured links
+ * Get top 3 most recent articles for the left sidebar featured section
  */
 export async function getLeftSidebarArticles(): Promise<BlogEntry[]> {
   const articles = await getAllBlogArticles();
-  const featured = articles.filter((a) => a.data.featured === true);
-  return featured.length > 0 ? featured : articles.slice(0, 6);
+  return articles.slice(0, 3);
 }
 
 /**
