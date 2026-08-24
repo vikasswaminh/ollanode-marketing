@@ -238,7 +238,8 @@ const gridArticles = mainFeatured
         var excerpt = (card.getAttribute('data-excerpt') || '').toLowerCase();
         var tags = (card.getAttribute('data-tags') || '').toLowerCase();
 
-        var matchesCategory = (currentCategory === 'All') || (cat === currentCategory.toLowerCase());
+        var targetCat = currentCategory.toLowerCase();
+        var matchesCategory = (currentCategory === 'All') || (cat === targetCat) || (cat.indexOf(targetCat) !== -1) || (targetCat.indexOf(cat) !== -1);
         var matchesSearch = !query || title.indexOf(query) !== -1 || excerpt.indexOf(query) !== -1 || cat.indexOf(query) !== -1 || tags.indexOf(query) !== -1;
 
         if (matchesCategory && matchesSearch) {
