@@ -57,25 +57,27 @@ const gridArticles = mainFeatured
     <div class="net-blog-container">
       <div class="net-blog-grid">
 
-        <!-- LEFT COLUMN: FEATURED INSIGHTS (STICKY) -->
+        <!-- LEFT COLUMN: FEATURED INSIGHTS (STICKY BOX) -->
         <aside class="net-col-left">
-          <div class="pill-badge pill-orange">FEATURED</div>
-          
-          {leftSidebarArticles.length > 0 ? (
-            <ul class="net-link-list">
-              {leftSidebarArticles.map((item) => (
-                <li>
-                  <a href={`/blog/${item.slug || item.id}`} class="net-link">{item.data.title}</a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ul class="net-link-list">
-              <li><span class="net-link-placeholder">No featured articles yet</span></li>
-            </ul>
-          )}
-          
-          <a href="/docs" class="view-all-link">Explore Docs →</a>
+          <div class="featured-box-card">
+            <div class="pill-badge pill-orange">FEATURED</div>
+            
+            {leftSidebarArticles.length > 0 ? (
+              <ul class="net-link-list">
+                {leftSidebarArticles.map((item) => (
+                  <li>
+                    <a href={`/blog/${item.slug || item.id}`} class="net-link">{item.data.title}</a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul class="net-link-list">
+                <li><span class="net-link-placeholder">No featured articles yet</span></li>
+              </ul>
+            )}
+            
+            <a href="/docs" class="view-all-link">Explore Docs →</a>
+          </div>
         </aside>
 
         <!-- CENTER COLUMN: MAIN CONTENT & LATEST ARTICLES -->
