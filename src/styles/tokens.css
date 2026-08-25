@@ -3229,12 +3229,12 @@ h3 {
 .net-col-right {
   position: -webkit-sticky;
   position: sticky;
-  top: 100px;
+  top: 130px;
   align-self: start;
   height: fit-content;
-  max-height: calc(100vh - 100px);
+  max-height: calc(100vh - 140px);
   overflow-y: auto;
-  z-index: 30;
+  z-index: 10;
 }
 
 /* Hide scrollbar for a cleaner look */
