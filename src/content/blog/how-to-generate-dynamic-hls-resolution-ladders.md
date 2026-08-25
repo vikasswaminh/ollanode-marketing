@@ -39,12 +39,14 @@ To generate a dynamic HLS resolution ladder with Ollanode, you configure a targe
 
 ## Key Takeaways
 
-1. **A ladder is a menu, not a mandate.** Every rung in an HLS ladder is a real encoded rendition; the player picks one per segment based on measured bandwidth, so an unnecessary rung is pure wasted encode time and storage.
-2. **Dynamic beats fixed.** A source-aware ladder generates only the rungs that make sense for a given upload's native resolution, instead of blindly producing a fixed 360p-through-4K set for every file regardless of what was actually uploaded.
-3. **No-upscale is a hard rule, not an option.** Ollanode's transcoder never generates a rendition above a source's native resolution — a 720p upload never produces a fake 1080p or 4K rung. See the [VOD Pipeline Overview](/#platform).
-4. **Codec tiering is config-gated, not automatic.** H.264 is the safe default; H.265/NVENC and the SVT-AV1 tier are real, shipped capabilities you opt into per project once you understand your audience's device mix.
-5. **Ladders can be scoped per project or per asset.** A course platform's screen recordings and a marketing team's cinematic trailers rarely need the same rung set — configure both, don't force one default across a mixed catalog.
-6. **Bandwidth accuracy in the manifest is what makes ABR actually work.** A ladder with inaccurate BANDWIDTH values in the master playlist causes players to make bad switching decisions even if the encodes themselves are fine. Learn more about [Playback & Delivery](/docs/playback).
+<div class="key-takeaways">
+  <p><strong>A ladder is a menu, not a mandate:</strong> Every rung in an HLS ladder is a real encoded rendition; the player picks one per segment based on measured bandwidth, so an unnecessary rung is pure wasted encode time and storage.</p>
+  <p><strong>Dynamic beats fixed:</strong> A source-aware ladder generates only the rungs that make sense for a given upload's native resolution, instead of blindly producing a fixed 360p-through-4K set for every file regardless of what was actually uploaded.</p>
+  <p><strong>No-upscale is a hard rule, not an option:</strong> Ollanode's transcoder never generates a rendition above a source's native resolution — a 720p upload never produces a fake 1080p or 4K rung. See the <a href="/#platform">VOD Pipeline Overview</a>.</p>
+  <p><strong>Codec tiering is config-gated, not automatic:</strong> H.264 is the safe default; H.265/NVENC and the SVT-AV1 tier are real, shipped capabilities you opt into per project once you understand your audience's device mix.</p>
+  <p><strong>Ladders can be scoped per project or per asset:</strong> A course platform's screen recordings and a marketing team's cinematic trailers rarely need the same rung set — configure both, don't force one default across a mixed catalog.</p>
+  <p><strong>Bandwidth accuracy in the manifest is what makes ABR actually work:</strong> A ladder with inaccurate BANDWIDTH values in the master playlist causes players to make bad switching decisions even if the encodes themselves are fine. Learn more about <a href="/docs/playback">Playback & Delivery</a>.</p>
+</div>
 
 ---
 
@@ -411,3 +413,4 @@ A dynamic HLS ladder is a set of testable choices: source-supported rungs, sensi
 With Ollanode, you can inspect and adjust those decisions. Test your catalog, monitor usage, and tune the ladder from real production evidence reliably.
 
 Explore the full platform and documentation at [Ollanode Docs](/docs) or view the [Ollanode Features Overview](/#features).
+
