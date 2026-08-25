@@ -2838,6 +2838,38 @@ h3 {
   margin: 0 auto;
 }
 
+
+.post-content-main {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.post-content-main table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  display: block;
+  overflow-x: auto;
+}
+
+.post-content-main th,
+.post-content-main td {
+  border: 1px solid #E2E8F0;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.post-content-main th {
+  background-color: #F8FAFC;
+  font-weight: 600;
+  color: #1A1D23;
+}
+
+.post-content-main pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .post-content-main h2 {
   font-size: 1.6rem;
   font-weight: 750;
