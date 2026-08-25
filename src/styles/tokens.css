@@ -3720,3 +3720,40 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+.key-takeaways {
+  background-color: #FFF5F2; /* Very light orange/beige */
+  border-left: 4px solid #FF5A3D; /* Ollanode Orange */
+  border-radius: 0 4px 4px 0;
+  padding: 24px 32px;
+  margin: 32px 0;
+  color: #1A1D23;
+}
+
+.key-takeaways p {
+  margin-top: 0;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.key-takeaways p:last-child {
+  margin-bottom: 0;
+}
+
+.key-takeaways strong {
+  font-weight: 700;
+  color: #1A1D23;
+}
+
+.key-takeaways a {
+  color: #FF5A3D;
+  text-decoration: underline;
+  text-decoration-color: #FF5A3D;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  font-weight: 500;
+}
+
+.key-takeaways a:hover {
+  color: #E0482D;
+  text-decoration-color: #E0482D;
+}
