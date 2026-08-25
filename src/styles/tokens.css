@@ -3720,27 +3720,3 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
-
-body, html, .blog-page-wrapper, .net-blog-section, .net-blog-container, .net-blog-grid {
-  overflow: visible !important;
-  overflow-x: visible !important;
-  overflow-y: visible !important;
-}
-
-.net-col-left,
-.net-col-right {
-  position: -webkit-sticky !important;
-  position: sticky !important;
-  top: 120px !important;
-  align-self: start !important;
-  height: fit-content !important;
-  z-index: 100 !important;
-}
-
-
-@media (max-width: 992px) {
-  .net-col-left,
-  .net-col-right {
-    position: static !important;
-  }
-}
