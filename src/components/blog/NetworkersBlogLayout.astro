@@ -220,133 +220,132 @@ const gridArticles = mainFeatured
 </div>
 
 <!-- CLIENT-SIDE COMBINED CATEGORY STRIP & SEARCH FILTERING SCRIPT -->
-<script is:inline>
-  (function () {
-    function setupBlogFiltering() {
-      var catBtns = document.querySelectorAll('.cat-strip-btn');
-      var itemCards = document.querySelectorAll('.blog-item-card');
-      var emptyState = document.getElementById('blog-empty-state');
-      var resetBtn = document.getElementById('reset-filters-btn');
-      var searchInput = document.getElementById('blog-search-input');
-      var countLabel = document.getElementById('article-count-label');
+<script>
+  // Astro bundles this script as a module and automatically defers it until the DOM is ready.
+  // It is immune to Cloudflare Rocket Loader and caching lifecycle bugs.
+  
+  const catBtns = document.querySelectorAll('.cat-strip-btn');
+  const itemCards = document.querySelectorAll('.blog-item-card');
+  const emptyState = document.getElementById('blog-empty-state');
+  const resetBtn = document.getElementById('reset-filters-btn');
+  const searchInput = document.getElementById('blog-search-input');
+  const countLabel = document.getElementById('article-count-label');
 
-      if (!catBtns.length && !itemCards.length) return;
+  if (catBtns.length > 0 && itemCards.length > 0) {
+    let currentCategory = 'All';
+    let searchQuery = '';
 
-      var currentCategory = 'All';
-      var searchQuery = '';
-
-      function normalizeCat(str) {
-        if (!str) return '';
-        var s = str.toLowerCase()
-          .replace(/&amp;/g, 'and')
-          .replace(/&/g, 'and')
-          .replace(/[^a-z0-9]/g, '')
-          .trim();
-        if (s.endsWith('s') && s.length > 3) {
-          s = s.slice(0, -1);
-        }
-        return s;
+    function normalizeCat(str) {
+      if (!str) return '';
+      let s = str.toLowerCase()
+        .replace(/&amp;/g, 'and')
+        .replace(/&/g, 'and')
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
+      if (s.endsWith('s') && s.length > 3) {
+        s = s.slice(0, -1);
       }
+      return s;
+    }
 
-      function isCategoryMatch(cardCat, selectedCategory) {
-        if (!selectedCategory || selectedCategory.toLowerCase().trim() === 'all') return true;
-        var normSel = normalizeCat(selectedCategory);
-        var normCard = normalizeCat(cardCat);
-        if (!normSel || !normCard) return false;
-        return normCard === normSel || normCard.indexOf(normSel) !== -1 || normSel.indexOf(normCard) !== -1;
-      }
+    function isCategoryMatch(cardCat, selectedCategory) {
+      if (!selectedCategory || selectedCategory.toLowerCase().trim() === 'all') return true;
+      const normSel = normalizeCat(selectedCategory);
+      const normCard = normalizeCat(cardCat);
+      if (!normSel || !normCard) return false;
+      return normCard === normSel || normCard.includes(normSel) || normSel.includes(normCard);
+    }
 
-      function filterArticles() {
-        var visibleCount = 0;
-        var query = searchQuery.trim().toLowerCase();
+    function filterArticles() {
+      let visibleCount = 0;
+      const query = searchQuery.trim().toLowerCase();
 
-        itemCards.forEach(function (card) {
-          var cat = card.getAttribute('data-category') || '';
-          var title = card.getAttribute('data-title') || '';
-          var excerpt = card.getAttribute('data-excerpt') || '';
-          var tags = card.getAttribute('data-tags') || '';
+      itemCards.forEach(card => {
+        const cat = card.getAttribute('data-category') || '';
+        const title = card.getAttribute('data-title') || '';
+        const excerpt = card.getAttribute('data-excerpt') || '';
+        const tags = card.getAttribute('data-tags') || '';
 
-          var matchesCategory = isCategoryMatch(cat, currentCategory);
-          var matchesSearch = !query ||
-            title.toLowerCase().indexOf(query) !== -1 ||
-            excerpt.toLowerCase().indexOf(query) !== -1 ||
-            cat.toLowerCase().indexOf(query) !== -1 ||
-            tags.toLowerCase().indexOf(query) !== -1;
+        const matchesCategory = isCategoryMatch(cat, currentCategory);
+        const matchesSearch = !query ||
+          title.toLowerCase().includes(query) ||
+          excerpt.toLowerCase().includes(query) ||
+          cat.toLowerCase().includes(query) ||
+          tags.toLowerCase().includes(query);
 
-          if (matchesCategory && matchesSearch) {
-            card.style.display = '';
-            visibleCount++;
-          } else {
-            card.style.display = 'none';
-          }
-        });
-
-        if (countLabel) {
-          countLabel.textContent = 'Showing ' + visibleCount + ' article' + (visibleCount === 1 ? '' : 's');
+        if (matchesCategory && matchesSearch) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
         }
-
-        if (emptyState) {
-          emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
-        }
-      }
-
-      itemCards.forEach(function (card) {
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', function (e) {
-          var href = card.getAttribute('data-href');
-          if (href && !e.target.closest('a')) {
-            window.location.href = href;
-          }
-        });
       });
 
-      catBtns.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          catBtns.forEach(function (b) {
+      if (countLabel) {
+        countLabel.textContent = 'Showing ' + visibleCount + ' article' + (visibleCount === 1 ? '' : 's');
+      }
+
+      if (emptyState) {
+        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    }
+
+    // Bind card clicks
+    itemCards.forEach(card => {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', (e) => {
+        const href = card.getAttribute('data-href');
+        if (href && !e.target.closest('a')) {
+          window.location.href = href;
+        }
+      });
+    });
+
+    // Bind category buttons
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        catBtns.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        currentCategory = btn.getAttribute('data-category') || 'All';
+        filterArticles();
+      });
+    });
+
+    // Bind search
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value || '';
+        filterArticles();
+      });
+    }
+
+    // Bind reset
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        currentCategory = 'All';
+        searchQuery = '';
+        if (searchInput) searchInput.value = '';
+
+        catBtns.forEach((b, idx) => {
+          if (idx === 0) {
+            b.classList.add('active');
+            b.setAttribute('aria-selected', 'true');
+          } else {
             b.classList.remove('active');
             b.setAttribute('aria-selected', 'false');
-          });
-          btn.classList.add('active');
-          btn.setAttribute('aria-selected', 'true');
-          currentCategory = btn.getAttribute('data-category') || 'All';
-          filterArticles();
+          }
         });
+
+        filterArticles();
       });
-
-      if (searchInput) {
-        searchInput.addEventListener('input', function (e) {
-          searchQuery = e.target.value || '';
-          filterArticles();
-        });
-      }
-
-      if (resetBtn) {
-        resetBtn.addEventListener('click', function () {
-          currentCategory = 'All';
-          searchQuery = '';
-          if (searchInput) searchInput.value = '';
-
-          catBtns.forEach(function (b, idx) {
-            if (idx === 0) {
-              b.classList.add('active');
-              b.setAttribute('aria-selected', 'true');
-            } else {
-              b.classList.remove('active');
-              b.setAttribute('aria-selected', 'false');
-            }
-          });
-
-          filterArticles();
-        });
-      }
     }
-
-    setupBlogFiltering();
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupBlogFiltering);
-    }
-    window.addEventListener('load', setupBlogFiltering);
-    document.addEventListener('astro:page-load', setupBlogFiltering);
-  })();
+    
+    // Initial filter run
+    filterArticles();
+  }
 </script>
 
