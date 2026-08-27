@@ -602,6 +602,16 @@ h3 {
   text-underline-offset: 4px;
 }
 
+.nav-divider {
+  color: #CBD5E1;
+  font-size: 13px;
+  font-weight: 300;
+  user-select: none;
+  font-family: var(--sans);
+  opacity: 0.85;
+  margin: 0 4px;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;

@@ -60,8 +60,11 @@ const nav = [
           <span class="wordmark" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.05em; color: #1A1D23;">OLLANODE</span>
         </a>
         <nav class="nav-links" aria-label="Primary">
-          {nav.map((n) => (
-            <a href={n.href} class={path === n.href ? 'active' : ''}>{n.label}</a>
+          {nav.map((n, index) => (
+            <>
+              <a href={n.href} class={path === n.href ? 'active' : ''}>{n.label}</a>
+              {index < nav.length - 1 && <span class="nav-divider">|</span>}
+            </>
           ))}
         </nav>
         <div class="nav-right">
