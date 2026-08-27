@@ -2391,35 +2391,96 @@ h3 {
 .characteristic-circle {
   width: 52px;
   height: 52px;
-  border-radius: 50%;
-  border: 1.5px solid #334155;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
   background: #F8FAFC;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #0F172A;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 0 3px rgba(26, 29, 35, 0.04);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
-.characteristic-item:hover .characteristic-circle {
-  background: #E0482B;
-  color: #FFFFFF;
-  border-color: #E0482B;
-  box-shadow: 0 0 0 4px rgba(224, 72, 43, 0.2);
+.characteristic-circle.circle-blue {
+  background: #EFF6FF;
+  border-color: #DBEAFE;
+  color: #2563EB;
+}
+.characteristic-circle.circle-blue .characteristic-icon {
+  color: #2563EB;
 }
 
+.characteristic-circle.circle-green {
+  background: #ECFDF5;
+  border-color: #D1FAE5;
+  color: #10B981;
+}
+.characteristic-circle.circle-green .characteristic-icon {
+  color: #10B981;
+}
+
+.characteristic-circle.circle-orange {
+  background: #FFF7ED;
+  border-color: #FFEDD5;
+  color: #F97316;
+}
+.characteristic-circle.circle-orange .characteristic-icon {
+  color: #F97316;
+}
+
+.characteristic-circle.circle-purple {
+  background: #F5F3FF;
+  border-color: #EDE9FE;
+  color: #8B5CF6;
+}
+.characteristic-circle.circle-purple .characteristic-icon {
+  color: #8B5CF6;
+}
+
+.characteristic-circle.circle-cyan {
+  background: #F0F9FF;
+  border-color: #E0F2FE;
+  color: #0284C7;
+}
+.characteristic-circle.circle-cyan .characteristic-icon {
+  color: #0284C7;
+}
+
+.characteristic-item:hover .characteristic-circle.circle-blue {
+  background: #DBEAFE;
+  border-color: #93C5FD;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+.characteristic-item:hover .characteristic-circle.circle-green {
+  background: #D1FAE5;
+  border-color: #6EE7B7;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+.characteristic-item:hover .characteristic-circle.circle-orange {
+  background: #FFEDD5;
+  border-color: #FDBA74;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+}
+.characteristic-item:hover .characteristic-circle.circle-purple {
+  background: #EDE9FE;
+  border-color: #C4B5FD;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+}
+.characteristic-item:hover .characteristic-circle.circle-cyan {
+  background: #E0F2FE;
+  border-color: #7DD3FC;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+}
 
 .characteristic-icon {
   width: 22px;
   height: 22px;
-  color: #FF5A3D;
-  transition: transform 0.25s ease, color 0.25s ease;
+  transition: transform 0.25s ease;
 }
 
 .characteristic-item:hover .characteristic-icon {
-  transform: scale(1.1);
-  color: #FFFFFF;
+  transform: scale(1.12);
 }
 
 .characteristic-title {
@@ -4082,14 +4143,40 @@ h3 {
 }
 
 .card-top-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: #FFF0EB;
-  color: var(--color-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   margin-bottom: 14px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  color: #0F172A;
+  transition: all 0.25s ease;
+}
+
+.card-top-icon.icon-blue {
+  background: #EFF6FF;
+  border-color: #DBEAFE;
+  color: #2563EB;
+}
+
+.card-top-icon.icon-orange {
+  background: #FFF7ED;
+  border-color: #FFEDD5;
+  color: #F97316;
+}
+
+.card-top-icon.icon-green {
+  background: #ECFDF5;
+  border-color: #D1FAE5;
+  color: #10B981;
+}
+
+.card-top-icon.icon-purple {
+  background: #F5F3FF;
+  border-color: #EDE9FE;
+  color: #8B5CF6;
 }
 
 .card-top-icon svg {

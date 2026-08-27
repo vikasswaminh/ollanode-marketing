@@ -1,45 +1,1108 @@
 ---
 import Site from '../layouts/Site.astro';
-const tiers = [
-  { name: 'Self-host', price: 'Free', tagline: 'Run the whole stack on your own infrastructure.',
-    features: ['Full source — Apache-2.0, permissive stack', 'Video pipeline + CDN + storage + edge functions', 'Unlimited videos, zones & projects', '~60 REST endpoints, webhooks, audit', 'Community support'],
-    cta: 'Open dashboard', href: 'https://login.ollanode.com', highlight: false },
-  { name: 'Managed', price: 'Talk to us', tagline: 'We operate it on your cloud, you keep your data.',
-    features: ['Everything in Self-host', 'Provisioning, upgrades & monitoring', 'Multi-region edge PoPs', 'SLA & priority support'],
-    cta: 'Contact sales', href: 'mailto:hello@ollanode.com', highlight: true },
-];
 ---
-<Site title="Pricing — Ollanode" description="Ownership-first pricing. No per-minute fees, no egress surprises — you bring the VMs and storage, we bring the platform.">
-  <section class="band pricing-sec">
-    <div class="wrap" style="max-width:920px">
-      <div class="sec-head">
-        <span class="eyebrow">Pricing</span>
-        <h2>Ownership-first pricing.</h2>
-        <p>No per-minute fees. No egress surprises. You bring the VMs and storage — we bring the platform.</p>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px" class="price-grid">
-        {tiers.map((t) => (
-          <div class="card" style={t.highlight ? 'background:#FFF0EB;border-color:#FF5A3D' : ''}>
-            <div style="display:flex;align-items:center;gap:10px">
-              <h3 class="mono hl" style="text-transform:uppercase;letter-spacing:.12em;font-size:12px">{t.name}</h3>
-              {t.highlight && <span class="pill brand">Recommended</span>}
-            </div>
-            <div style="font-size:2.6rem;font-weight:600;letter-spacing:-.02em;margin:.5rem 0 .2rem;color:#1A1D23">{t.price}</div>
-            <p style="color:#667085;font-size:14px">{t.tagline}</p>
-            <ul style="list-style:none;margin:1.4rem 0 0;padding:0;display:flex;flex-direction:column;gap:10px">
-              {t.features.map((f) => (
-                <li style="display:flex;gap:10px;font-size:14px;color:#1A1D23"><span style="color:var(--ok)">✓</span>{f}</li>
-              ))}
-            </ul>
-            <a class={t.highlight ? 'btn btn-primary chamfer-sm' : 'btn chamfer-sm'} href={t.href} style="margin-top:1.6rem;width:100%;justify-content:center">{t.cta}</a>
-          </div>
-        ))}
-      </div>
-      <p class="mono" style="margin-top:2rem;font-size:12px;color:var(--muted-2)">Both tiers are the same platform — Managed just means we run the ops. <a href="/#capabilities" class="hl">See everything included →</a></p>
+
+<Site
+  title="Pricing — Ollanode"
+  description="Ownership-first pricing. No per-minute fees, no egress surprises. You bring the VMs and storage — we bring the platform."
+>
+  <div class="pricing-page-wrapper">
+    <!-- Sophisticated Hero Backdrop with Left Peach Glow and Right Geometric Fan Rays -->
+    <div class="pricing-backdrop" aria-hidden="true">
+      <!-- Left Warm Peach/Coral Glow -->
+      <div class="backdrop-glow-left"></div>
+      
+      <!-- Left Stipple / Dot Texture Field -->
+      <div class="backdrop-dots-left"></div>
+
+      <!-- Right Lavender/Violet Ambient Glow -->
+      <div class="backdrop-glow-right"></div>
+
+      <!-- Right Geometric Curved Ray Fan (SVG Vector Rays) -->
+      <svg class="backdrop-rays-svg" viewBox="0 0 1440 680" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMin meet">
+        <defs>
+          <linearGradient id="rayGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.55" />
+            <stop offset="45%" stop-color="#A78BFA" stop-opacity="0.32" />
+            <stop offset="80%" stop-color="#DDD6FE" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="rayGradSubtle" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#C084FC" stop-opacity="0.45" />
+            <stop offset="50%" stop-color="#E9D5FF" stop-opacity="0.20" />
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        
+        <!-- Curved Vector Ray Splines Fanning from Top-Right Corner -->
+        <path d="M1440 -40 Q 1150 60 780 200" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 -10 Q 1180 110 830 250" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 20 Q 1200 160 880 300" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 50 Q 1230 210 930 350" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 80 Q 1250 260 980 400" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 110 Q 1270 310 1030 450" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 140 Q 1300 360 1080 500" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 170 Q 1320 410 1130 550" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 200 Q 1340 460 1180 600" stroke="url(#rayGrad)" stroke-width="1.3" />
+        <path d="M1440 230 Q 1360 510 1230 650" stroke="url(#rayGrad)" stroke-width="1.3" />
+
+        <!-- Concentric Perspective Guide Arcs -->
+        <path d="M780 200 C 950 140 1200 50 1440 -40" stroke="url(#rayGradSubtle)" stroke-width="1" stroke-dasharray="3 3" />
+        <path d="M880 300 C 1050 230 1270 120 1440 20" stroke="url(#rayGradSubtle)" stroke-width="1" stroke-dasharray="3 3" />
+        <path d="M980 400 C 1130 320 1330 200 1440 80" stroke="url(#rayGradSubtle)" stroke-width="1" stroke-dasharray="3 3" />
+        <path d="M1080 500 C 1220 420 1370 280 1440 140" stroke="url(#rayGradSubtle)" stroke-width="1" stroke-dasharray="3 3" />
+
+        <!-- Extra Delicate Ray Accents -->
+        <path d="M1440 5 Q 1190 135 855 275" stroke="url(#rayGradSubtle)" stroke-width="0.9" />
+        <path d="M1440 35 Q 1215 185 905 325" stroke="url(#rayGradSubtle)" stroke-width="0.9" />
+        <path d="M1440 65 Q 1240 235 955 375" stroke="url(#rayGradSubtle)" stroke-width="0.9" />
+        <path d="M1440 95 Q 1260 285 1005 425" stroke="url(#rayGradSubtle)" stroke-width="0.9" />
+        <path d="M1440 125 Q 1285 335 1055 475" stroke="url(#rayGradSubtle)" stroke-width="0.9" />
+        <path d="M1440 155 Q 1310 385 1105 525" stroke="url(#rayGradSubtle)" stroke-width="0.9" />
+        <path d="M1440 185 Q 1330 435 1155 575" stroke="url(#rayGradSubtle)" stroke-width="0.9" />
+      </svg>
     </div>
-  </section>
+
+    <main class="pricing-main-container">
+      <!-- 1. HERO HEADER SECTION -->
+      <section class="pricing-hero-header">
+        <div class="pricing-eyebrow-pill">
+          <span class="eyebrow-orange-dot"></span>
+          <span class="eyebrow-text">PRICING</span>
+        </div>
+
+        <h1 class="pricing-hero-h1">
+          Ownership-first pricing<span class="text-brand-dot">.</span>
+        </h1>
+
+        <p class="pricing-hero-lead">
+          No per-minute fees. No egress surprises.<br />
+          You bring the VMs and storage — we bring the platform.
+        </p>
+      </section>
+
+      <!-- 2. TWO PRIMARY PRICING CARDS -->
+      <section class="pricing-cards-section">
+        <div class="pricing-cards-grid">
+          
+          <!-- CARD 1: SELF-HOST (FREE) -->
+          <div class="pricing-card card-selfhost">
+            <div class="card-top-badge">
+              <span class="badge-selfhost">SELF-HOST</span>
+            </div>
+
+            <div class="card-price-row">
+              <h2 class="card-price-h2">Free</h2>
+              <div class="price-accent-bar accent-blue"></div>
+            </div>
+
+            <p class="card-tagline">
+              Run the whole stack on your own infrastructure.
+            </p>
+
+            <ul class="card-features-list">
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>Full source — Apache-2.0, permissive stack</span>
+              </li>
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>Video pipeline + CDN + storage + edge functions</span>
+              </li>
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>Unlimited videos, zones &amp; projects</span>
+              </li>
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>~60 REST endpoints, webhooks, audit</span>
+              </li>
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>Community support</span>
+              </li>
+            </ul>
+
+            <div class="card-action-wrap">
+              <a href="https://login.ollanode.com" class="btn-pricing-outline">
+                <span>OPEN DASHBOARD</span>
+                <span class="arrow-icon">→</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- CARD 2: MANAGED (RECOMMENDED) -->
+          <div class="pricing-card card-managed">
+            <div class="card-top-badge badge-row-managed">
+              <span class="badge-managed">MANAGED</span>
+              <span class="badge-recommended">Recommended</span>
+            </div>
+
+            <div class="card-price-row">
+              <h2 class="card-price-h2">Talk to us</h2>
+              <div class="price-accent-bar accent-orange"></div>
+            </div>
+
+            <p class="card-tagline">
+              We operate it on your cloud, you keep your data.
+            </p>
+
+            <ul class="card-features-list">
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>Everything in Self-host</span>
+              </li>
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>Provisioning, upgrades &amp; monitoring</span>
+              </li>
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>Multi-region edge PoPs</span>
+              </li>
+              <li>
+                <span class="check-icon-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span>SLA &amp; priority support</span>
+              </li>
+            </ul>
+
+            <div class="card-action-wrap">
+              <a href="mailto:hello@ollanode.com" class="btn-pricing-solid">
+                <span>CONTACT SALES</span>
+                <span class="arrow-icon">→</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Info Note Banner Below Cards -->
+        <div class="pricing-info-pill-banner">
+          <div class="info-pill-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF5A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </div>
+          <p class="info-pill-text">
+            Both tiers are the same platform – Managed just means we run the ops.
+            <a href="#scale-features" class="info-pill-link">See everything included →</a>
+          </p>
+        </div>
+      </section>
+
+      <!-- 3. FOUR VALUE PROPOSITION PILLARS -->
+      <section class="pricing-pillars-section">
+        <div class="pillars-grid">
+          
+          <!-- Pillar 1 -->
+          <div class="pillar-card">
+            <div class="pillar-icon-box icon-blue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <h3 class="pillar-title">No per-minute fees</h3>
+            <p class="pillar-desc">
+              Predictable usage.<br />No egress or surprise charges.
+            </p>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="pillar-card">
+            <div class="pillar-icon-box icon-green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <h3 class="pillar-title">You own everything</h3>
+            <p class="pillar-desc">
+              Your data stays in your cloud.<br />You stay in control.
+            </p>
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="pillar-card">
+            <div class="pillar-icon-box icon-orange">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+              </svg>
+            </div>
+            <h3 class="pillar-title">One platform, all you need</h3>
+            <p class="pillar-desc">
+              Video, CDN, storage, edge functions — built-in.
+            </p>
+          </div>
+
+          <!-- Pillar 4 -->
+          <div class="pillar-card">
+            <div class="pillar-icon-box icon-purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+            </div>
+            <h3 class="pillar-title">Open &amp; extensible</h3>
+            <p class="pillar-desc">
+              Apache-2.0 license.<br />Extend and integrate freely.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 4. EVERYTHING YOU NEED TO BUILD AT SCALE (FEATURE MATRIX) -->
+      <section class="pricing-features-card-section" id="scale-features">
+        <div class="features-box-container">
+          
+          <!-- Left Column Content -->
+          <div class="features-left-col">
+            <div class="features-eyebrow">
+              <span class="eyebrow-orange-dot"></span>
+              <span>INCLUDED IN BOTH TIERS</span>
+            </div>
+
+            <h2 class="features-box-title">
+              Everything you need to build at scale<span class="text-brand-dot">.</span>
+            </h2>
+
+            <p class="features-box-desc">
+              From ingest to edge delivery, access control to observability — it's all in Ollanode.
+            </p>
+          </div>
+
+          <!-- Right Column 2x3 Grid of Sub-Capabilities -->
+          <div class="features-right-grid">
+            
+            <!-- Item 1: Video Pipeline -->
+            <div class="feature-sub-item">
+              <div class="feature-icon-wrap icon-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </div>
+              <div class="feature-item-text">
+                <h4 class="feature-item-title">Video Pipeline</h4>
+                <p class="feature-item-desc">Ingest, transcode, ABR, thumbnails, captions.</p>
+              </div>
+            </div>
+
+            <!-- Item 2: CDN + Edge -->
+            <div class="feature-sub-item">
+              <div class="feature-icon-wrap icon-green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+              <div class="feature-item-text">
+                <h4 class="feature-item-title">CDN + Edge</h4>
+                <p class="feature-item-desc">Global delivery, caching, edge functions.</p>
+              </div>
+            </div>
+
+            <!-- Item 3: Storage -->
+            <div class="feature-sub-item">
+              <div class="feature-icon-wrap icon-orange">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+              </div>
+              <div class="feature-item-text">
+                <h4 class="feature-item-title">Storage</h4>
+                <p class="feature-item-desc">S3-compatible, lifecycle policies, versioning.</p>
+              </div>
+            </div>
+
+            <!-- Item 4: Access Control -->
+            <div class="feature-sub-item">
+              <div class="feature-icon-wrap icon-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <div class="feature-item-text">
+                <h4 class="feature-item-title">Access Control</h4>
+                <p class="feature-item-desc">API keys, JWT, role-based access, audit logs.</p>
+              </div>
+            </div>
+
+            <!-- Item 5: APIs & Webhooks -->
+            <div class="feature-sub-item">
+              <div class="feature-icon-wrap icon-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <div class="feature-item-text">
+                <h4 class="feature-item-title">APIs &amp; Webhooks</h4>
+                <p class="feature-item-desc">~60 REST endpoints, webhooks, SDKs.</p>
+              </div>
+            </div>
+
+            <!-- Item 6: Observability -->
+            <div class="feature-sub-item">
+              <div class="feature-icon-wrap icon-green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+              </div>
+              <div class="feature-item-text">
+                <h4 class="feature-item-title">Observability</h4>
+                <p class="feature-item-desc">Metrics, logs, alerts, health checks.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. BOTTOM CTA BANNER -->
+      <section class="pricing-cta-section">
+        <div class="pricing-cta-banner">
+          <div class="cta-left-content">
+            <div class="cta-rocket-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF8A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+              </svg>
+            </div>
+            <div class="cta-text-wrap">
+              <h2 class="cta-title">Ready to get started?</h2>
+              <p class="cta-subtitle">Spin up the free self-hosted stack in minutes.</p>
+            </div>
+          </div>
+
+          <div class="cta-right-btn-wrap">
+            <a href="https://login.ollanode.com" class="btn-cta-white">
+              <span>OPEN DASHBOARD</span>
+              <span class="arrow-icon">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 </Site>
 
 <style>
-  @media (max-width: 680px) { .price-grid { grid-template-columns: 1fr !important; } }
+  /* ==========================================================================
+     REDESIGNED PRICING PAGE STYLING (MATCHING EXACT AMBIENT BACKDROP SPEC)
+     ========================================================================== */
+
+  .pricing-page-wrapper {
+    position: relative;
+    background-color: #FFFFFF;
+    color: #1A1D23;
+    overflow: hidden;
+    padding-bottom: 90px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Sophisticated Hero Backdrop Container */
+  .pricing-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 720px;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  /* Left Warm Peach/Coral Ambient Glow */
+  .backdrop-glow-left {
+    position: absolute;
+    top: -60px;
+    left: -120px;
+    width: 680px;
+    height: 680px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 140, 110, 0.32) 0%, rgba(255, 185, 160, 0.16) 45%, rgba(255, 255, 255, 0) 72%);
+    filter: blur(30px);
+  }
+
+  /* Left Fine Stipple Dot Pattern Field */
+  .backdrop-dots-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 480px;
+    height: 540px;
+    background-image: radial-gradient(rgba(255, 120, 80, 0.18) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 70% 60% at 20% 30%, black 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 20% 30%, black 20%, transparent 80%);
+    opacity: 0.85;
+  }
+
+  /* Right Lavender/Violet Ambient Glow */
+  .backdrop-glow-right {
+    position: absolute;
+    top: -80px;
+    right: -100px;
+    width: 750px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(216, 195, 255, 0.40) 0%, rgba(235, 225, 255, 0.18) 50%, rgba(255, 255, 255, 0) 75%);
+    filter: blur(40px);
+  }
+
+  /* Right Geometric Curved Ray Fan */
+  .backdrop-rays-svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 920px;
+    height: 680px;
+    opacity: 0.9;
+    mix-blend-mode: multiply;
+  }
+
+  .pricing-main-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 60px 24px 0;
+  }
+
+  /* 1. HERO HEADER */
+  .pricing-hero-header {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 52px;
+  }
+
+  .pricing-eyebrow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .eyebrow-orange-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #FF5A3D;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(255, 90, 61, 0.2);
+    display: inline-block;
+  }
+
+  .eyebrow-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #FF5A3D;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .pricing-hero-h1 {
+    font-size: clamp(2.6rem, 4.5vw, 3.6rem);
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    margin: 0 0 20px;
+  }
+
+  .text-brand-dot {
+    color: #FF5A3D;
+  }
+
+  .pricing-hero-lead {
+    font-size: clamp(1.05rem, 1.8vw, 1.18rem);
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 580px;
+  }
+
+  /* 2. TWO PRIMARY PRICING CARDS */
+  .pricing-cards-section {
+    margin-bottom: 64px;
+  }
+
+  .pricing-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    margin-bottom: 28px;
+  }
+
+  .pricing-card {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 20px;
+    padding: 38px 36px 34px;
+    box-shadow: 0 14px 34px -4px rgba(15, 23, 42, 0.12), 0 4px 14px -2px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  }
+
+  .pricing-card:hover {
+    transform: translateY(-3px);
+    border-color: #94A3B8;
+    box-shadow: 0 22px 46px -6px rgba(15, 23, 42, 0.18), 0 8px 20px -4px rgba(15, 23, 42, 0.12);
+  }
+
+  .card-top-badge {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .badge-selfhost {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #2563EB;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .badge-managed {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #EA580C;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .badge-recommended {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #EA580C;
+    background: #FFF7ED;
+    border: 1px solid #FFEDD5;
+    padding: 2px 9px;
+    border-radius: 12px;
+  }
+
+  .card-price-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 14px;
+  }
+
+  .card-price-h2 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 0 0 12px;
+  }
+
+  .price-accent-bar {
+    width: 38px;
+    height: 4px;
+    border-radius: 2px;
+  }
+
+  .accent-blue {
+    background-color: #93C5FD;
+  }
+
+  .accent-orange {
+    background-color: #FDBA74;
+  }
+
+  .card-tagline {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.5;
+    margin: 0 0 28px;
+    min-height: 42px;
+  }
+
+  .card-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-grow: 1;
+  }
+
+  .card-features-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.92rem;
+    color: #1E293B;
+    line-height: 1.45;
+  }
+
+  .check-icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background-color: #DCFCE7;
+    color: #16A34A;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .card-action-wrap {
+    margin-top: auto;
+  }
+
+  .btn-pricing-outline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 20px;
+    background: #FFFFFF;
+    border: 1.5px solid #93C5FD;
+    border-radius: 10px;
+    color: #2563EB;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-pricing-outline:hover {
+    background: #EFF6FF;
+    border-color: #3B82F6;
+    color: #1D4ED8;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  }
+
+  .btn-pricing-solid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 20px;
+    background: #FF5A3D;
+    border: 1.5px solid #FF5A3D;
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(255, 90, 61, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .btn-pricing-solid:hover {
+    background: #E0482B;
+    border-color: #E0482B;
+    box-shadow: 0 8px 22px rgba(255, 90, 61, 0.45);
+    transform: translateY(-1px);
+  }
+
+  /* Info Note Banner */
+  .pricing-info-pill-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #FFFFFF;
+    border: 1px solid #FDBA74;
+    box-shadow: 0 6px 18px -2px rgba(255, 90, 61, 0.12);
+    border-radius: 999px;
+    padding: 10px 26px;
+    max-width: 660px;
+    margin: 0 auto;
+  }
+
+  .info-pill-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #FFF0EB;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .info-pill-text {
+    font-size: 0.88rem;
+    color: #475569;
+    margin: 0;
+  }
+
+  .info-pill-link {
+    color: #FF5A3D;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 4px;
+  }
+
+  .info-pill-link:hover {
+    text-decoration: underline;
+  }
+
+  /* 3. FOUR VALUE PROPOSITION PILLARS */
+  .pricing-pillars-section {
+    margin-bottom: 56px;
+  }
+
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+
+  .pillar-card {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 16px;
+    padding: 26px 22px;
+    text-align: center;
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .pillar-card:hover {
+    transform: translateY(-3px);
+    border-color: #94A3B8;
+    box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.15);
+  }
+
+  .pillar-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .icon-blue {
+    background-color: #EFF6FF;
+  }
+
+  .icon-green {
+    background-color: #ECFDF5;
+  }
+
+  .icon-orange {
+    background-color: #FFF7ED;
+  }
+
+  .icon-purple {
+    background-color: #F5F3FF;
+  }
+
+  .pillar-title {
+    font-size: 0.96rem;
+    font-weight: 750;
+    color: #0F172A;
+    line-height: 1.3;
+    margin: 0 0 8px;
+  }
+
+  .pillar-desc {
+    font-size: 0.82rem;
+    color: #64748B;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  /* 4. EVERYTHING YOU NEED TO BUILD AT SCALE */
+  .pricing-features-card-section {
+    margin-bottom: 56px;
+  }
+
+  .features-box-container {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 20px;
+    padding: 44px 44px;
+    box-shadow: 0 16px 40px -4px rgba(15, 23, 42, 0.11), 0 6px 16px -2px rgba(15, 23, 42, 0.06);
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .features-left-col {
+    max-width: 320px;
+  }
+
+  .features-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #FF5A3D;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .features-box-title {
+    font-size: 1.95rem;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+  }
+
+  .features-box-desc {
+    font-size: 0.95rem;
+    color: #64748B;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .features-right-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px 20px;
+  }
+
+  .feature-sub-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .feature-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .feature-item-title {
+    font-size: 0.9rem;
+    font-weight: 750;
+    color: #0F172A;
+    margin: 0 0 4px;
+    line-height: 1.25;
+  }
+
+  .feature-item-desc {
+    font-size: 0.78rem;
+    color: #64748B;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  /* 5. BOTTOM CTA BANNER */
+  .pricing-cta-banner {
+    background: linear-gradient(108deg, #0F172A 0%, #161E2E 48%, #991B1B 78%, #FF5A3D 100%);
+    border-radius: 20px;
+    padding: 36px 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 22px 48px -10px rgba(15, 23, 42, 0.35);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pricing-cta-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .cta-left-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-rocket-icon-wrap {
+    width: 52px;
+    height: 52px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cta-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .cta-subtitle {
+    font-size: 0.92rem;
+    color: #CBD5E1;
+    margin: 0;
+  }
+
+  .cta-right-btn-wrap {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-cta-white {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    color: #0F172A;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    padding: 13px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .btn-cta-white:hover {
+    background: #F8FAFC;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  /* RESPONSIVE DESIGN */
+  @media (max-width: 960px) {
+    .features-box-container {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+
+    .features-left-col {
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .features-right-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pillars-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .pricing-cards-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pricing-cta-banner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 30px 24px;
+    }
+
+    .btn-cta-white {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .features-right-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .pillars-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pricing-hero-h1 {
+      font-size: 2.2rem;
+    }
+
+    .pricing-info-pill-banner {
+      border-radius: 16px;
+      padding: 12px 16px;
+      text-align: center;
+      flex-direction: column;
+    }
+  }
 </style>

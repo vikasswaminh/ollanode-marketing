@@ -1,52 +1,881 @@
 ---
 import DocsLayout from '../../layouts/DocsLayout.astro';
-import CodeBlock from '../../components/CodeBlock.astro';
 
-const firstCall = `curl https://api.ollanode.com/v1/whoami \\
-  -H "Authorization: Bearer $OLLANODE_API_KEY"`;
-
-const areas = [
-  { href: '/docs/quickstart', t: 'Quickstart', d: 'From signup to your first playing video in a handful of calls.' },
-  { href: '/docs/authentication', t: 'Authentication & scopes', d: 'API keys, roles, the fine-grained resource:action model, errors, rate limits.' },
-  { href: '/docs/videos', t: 'Videos & ingest', d: 'Create videos and get bytes in — presigned, multipart, resumable, or pull-from-URL.' },
-  { href: '/docs/processing', t: 'Processing & AI', d: 'Transcode ladder, thumbnails, transcripts, subtitles, chapters, AI metadata.' },
-  { href: '/docs/playback', t: 'Playback & delivery', d: 'Signed tokens, private-origin HLS, AES-128, the embed player, analytics.' },
-  { href: '/docs/cdn', t: 'CDN pull zones', d: 'Cache at the edge, purge, hotlink signing, edge rules, per-zone analytics.' },
-  { href: '/docs/storage', t: 'Storage & images', d: 'S3-style zones, presigned upload, and the on-the-fly image optimizer.' },
-  { href: '/docs/dns', t: 'DNS', d: 'Authoritative zones and records (A/AAAA/CNAME/TXT/MX/NS) served on :53.' },
-  { href: '/docs/edge-functions', t: 'Edge functions', d: 'Deploy JS/TS that runs in a V8 isolate next to your cache.' },
-  { href: '/docs/kv', t: 'KV store', d: 'A per-project key/value store your functions and dashboard share.' },
-  { href: '/docs/webhooks', t: 'Webhooks', d: 'HMAC-signed events with retries and a dead-letter queue.' },
-  { href: '/docs/agents', t: 'AI agents & governance', d: 'Capability discovery, approval-gated actions, hash-chain audit, kill-switch.' },
+const apiAreas = [
+  { href: '/docs/quickstart', title: 'Quickstart', desc: 'Run your first API call in seconds.', icon: 'rocket', color: 'orange' },
+  { href: '/docs/authentication', title: 'Authentication & scopes', desc: 'API keys, tokens, and fine-grained permissions.', icon: 'lock', color: 'orange' },
+  { href: '/docs/videos', title: 'Videos & ingest', desc: 'Create, upload and get details for your videos.', icon: 'video', color: 'blue' },
+  { href: '/docs/processing', title: 'Processing & AI', desc: 'Transcode, AI chapters, thumbnails, and more.', icon: 'sparkle', color: 'purple' },
+  { href: '/docs/playback', title: 'Playback & delivery', desc: 'Signed URLs, HLS, DASH, and delivery analytics.', icon: 'play', color: 'cyan' },
+  { href: '/docs/cdn', title: 'CDN pull zones', desc: 'Cache rules, regions, origins, and performance.', icon: 'globe', color: 'purple' },
+  { href: '/docs/storage', title: 'Storage & images', desc: 'S3-compatible storage policies and lifecycle.', icon: 'folder', color: 'green' },
+  { href: '/docs/dns', title: 'DNS', desc: 'Authoritative zones and records management.', icon: 'dns', color: 'blue' },
+  { href: '/docs/edge-functions', title: 'Edge functions', desc: 'Run your code at the edge (V8 isolates).', icon: 'code', color: 'purple' },
+  { href: '/docs/kv', title: 'KV store', desc: 'Low-latency key-value store at the edge.', icon: 'database', color: 'orange' },
+  { href: '/docs/webhooks', title: 'Webhooks', desc: 'Event notifications with retries.', icon: 'bell', color: 'blue' },
+  { href: '/docs/agents', title: 'AI agents & governance', desc: 'Agent actions, audit logs, and policy controls.', icon: 'bot', color: 'purple' },
 ];
 ---
-<DocsLayout active="overview" title="Ollanode API Docs" description="Reference and guides for the Ollanode API — video, CDN, storage, DNS, edge functions, webhooks, and AI-agent governance, all behind one project-scoped REST API.">
-  <div class="docs-hero">
-    <span class="eyebrow">Documentation</span>
-    <h1>Build on Ollanode.</h1>
-    <p class="lede">One project-scoped REST API for video, CDN, storage, DNS, edge compute, and governance. Every feature is an endpoint; every example below is a real call you can run against your own deployment.</p>
-    <div class="docs-chips">
-      <span class="chip">Base <span class="mono">https://api.ollanode.com</span></span>
-      <span class="chip">OpenAPI 3.1</span>
-      <span class="chip">MCP for agents</span>
-    </div>
+
+<DocsLayout active="overview" title="Ollanode API Documentation" description="One project-scoped REST API for video, CDN, storage, DNS, edge compute, and governance.">
+  <div class="docs-page-container">
+
+    <!-- 1. HERO SECTION -->
+    <header class="docs-hero-sec">
+      <div class="docs-hero-left">
+        <div class="docs-eyebrow-pill">
+          <span class="eyebrow-dot"></span>
+          <span class="eyebrow-label">DOCUMENTATION</span>
+        </div>
+
+        <h1 class="docs-hero-h1">
+          Build on Ollanode<span class="text-brand-dot">.</span>
+        </h1>
+
+        <p class="docs-hero-lead">
+          One project-scoped REST API for video, CDN, storage, DNS, edge compute, and governance. Every feature is an endpoint; every example below is a real call you can run against your own deployment.
+        </p>
+
+        <!-- CHIPS -->
+        <div class="docs-chips-row">
+          <div class="chip-item chip-blue">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Base URL: <code>https://api.ollanode.com</code></span>
+          </div>
+          <div class="chip-item chip-blue">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>OpenAPI 3.1</span>
+          </div>
+          <div class="chip-item chip-green">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>SDKs for agents</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO RIGHT ISOMETRIC 3D GRAPHIC (EXACT IMAGE FROM SCREENSHOT) -->
+      <div class="docs-hero-graphic" aria-hidden="true">
+        <img 
+          src="/images/docs-hero-platform.jpg" 
+          alt="Ollanode API Platform Architecture 3D Graphic" 
+          class="docs-hero-3d-img"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    </header>
+
+    <!-- 2. BASE URL & AUTHENTICATION SECTION -->
+    <section class="docs-content-section">
+      <h2 class="docs-section-h2">Base URL &amp; authentication</h2>
+      <p class="docs-section-desc">
+        All requests go to <code>https://api.ollanode.com</code> and carry a bearer credential — either a token, API key or dashboard session token in the <code class="hl-orange">Authorization</code> header (the <code>x-api-key</code> header is also accepted). Create keys in the dashboard under API keys.
+      </p>
+
+      <div class="auth-split-layout">
+        <!-- Left: Interactive Code Block -->
+        <div class="code-terminal-wrapper">
+          <div class="terminal-header">
+            <div class="terminal-tab">
+              <span>curl</span>
+            <button class="btn-copy-code" id="btn-copy-curl" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <pre class="terminal-body"><code><span class="cmd-curl">curl</span> https://api.ollanode.com/v1/videos \
+  <span class="cmd-flag">-H</span> <span class="cmd-str">"Authorization: Bearer OLK_your_key"</span></code></pre>
+
+          <!-- Quick Test Info Box -->
+          <div class="terminal-foot-info">
+            <span class="method-badge-get">GET</span>
+            <span class="foot-info-text"><code>/v1/whoami</code> returns who you are and a per-action capability map — the fastest way to confirm a key works and see what it can do.</span>
+          </div>
+        </div>
+
+        <!-- Right: Auth Methods Card -->
+        <div class="auth-methods-card">
+          <h4 class="auth-card-title">AUTH METHODS</h4>
+          <div class="auth-methods-list">
+            
+            <div class="auth-method-item">
+              <div class="auth-method-icon icon-orange">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF5A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="auth-method-text">
+                <div class="auth-name">Bearer Token</div>
+                <div class="auth-sub">Recommended</div>
+              </div>
+            </div>
+
+            <div class="auth-method-item">
+              <div class="auth-method-icon icon-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-6 6 2-2m-2 2-7.5 7.5a2.12 2.12 0 1 1-3-3L12 7m0 0 2-2m2 2 4-4"/></svg>
+              </div>
+              <div class="auth-method-text">
+                <div class="auth-name">API Key</div>
+                <div class="auth-sub">Header: / x-api-key</div>
+              </div>
+            </div>
+
+            <div class="auth-method-item">
+              <div class="auth-method-icon icon-green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="auth-method-text">
+                <div class="auth-name">Dashboard Session</div>
+                <div class="auth-sub">For browser requests</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. CONVENTIONS IN 30 SECONDS SECTION -->
+    <section class="docs-content-section">
+      <h2 class="docs-section-h2">Conventions in 30 seconds</h2>
+
+      <div class="conventions-split-layout">
+        <div class="conventions-text-box">
+          <p>
+            Actions are caseful: <code>POST</code>, <code>GET</code>, action or filter-graded <code>revalidate:actions</code>, and conventional HTTP status. Data pages with <code>?limit=</code> (default 25, max 100), <code>?offset=</code> and order <code>?sort_date</code>, <code>scan_name</code>. We accept all standard codes; every response carries a <code>Request-ID</code> and rate-limit headers.
+          </p>
+        </div>
+
+        <div class="conventions-timer-card">
+          <div class="mini-doc-preview">
+            <div class="mini-line line-red"></div>
+            <div class="mini-line line-gray"></div>
+            <div class="mini-line line-gray-short"></div>
+          </div>
+          <div class="stopwatch-badge">
+            <span class="stopwatch-num">30</span>
+            <span class="stopwatch-unit">s</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. EXPLORE THE API (12 CARDS GRID) -->
+    <section class="docs-content-section">
+      <h2 class="docs-section-h2">Explore the API</h2>
+
+      <div class="api-cards-grid">
+        {apiAreas.map((area) => (
+          <a href={area.href} class="api-card">
+            <div class="api-card-header">
+              <div class={`api-card-icon icon-${area.color}`}>
+                {area.icon === 'rocket' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+                )}
+                {area.icon === 'lock' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                )}
+                {area.icon === 'video' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                )}
+                {area.icon === 'sparkle' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                )}
+                {area.icon === 'play' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                )}
+                {area.icon === 'globe' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                )}
+                {area.icon === 'folder' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                )}
+                {area.icon === 'dns' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                )}
+                {area.icon === 'code' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                )}
+                {area.icon === 'database' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                )}
+                {area.icon === 'bell' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                )}
+                {area.icon === 'bot' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 17v1"/><path d="M15 17v1"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+                )}
+              </div>
+              <span class="api-arrow-icon">→</span>
+            </div>
+            <h3 class="api-card-title">{area.title}</h3>
+            <p class="api-card-desc">{area.desc}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- 5. BOTTOM CTA BANNER -->
+    <section class="docs-bottom-banner">
+      <div class="banner-left-wrap">
+        <div class="terminal-icon-box">
+          <div class="mac-dots">
+            <span class="mac-dot red"></span>
+            <span class="mac-dot yellow"></span>
+            <span class="mac-dot green"></span>
+          </div>
+          <span class="term-prompt">&gt;_</span>
+        </div>
+        <div class="banner-text">
+          <h3 class="banner-h3">Ready to build?</h3>
+          <p class="banner-p">Start building on Ollanode with powerful APIs designed for speed, scale, and ownership.</p>
+        </div>
+      </div>
+
+      <div class="banner-actions">
+        <a href="/docs/quickstart" class="btn-banner-primary">
+          <span>RUN QUICKSTART</span>
+          <span class="arrow-icon">→</span>
+        </a>
+        <a href="/docs" class="btn-banner-secondary">
+          <span>EXPLORE SDKs</span>
+          <span class="arrow-icon">→</span>
+        </a>
+      </div>
+    </section>
+
   </div>
 
-  <h2>Base URL &amp; authentication</h2>
-  <p>All control-plane requests go to <code>https://api.ollanode.com</code> and carry a bearer credential — either a <code>vbk_</code> API key or a dashboard session token — in the <code>Authorization</code> header (the <code>x-api-key</code> header is also accepted). Create keys in the dashboard under API Keys.</p>
-  <CodeBlock code={firstCall} label="your first request" />
-  <p><code>GET /v1/whoami</code> returns who you are and a per-action capability map — the fastest way to confirm a key works and see what it can do.</p>
-
-  <h2>Conventions in 30 seconds</h2>
-  <p><b>Scopes</b> are coarse (<code>read</code>, <code>write</code>, <code>admin</code>) or fine-grained (<code>resource:action</code>, e.g. <code>videos:write</code>); a coarse preset satisfies the matching fine-grained checks. <b>Errors</b> are <code>{'{ "error": { "code", "message" } }'}</code> with conventional HTTP statuses. <b>Lists</b> page with <code>?limit=</code> (default 25, max 100) &amp; <code>?offset=</code> and return <code>{'{ items, total, limit, offset }'}</code>. Writes accept an <code>Idempotency-Key</code>; every response carries <code>X-Request-Id</code> and rate-limit headers. Full detail on the <a href="/docs/authentication">Authentication &amp; scopes</a> page.</p>
-
-  <h2>Explore the API</h2>
-  <div class="docs-cards">
-    {areas.map((a) => (
-      <a class="docs-card" href={a.href}>
-        <h3>{a.t}</h3>
-        <p>{a.d}</p>
-      </a>
-    ))}
-  </div>
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const copyBtn = document.getElementById('btn-copy-curl');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText('curl https://api.ollanode.com/v1/videos \\\n  -H "Authorization: Bearer OLK_your_key"');
+          const span = copyBtn.querySelector('span');
+          if (span) {
+            const orig = span.textContent;
+            span.textContent = 'Copied!';
+            setTimeout(() => { span.textContent = orig; }, 2000);
+          }
+        });
+      }
+    });
+  </script>
 </DocsLayout>
+
+<style>
+  /* ==========================================================================
+     REDESIGNED DOCS PAGE STYLING (PIXEL-PERFECT FROM SCREENSHOT SPEC)
+     ========================================================================== */
+
+  .docs-page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    color: #1A1D23;
+  }
+
+  /* 1. HERO */
+  .docs-hero-sec {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .docs-eyebrow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #FF5A3D;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(255, 90, 61, 0.2);
+    display: inline-block;
+  }
+
+  .eyebrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #FF5A3D;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .docs-hero-h1 {
+    font-size: clamp(2.4rem, 3.8vw, 3.1rem);
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    margin: 0 0 16px;
+  }
+
+  .text-brand-dot {
+    color: #FF5A3D;
+  }
+
+  .docs-hero-lead {
+    font-size: 1.05rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 0 24px;
+    max-width: 620px;
+  }
+
+  .docs-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .chip-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  .chip-blue {
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 1px solid #DBEAFE;
+  }
+  .chip-blue code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: #1D4ED8;
+  }
+
+  .chip-green {
+    background: #ECFDF5;
+    color: #059669;
+    border: 1px solid #D1FAE5;
+  }
+
+  .docs-hero-graphic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .docs-hero-3d-img {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 18px;
+    filter: drop-shadow(0 14px 34px rgba(15, 23, 42, 0.09));
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .docs-hero-3d-img:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  /* 2. BASE URL & AUTHENTICATION */
+  .docs-section-h2 {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+
+  .docs-section-desc {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 0 22px;
+  }
+
+  .docs-section-desc code {
+    background: #F1F5F9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    color: #0F172A;
+  }
+
+  .hl-orange {
+    color: #EA580C !important;
+    background: #FFF7ED !important;
+  }
+
+  .auth-split-layout {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 24px;
+  }
+
+  /* TERMINAL CODE BOX */
+  .code-terminal-wrapper {
+    background: #0D1117;
+    border: 1px solid #30363D;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px -4px rgba(15, 23, 42, 0.18);
+  }
+
+  .terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #161B22;
+    border-bottom: 1px solid #30363D;
+  }
+
+  .terminal-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8B949E;
+  }
+
+  .btn-copy-code {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    color: #8B949E;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-copy-code:hover {
+    color: #FFFFFF;
+    border-color: #8B949E;
+  }
+
+  .terminal-body {
+    padding: 18px 20px;
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #C9D1D9;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  .cmd-curl {
+    color: #58A6FF;
+  }
+  .cmd-flag {
+    color: #FF7B72;
+  }
+  .cmd-str {
+    color: #7EE787;
+  }
+
+  .terminal-foot-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #F0F9FF;
+    border-top: 1px solid #BAE6FD;
+    padding: 12px 18px;
+    color: #0369A1;
+    font-size: 12.5px;
+  }
+
+  .method-badge-get {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    background: #0284C7;
+    color: #FFFFFF;
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .foot-info-text code {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  /* AUTH METHODS CARD */
+  .auth-methods-card {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 10px 26px -4px rgba(15, 23, 42, 0.08);
+  }
+
+  .auth-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94A3B8;
+    letter-spacing: 0.08em;
+    margin: 0 0 16px;
+  }
+
+  .auth-methods-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .auth-method-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .auth-method-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .icon-orange {
+    background-color: #FFF7ED;
+    color: #F97316;
+    border: 1px solid #FFEDD5;
+  }
+  .icon-blue {
+    background-color: #EFF6FF;
+    color: #2563EB;
+    border: 1px solid #DBEAFE;
+  }
+  .icon-green {
+    background-color: #ECFDF5;
+    color: #10B981;
+    border: 1px solid #D1FAE5;
+  }
+  .icon-purple {
+    background-color: #F5F3FF;
+    color: #8B5CF6;
+    border: 1px solid #EDE9FE;
+  }
+  .icon-cyan {
+    background-color: #F0F9FF;
+    color: #0EA5E9;
+    border: 1px solid #E0F2FE;
+  }
+
+  .auth-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.25;
+  }
+
+  .auth-sub {
+    font-size: 0.78rem;
+    color: #64748B;
+  }
+
+  /* 3. CONVENTIONS SECTION */
+  .conventions-split-layout {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 28px;
+    align-items: center;
+  }
+
+  .conventions-text-box {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.65;
+  }
+  .conventions-text-box code {
+    background: #F1F5F9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    color: #0F172A;
+  }
+
+  .conventions-timer-card {
+    background: #FFFDFB;
+    border: 1px solid #FFE4DD;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 16px -2px rgba(255, 90, 61, 0.08);
+  }
+
+  .mini-doc-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 60px;
+  }
+
+  .mini-line {
+    height: 4px;
+    border-radius: 2px;
+  }
+  .line-red {
+    background: #FF5A3D;
+    width: 40px;
+  }
+  .line-gray {
+    background: #E2E8F0;
+    width: 55px;
+  }
+  .line-gray-short {
+    background: #E2E8F0;
+    width: 30px;
+  }
+
+  .stopwatch-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #FF5A3D;
+    background: #FFF0EB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FF5A3D;
+    font-weight: 800;
+  }
+
+  .stopwatch-num {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .stopwatch-unit {
+    font-size: 0.7rem;
+    margin-top: 2px;
+  }
+
+  /* 4. EXPLORE API CARDS GRID */
+  .api-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .api-card {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 16px;
+    padding: 22px 20px;
+    text-decoration: none;
+    box-shadow: 0 8px 22px -4px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.22s ease;
+  }
+
+  .api-card:hover {
+    transform: translateY(-3px);
+    border-color: #94A3B8;
+    box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.14);
+  }
+
+  .api-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .api-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .api-arrow-icon {
+    color: #94A3B8;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .api-card:hover .api-arrow-icon {
+    transform: translateX(3px);
+    color: #0F172A;
+  }
+
+  .api-card-title {
+    font-size: 0.98rem;
+    font-weight: 750;
+    color: #0F172A;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .api-card-desc {
+    font-size: 0.82rem;
+    color: #64748B;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  /* 5. BOTTOM BANNER */
+  .docs-bottom-banner {
+    background: linear-gradient(135deg, #FFFDFB 0%, #FFF4F0 100%);
+    border: 1px solid #FFE4DD;
+    border-radius: 20px;
+    padding: 32px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    box-shadow: 0 10px 30px -4px rgba(255, 90, 61, 0.08);
+  }
+
+  .banner-left-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .terminal-icon-box {
+    width: 60px;
+    height: 48px;
+    background: #0F172A;
+    border-radius: 10px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+    flex-shrink: 0;
+  }
+
+  .mac-dots {
+    display: flex;
+    gap: 4px;
+  }
+  .mac-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+  .mac-dot.red { background: #FF5F56; }
+  .mac-dot.yellow { background: #FFBD2E; }
+  .mac-dot.green { background: #27C93F; }
+
+  .term-prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #FF5A3D;
+  }
+
+  .banner-h3 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .banner-p {
+    font-size: 0.88rem;
+    color: #64748B;
+    margin: 0;
+  }
+
+  .banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .btn-banner-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FF5A3D;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 12px 22px;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(255, 90, 61, 0.28);
+    transition: all 0.2s ease;
+  }
+  .btn-banner-primary:hover {
+    background: #E0482B;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 90, 61, 0.38);
+  }
+
+  .btn-banner-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    color: #0F172A;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .btn-banner-secondary:hover {
+    background: #F8FAFC;
+    border-color: #94A3B8;
+  }
+
+  /* RESPONSIVE DESIGN */
+  @media (max-width: 960px) {
+    .docs-hero-sec {
+      grid-template-columns: 1fr;
+    }
+    .auth-split-layout {
+      grid-template-columns: 1fr;
+    }
+    .conventions-split-layout {
+      grid-template-columns: 1fr;
+    }
+    .api-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .docs-bottom-banner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .banner-actions {
+      width: 100%;
+      flex-direction: column;
+    }
+    .btn-banner-primary, .btn-banner-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .api-cards-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
