@@ -10,7 +10,7 @@ const tiers = [
 ];
 ---
 <Site title="Pricing — Ollanode" description="Ownership-first pricing. No per-minute fees, no egress surprises — you bring the VMs and storage, we bring the platform.">
-  <section class="band grid-bg">
+  <section class="band pricing-sec">
     <div class="wrap" style="max-width:920px">
       <div class="sec-head">
         <span class="eyebrow">Pricing</span>
@@ -19,16 +19,16 @@ const tiers = [
       </div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px" class="price-grid">
         {tiers.map((t) => (
-          <div class="card" style={t.highlight ? 'border-color:var(--brand)' : ''}>
+          <div class="card" style={t.highlight ? 'background:#FFF0EB;border-color:#FF5A3D' : ''}>
             <div style="display:flex;align-items:center;gap:10px">
               <h3 class="mono hl" style="text-transform:uppercase;letter-spacing:.12em;font-size:12px">{t.name}</h3>
               {t.highlight && <span class="pill brand">Recommended</span>}
             </div>
-            <div style="font-size:2.6rem;font-weight:600;letter-spacing:-.02em;margin:.5rem 0 .2rem">{t.price}</div>
-            <p style="color:var(--muted);font-size:14px">{t.tagline}</p>
+            <div style="font-size:2.6rem;font-weight:600;letter-spacing:-.02em;margin:.5rem 0 .2rem;color:#1A1D23">{t.price}</div>
+            <p style="color:#667085;font-size:14px">{t.tagline}</p>
             <ul style="list-style:none;margin:1.4rem 0 0;padding:0;display:flex;flex-direction:column;gap:10px">
               {t.features.map((f) => (
-                <li style="display:flex;gap:10px;font-size:14px;color:var(--fg-2)"><span style="color:var(--ok)">✓</span>{f}</li>
+                <li style="display:flex;gap:10px;font-size:14px;color:#1A1D23"><span style="color:var(--ok)">✓</span>{f}</li>
               ))}
             </ul>
             <a class={t.highlight ? 'btn btn-primary chamfer-sm' : 'btn chamfer-sm'} href={t.href} style="margin-top:1.6rem;width:100%;justify-content:center">{t.cta}</a>

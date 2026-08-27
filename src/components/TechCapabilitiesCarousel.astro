@@ -1,0 +1,38 @@
+---
+// src/components/TechCapabilitiesCarousel.astro
+const capabilities = [
+  { metric: '9', label: 'Services', desc: 'Core microservices running on your infra' },
+  { metric: '11', label: 'Library crates', desc: 'Modular Rust library crates' },
+  { metric: '360p → 4K', label: 'HLS ladder', desc: 'Adaptive multi-bitrate streaming' },
+  { metric: '-52%', label: 'AVIF posters', desc: 'Bandwidth-optimized image posters' },
+  { metric: ':53', label: 'Authoritative DNS', desc: 'Integrated DNS server engine' },
+];
+
+// Duplicate items for infinite seamless right-to-left marquee
+const marqueeItems = [...capabilities, ...capabilities, ...capabilities];
+---
+
+<section class="band tight alt tech-carousel-sec">
+  <div class="wrap">
+    <div class="tech-carousel-header">
+      <span class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        TECHNICAL CAPABILITIES
+      </span>
+      <h3 class="tech-h3 reveal-up ">Engineered for high performance</h3>
+    </div>
+
+    {/* CONTINUOUS RIGHT-TO-LEFT MARQUEE CAROUSEL TRACK */}
+    <div class="tech-carousel-container" aria-label="Technical Capabilities Carousel moving right to left">
+      <div class="tech-carousel-track">
+        {marqueeItems.map((item) => (
+          <div class="tech-cap-card">
+            <div class="cap-metric">{item.metric}</div>
+            <div class="cap-label">{item.label}</div>
+            <div class="cap-desc">{item.desc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

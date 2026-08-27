@@ -1,0 +1,403 @@
+---
+// src/components/WhatOllanodeIsSection.astro
+const qnaList = [
+  {
+    tag: 'PIPELINE',
+    question: 'Is there live streaming?',
+    answer: "No — it's a VOD pipeline only. There's no live / RTMP ingest.",
+    highlight: 'VOD Pipeline Only'
+  },
+  {
+    tag: 'STREAMING FORMATS',
+    question: 'HLS or DASH?',
+    answer: 'HLS today. Segments are already CMAF/fMP4 (DASH-ready packaging); a DASH manifest is the remaining piece.',
+    highlight: 'HLS + CMAF/fMP4'
+  },
+  {
+    tag: 'PRICING & BILLING',
+    question: 'How does pricing work?',
+    answer: "It's self-hosted software you run on your own hardware. There's no billing system and no metered plans — the cost is your infrastructure.",
+    highlight: 'Self-Hosted · Zero Markups'
+  },
+  {
+    tag: 'CONFIGURATION',
+    question: "What's off by default?",
+    answer: 'AI metadata, speaker diarization, H.265/NVENC, loudness normalization and the SVT-AV1 tier are all real but config/hardware-gated and off by default.',
+    highlight: 'Hardware-Gated Opt-in'
+  },
+  {
+    tag: 'OPEN SOURCE LICENSE',
+    question: 'How is it licensed?',
+    answer: 'Apache-2.0, with permissive-OSS-only dependencies (no AGPL) — SeaweedFS, imgproxy, tusd, Coraza, Hickory, Vidstack.',
+    highlight: '100% Permissive Apache-2.0'
+  },
+  {
+    tag: 'DEVELOPER SPEC',
+    question: "Where's the API described?",
+    answer: 'Machine-readable at GET /openapi.json (OpenAPI 3.1), with MCP for agents.',
+    highlight: 'OpenAPI 3.1 + MCP'
+  },
+  {
+    tag: 'DEPLOYMENT MODEL',
+    question: 'Is it managed or self-hosted?',
+    answer: 'Ownership-first software. You bring the VMs and storage, OllaNode provides the platform control plane.',
+    highlight: 'Ownership-First Stack'
+  },
+  {
+    tag: 'AGENT GOVERNANCE',
+    question: 'Can AI agents execute admin tasks?',
+    answer: 'No — agent keys are structurally prevented from holding admin, managing credentials, or accessing billing.',
+    highlight: 'Strict Human-Only Admin'
+  }
+];
+---
+
+<section class="what-is-sticky-wrapper" id="what-is">
+  <div class="what-is-sticky-pin">
+    <div class="band alt what-is-sec">
+      <div class="wrap">
+        {/* HEADER AREA */}
+        <div class="what-is-header-grid">
+          <div class="what-is-left">
+            <span class="eyebrow">
+              <span class="eyebrow-dot"></span>
+              FREQUENTLY ASKED QUESTIONS
+            </span>
+            <h2 class="what-is-h2 reveal-up ">
+              What Ollanode is.<br />
+              And what it isn't.
+            </h2>
+            <p class="what-is-desc reveal-up reveal-up">
+              Clear answers on platform boundaries, licensing, pricing, and infrastructure architecture — straight from the official source.
+            </p>
+          </div>
+
+          <div class="what-is-scroll-meta">
+            <div class="qna-indicator">
+              <span class="qna-step-active" id="qna-step-num">01</span>
+              <span class="qna-step-slash">/</span>
+              <span class="qna-step-total">08</span>
+            </div>
+            <div class="qna-scroll-badge">
+              <span class="qna-badge-line"></span>
+              <span>Scroll page to slide ↓</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SCROLL-DRIVEN HORIZONTAL CAROUSEL */}
+        <div class="qna-carousel-outer" id="qna-viewport">
+          <div class="qna-track" id="qna-track">
+            {qnaList.map((item, index) => (
+              <article class="qna-card" data-qna-card>
+                <div class="qna-card-head">
+                  <span class="qna-card-num">0{index + 1}</span>
+                  <span class="qna-card-tag">{item.tag}</span>
+                </div>
+
+                <h3 class="qna-card-question">{item.question}</h3>
+                <p class="qna-card-answer">{item.answer}</p>
+
+                <div class="qna-card-foot">
+                  <span class="qna-badge">{item.highlight}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    function initStickyQnaScroll() {
+      var wrapper = document.querySelector('.what-is-sticky-wrapper');
+      var track = document.getElementById('qna-track');
+      var viewport = document.getElementById('qna-viewport');
+      var stepNum = document.getElementById('qna-step-num');
+
+      if (!wrapper || !track || !viewport) return;
+
+      var isTicking = false;
+
+      function updateScroll() {
+        var rect = wrapper.getBoundingClientRect();
+        var windowHeight = window.innerHeight;
+        var wrapperHeight = wrapper.offsetHeight;
+        var scrollableDist = wrapperHeight - windowHeight;
+
+        var progress = 0;
+        if (scrollableDist > 0) {
+          var scrolled = -rect.top;
+          progress = Math.max(0, Math.min(1, scrolled / scrollableDist));
+        }
+
+        var maxScrollX = Math.max(0, track.scrollWidth - viewport.clientWidth);
+        var moveX = progress * maxScrollX;
+
+        track.style.transform = 'translateX(-' + moveX + 'px)';
+
+        if (stepNum) {
+          var totalCards = 8;
+          var activeIndex = Math.min(totalCards, Math.floor(progress * totalCards) + 1);
+          stepNum.textContent = activeIndex < 10 ? '0' + activeIndex : activeIndex;
+        }
+
+        isTicking = false;
+      }
+
+      function onScroll() {
+        if (!isTicking) {
+          requestAnimationFrame(updateScroll);
+          isTicking = true;
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      updateScroll();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initStickyQnaScroll);
+    } else {
+      initStickyQnaScroll();
+    }
+  })();
+</script>
+
+<style>
+  /* STICKY CONTAINER WRAPPER FOR SCROLL PINNING */
+  .what-is-sticky-wrapper {
+    position: relative;
+    width: 100%;
+    height: 250vh; /* Scroll space distance */
+    background: #F8F7F4;
+  }
+
+  .what-is-sticky-pin {
+    position: sticky;
+    top: 80px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .what-is-sec {
+    position: relative;
+    width: 100%;
+    background: #F8F7F4;
+    padding: 70px 0 80px;
+    border-top: 1px solid rgba(255, 90, 61, 0.15);
+    border-bottom: 1px solid rgba(255, 90, 61, 0.15);
+    z-index: 2;
+  }
+
+  .what-is-header-grid {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 36px;
+  }
+
+  .what-is-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 720px;
+  }
+
+  .what-is-h2 {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 3vw, 2.6rem);
+    font-weight: 620;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    color: #1A1D23;
+    margin: 0;
+  }
+
+  .what-is-desc {
+    font-family: var(--sans);
+    font-size: clamp(0.98rem, 1.15vw, 1.1rem);
+    font-weight: 400;
+    color: #475569;
+    line-height: 1.58;
+    margin: 0;
+  }
+
+  .what-is-scroll-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .qna-indicator {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-family: var(--mono);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1A1D23;
+  }
+
+  .qna-step-active {
+    color: #FF5A3D;
+  }
+
+  .qna-step-slash,
+  .qna-step-total {
+    color: #94A3B8;
+    font-size: 0.95rem;
+  }
+
+  .qna-scroll-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: #667085;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .qna-badge-line {
+    width: 20px;
+    height: 2px;
+    background: #FF5A3D;
+    border-radius: 2px;
+  }
+
+  /* SCROLL-DRIVEN CAROUSEL VIEWPORT & TRACK */
+  .qna-carousel-outer {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 6px 2px 14px;
+  }
+
+  .qna-track {
+    display: flex;
+    gap: 24px;
+    transition: transform 0.08s linear;
+    will-change: transform;
+  }
+
+  .qna-card {
+    flex: 0 0 clamp(360px, 42vw, 540px);
+    background: #FFFFFF;
+    border: 1.5px solid rgba(255, 90, 61, 0.38);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 220px;
+    box-shadow: 0 8px 24px rgba(26, 29, 35, 0.08), 0 2px 8px rgba(255, 90, 61, 0.1);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .qna-card:hover {
+    border-color: #FF5A3D;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(255, 90, 61, 0.12);
+  }
+
+  .qna-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 12px;
+  }
+
+  .qna-card-num {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #FF5A3D;
+  }
+
+  .qna-card-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: #667085;
+    letter-spacing: 0.05em;
+    background: #F1F5F9;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .qna-card-question {
+    font-family: var(--sans);
+    font-size: 1.15rem;
+    font-weight: 650;
+    color: #1A1D23;
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  .qna-card-answer {
+    font-family: var(--sans);
+    font-size: 0.94rem;
+    color: #475569;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .qna-card-foot {
+    padding-top: 12px;
+    border-top: 1px solid #F1F5F9;
+  }
+
+  .qna-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #C2410C;
+    background: #FFF0EB;
+    border: 1px solid #FFBDAD;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .what-is-sticky-wrapper {
+      height: auto;
+    }
+
+    .what-is-sticky-pin {
+      position: relative;
+      top: 0;
+    }
+
+    .qna-carousel-outer {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .qna-track {
+      transform: none !important;
+    }
+
+    .qna-card {
+      scroll-snap-align: start;
+      flex: 0 0 320px;
+    }
+
+    .what-is-header-grid {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+</style>

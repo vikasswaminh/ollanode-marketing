@@ -1,0 +1,312 @@
+---
+// src/components/HowItWorksArchitecture.astro
+---
+
+<section class="band alt how-it-works-sec" id="how-it-works">
+  <div class="wrap">
+    <div class="how-it-works-grid">
+      {/* LEFT COLUMN: Content & Control */}
+      <div class="how-left">
+        <span class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          HOW IT WORKS
+        </span>
+        <h2 class="how-h2 reveal-up ">
+          Built for developers.<br />
+          Designed for ownership.
+        </h2>
+        <p class="how-desc reveal-up reveal-up">
+          OllaNode orchestrates your video, storage, and edge infrastructure through a unified control plane. You run the app and API — our control plane handles storage, background processing, and global edge delivery.
+        </p>
+        <div class="how-cta-wrap">
+          <button
+            type="button"
+            id="how-it-works-cta-btn"
+            class="btn btn-primary chamfer-sm"
+            aria-label="Explore the architecture flow process"
+          >
+            Explore the process →
+          </button>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN: Interactive Architecture Diagram */}
+      <div class="how-right" role="region" aria-label="Interactive Architecture Diagram">
+        <div class="graph-card">
+          <div class="graph-grid-bg" aria-hidden="true"></div>
+
+          {/* TOPOLOGY GRAPH */}
+          <div class="graph-container" id="arch-graph-container">
+            {/* 1. USERS NODE */}
+            <div class="arch-node node-users state-idle" id="node-users" data-node="users">
+              <div class="node-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div class="node-info">
+                <div class="node-title">Users</div>
+                <div class="node-badge">Client / Browser</div>
+              </div>
+              <span class="status-indicator"></span>
+            </div>
+
+            <div class="connector-v" id="conn-1">↓</div>
+
+            {/* 2. APP NODE */}
+            <div class="arch-node node-app state-idle" id="node-app" data-node="app">
+              <div class="node-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <line x1="3" y1="9" x2="21" y2="9" />
+                  <line x1="9" y1="21" x2="9" y2="9" />
+                </svg>
+              </div>
+              <div class="node-info">
+                <div class="node-title">App</div>
+                <div class="node-badge">Application Layer</div>
+              </div>
+              <span class="status-indicator"></span>
+            </div>
+
+            <div class="connector-v" id="conn-2">↓</div>
+
+            {/* 3. API NODE */}
+            <div class="arch-node node-api state-idle" id="node-api" data-node="api">
+              <div class="node-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+              </div>
+              <div class="node-info">
+                <div class="node-title">API</div>
+                <div class="node-badge">REST Gateway</div>
+              </div>
+              <span class="status-indicator"></span>
+            </div>
+
+            <div class="connector-v" id="conn-3">↓</div>
+
+            {/* 4. CONTROL PLANE (PROMINENT / CENTRAL BRAIN) */}
+            <div class="arch-node node-control state-idle" id="node-control" data-node="control">
+              <div class="central-aura"></div>
+              <div class="node-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="2" width="20" height="8" rx="2" />
+                  <rect x="2" y="14" width="20" height="8" rx="2" />
+                  <line x1="6" y1="6" x2="6.01" y2="6" />
+                  <line x1="6" y1="18" x2="6.01" y2="18" />
+                </svg>
+              </div>
+              <div class="node-info">
+                <div class="node-title">Control Plane</div>
+                <div class="node-badge">Central Orchestration</div>
+              </div>
+              <span class="status-indicator"></span>
+            </div>
+
+            {/* DUAL BRANCH CONNECTORS */}
+            <div class="branch-split-label" id="conn-branch">
+              <span>Dispatches in Parallel</span>
+            </div>
+
+            {/* 5. PARALLEL BRANCHES (STORAGE & PROCESS) */}
+            <div class="branch-row">
+              {/* STORAGE NODE */}
+              <div class="arch-node node-branch state-idle" id="node-storage" data-node="storage">
+                <div class="node-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3" />
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                  </svg>
+                </div>
+                <div class="node-info">
+                  <div class="node-title">Storage</div>
+                  <div class="node-badge">S3 &amp; Optimizer</div>
+                </div>
+                <span class="status-indicator"></span>
+              </div>
+
+              {/* PROCESS NODE */}
+              <div class="arch-node node-branch state-idle" id="node-process" data-node="process">
+                <div class="node-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                </div>
+                <div class="node-info">
+                  <div class="node-title">Process</div>
+                  <div class="node-badge">Async Workers</div>
+                </div>
+                <span class="status-indicator"></span>
+              </div>
+            </div>
+
+            <div class="connector-v" id="conn-5">↓</div>
+
+            {/* 6. CDN / EDGE NODE */}
+            <div class="arch-node node-edge state-idle" id="node-edge" data-node="edge">
+              <div class="node-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+              </div>
+              <div class="node-info">
+                <div class="node-title">CDN / Edge</div>
+                <div class="node-badge">OpenResty Pull Zones</div>
+              </div>
+              <span class="status-indicator"></span>
+            </div>
+
+            <div class="connector-v return-link" id="conn-6">
+              <span>Delivers Back →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    function initHowItWorks() {
+      var btn = document.getElementById('how-it-works-cta-btn');
+      if (!btn) return;
+
+      var nodeUsers = document.getElementById('node-users');
+      var nodeApp = document.getElementById('node-app');
+      var nodeApi = document.getElementById('node-api');
+      var nodeControl = document.getElementById('node-control');
+      var nodeStorage = document.getElementById('node-storage');
+      var nodeProcess = document.getElementById('node-process');
+      var nodeEdge = document.getElementById('node-edge');
+
+      var conn1 = document.getElementById('conn-1');
+      var conn2 = document.getElementById('conn-2');
+      var conn3 = document.getElementById('conn-3');
+      var connBranch = document.getElementById('conn-branch');
+      var conn5 = document.getElementById('conn-5');
+      var conn6 = document.getElementById('conn-6');
+
+      var allNodes = [nodeUsers, nodeApp, nodeApi, nodeControl, nodeStorage, nodeProcess, nodeEdge];
+      var allConns = [conn1, conn2, conn3, connBranch, conn5, conn6];
+
+      var isAnimating = false;
+      var currentStep = 0;
+      var timer = null;
+
+      function setNodeState(node, state) {
+        if (!node) return;
+        node.classList.remove('state-idle', 'state-active', 'state-completed');
+        node.classList.add('state-' + state);
+
+        var statusElem = node.querySelector('.status-indicator');
+        if (statusElem) {
+          if (state === 'completed') {
+            statusElem.innerHTML = '<span class="completed-check">✓</span>';
+          } else if (state === 'active') {
+            statusElem.innerHTML = '<span class="active-pulse"></span>';
+          } else {
+            statusElem.innerHTML = '';
+          }
+        }
+      }
+
+      function resetAll() {
+        allNodes.forEach(function (node) {
+          setNodeState(node, 'idle');
+        });
+        allConns.forEach(function (conn) {
+          if (conn) conn.classList.remove('flowing');
+        });
+        btn.innerText = 'Explore the process →';
+        btn.disabled = false;
+        isAnimating = false;
+        currentStep = 0;
+      }
+
+      function updateStep(step) {
+        currentStep = step;
+
+        if (step === 1) {
+          setNodeState(nodeUsers, 'active');
+        } else if (step === 2) {
+          setNodeState(nodeUsers, 'completed');
+          if (conn1) conn1.classList.add('flowing');
+          setNodeState(nodeApp, 'active');
+        } else if (step === 3) {
+          setNodeState(nodeApp, 'completed');
+          if (conn1) conn1.classList.remove('flowing');
+          if (conn2) conn2.classList.add('flowing');
+          setNodeState(nodeApi, 'active');
+        } else if (step === 4) {
+          setNodeState(nodeApi, 'completed');
+          if (conn2) conn2.classList.remove('flowing');
+          if (conn3) conn3.classList.add('flowing');
+          setNodeState(nodeControl, 'active');
+        } else if (step === 5) {
+          setNodeState(nodeControl, 'completed');
+          if (conn3) conn3.classList.remove('flowing');
+          if (connBranch) connBranch.classList.add('flowing');
+          setNodeState(nodeStorage, 'active');
+          setNodeState(nodeProcess, 'active');
+        } else if (step === 6) {
+          setNodeState(nodeStorage, 'completed');
+          setNodeState(nodeProcess, 'completed');
+          if (connBranch) connBranch.classList.remove('flowing');
+          if (conn5) conn5.classList.add('flowing');
+          setNodeState(nodeEdge, 'active');
+        } else if (step === 7) {
+          setNodeState(nodeEdge, 'completed');
+          if (conn5) conn5.classList.remove('flowing');
+          if (conn6) conn6.classList.add('flowing');
+          setNodeState(nodeUsers, 'active');
+        } else if (step === 8) {
+          allNodes.forEach(function (n) { setNodeState(n, 'completed'); });
+          if (conn6) conn6.classList.remove('flowing');
+          btn.innerText = 'Replay process ↻';
+          btn.disabled = false;
+          isAnimating = false;
+          return;
+        }
+
+        if (step < 8) {
+          timer = setTimeout(function () {
+            updateStep(step + 1);
+          }, 750);
+        }
+      }
+
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (isAnimating) return;
+
+        var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) {
+          updateStep(8);
+          return;
+        }
+
+        resetAll();
+        isAnimating = true;
+        btn.disabled = true;
+        btn.innerText = 'Exploring process...';
+        updateStep(1);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHowItWorks);
+    } else {
+      initHowItWorks();
+    }
+  })();
+</script>

@@ -1,0 +1,321 @@
+---
+// src/components/VodPipelineSection.astro
+---
+
+<section class="band grid-bg vod-pipeline-sec" id="pipeline">
+  <div class="wrap">
+    <div class="vod-pipeline-grid">
+      {/* LEFT COLUMN: Video Player + Boundary Wrapped Nodes */}
+      <div class="vod-left">
+        <div class="vod-player-boundary-wrap">
+          {/* TOP NODES */}
+          <div class="boundary-row top-row">
+            <div class="node-chip state-idle" id="vod-node-1" data-stage="upload_completed">
+              <span class="type-tag">event</span>
+              <span class="node-name">upload_completed</span>
+              <span class="status-icon"></span>
+            </div>
+            <span class="b-arr" id="vod-arr-1">→</span>
+
+            <div class="node-chip state-idle" id="vod-node-2" data-stage="validate">
+              <span class="type-tag">step</span>
+              <span class="node-name">validate</span>
+              <span class="status-icon"></span>
+            </div>
+            <span class="b-arr" id="vod-arr-2">→</span>
+
+            <div class="node-chip state-idle" id="vod-node-3" data-stage="extract_metadata">
+              <span class="type-tag">step</span>
+              <span class="node-name">extract_metadata</span>
+              <span class="status-icon"></span>
+            </div>
+          </div>
+
+          {/* MIDDLE ROW: LEFT NODES + VIDEO PLAYER + RIGHT NODES */}
+          <div class="boundary-middle">
+            {/* LEFT NODES */}
+            <div class="boundary-col left-col">
+              <div class="node-chip key-node state-idle" id="vod-node-10" data-stage="mark_ready">
+                <span class="type-tag">ready</span>
+                <span class="node-name">mark_ready</span>
+                <span class="status-icon"></span>
+              </div>
+
+              <div class="node-chip state-idle" id="vod-node-9" data-stage="emit_webhook">
+                <span class="type-tag">step</span>
+                <span class="node-name">emit_webhook</span>
+                <span class="status-icon"></span>
+              </div>
+            </div>
+
+            {/* RECTANGULAR VIDEO PLAYER */}
+            <div class="vod-player-card">
+              <div class="player-stage">
+                {/* REALISTIC VIDEO FRAME MOCKUP */}
+                <div class="player-screen-demo" id="vod-demo-screen">
+                  <div class="video-overlay-gradient"></div>
+                  
+                  {/* REALISTIC VIDEO CONTENT PREVIEW */}
+                  <div class="real-video-mockup">
+                    <div class="video-grid-pattern"></div>
+                    <div class="video-center-graphic">
+                      <div class="video-pulse-ring"></div>
+                      <div class="video-play-symbol">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      </div>
+                    </div>
+                    <div class="video-stream-meta">
+                      <span class="stream-stat">H.264 / AAC</span>
+                      <span class="stream-stat">1080p @ 60fps</span>
+                      <span class="stream-stat bitrate">4.2 Mbps</span>
+                    </div>
+                  </div>
+
+                  {/* EQUALIZER WAVEFORM */}
+                  <div class="video-equalizer-bar">
+                    <div class="demo-wave-bar b1"></div>
+                    <div class="demo-wave-bar b2"></div>
+                    <div class="demo-wave-bar b3"></div>
+                    <div class="demo-wave-bar b4"></div>
+                    <div class="demo-wave-bar b5"></div>
+                  </div>
+                </div>
+
+                <div class="player-badges">
+                  <span class="badge-tag">MUTE / SILENT</span>
+                  <span class="badge-tag brand">HLS 1080p</span>
+                  <span class="badge-tag live-dot"><span class="red-dot"></span> LIVE ENCODE</span>
+                </div>
+
+                {/* PLAY / PAUSE OVERLAY BUTTON */}
+                <button type="button" class="player-center-play" id="vod-play-overlay-btn" aria-label="Play or Pause video pipeline">
+                  <svg id="vod-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </button>
+              </div>
+
+              <div class="player-controls-bar">
+                <button type="button" class="btn btn-primary btn-sm chamfer-sm" id="vod-control-btn">
+                  ▶ Play Pipeline
+                </button>
+                <div class="scrub-bar-track">
+                  <div class="scrub-progress" id="vod-scrub-progress"></div>
+                </div>
+                <div class="time-readout" id="vod-time-readout">00:00 / 00:10</div>
+              </div>
+            </div>
+
+            {/* RIGHT NODES */}
+            <div class="boundary-col right-col">
+              <div class="node-chip key-node state-idle" id="vod-node-4" data-stage="transcode">
+                <span class="type-tag">encode</span>
+                <span class="node-name">transcode</span>
+                <span class="status-icon"></span>
+              </div>
+
+              <div class="node-chip key-node state-idle" id="vod-node-5" data-stage="generate_hls">
+                <span class="type-tag">encode</span>
+                <span class="node-name">generate_hls</span>
+                <span class="status-icon"></span>
+              </div>
+            </div>
+          </div>
+
+          {/* BOTTOM NODES */}
+          <div class="boundary-row bottom-row">
+            <div class="node-chip state-idle" id="vod-node-8" data-stage="store_assets">
+              <span class="type-tag">step</span>
+              <span class="node-name">store_assets</span>
+              <span class="status-icon"></span>
+            </div>
+            <span class="b-arr reverse" id="vod-arr-8">←</span>
+
+            <div class="node-chip state-idle" id="vod-node-7" data-stage="transcript">
+              <span class="type-tag">step</span>
+              <span class="node-name">transcript</span>
+              <span class="status-icon"></span>
+            </div>
+            <span class="b-arr reverse" id="vod-arr-7">←</span>
+
+            <div class="node-chip state-idle" id="vod-node-6" data-stage="thumbnails">
+              <span class="type-tag">step</span>
+              <span class="node-name">thumbnails</span>
+              <span class="status-icon"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN: Supporting Explanation */}
+      <div class="vod-right">
+        <span class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          THE VOD PIPELINE
+        </span>
+        <h2 class="vod-h2 reveal-up ">One upload. A full pipeline.</h2>
+        <p class="vod-desc reveal-up reveal-up">
+          All long-running work is async and runs in worker pools, never in request handlers. Once an upload completes, OllaNode automatically validates media integrity, extracts metadata, transcodes video into adaptive HLS ladders, generates thumbnails and WhisperX transcripts, stores assets in S3, and emits HMAC-signed webhooks.
+        </p>
+
+        {/* PIPELINE PROGRESS COUNTER */}
+        <div class="pipeline-progress-box">
+          <div class="progress-header">
+            <span class="progress-lbl">PIPELINE STAGE</span>
+            <span class="progress-num" id="vod-progress-num">00 / 10</span>
+          </div>
+          <div class="progress-active-stage" id="vod-active-stage-name">READY TO EXECUTE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    function initVodPipeline() {
+      var controlBtn = document.getElementById('vod-control-btn');
+      var overlayBtn = document.getElementById('vod-play-overlay-btn');
+      var playIcon = document.getElementById('vod-play-icon');
+      var scrubProgress = document.getElementById('vod-scrub-progress');
+      var timeReadout = document.getElementById('vod-time-readout');
+      var progressNum = document.getElementById('vod-progress-num');
+      var stageNameText = document.getElementById('vod-active-stage-name');
+      var demoScreen = document.getElementById('vod-demo-screen');
+
+      if (!controlBtn) return;
+
+      var stages = [
+        { num: 1, id: 'vod-node-1', name: 'upload_completed', arr: 'vod-arr-1' },
+        { num: 2, id: 'vod-node-2', name: 'validate', arr: 'vod-arr-2' },
+        { num: 3, id: 'vod-node-3', name: 'extract_metadata', arr: null },
+        { num: 4, id: 'vod-node-4', name: 'transcode', arr: null },
+        { num: 5, id: 'vod-node-5', name: 'generate_hls', arr: null },
+        { num: 6, id: 'vod-node-6', name: 'thumbnails', arr: 'vod-arr-6' },
+        { num: 7, id: 'vod-node-7', name: 'transcript', arr: 'vod-arr-7' },
+        { num: 8, id: 'vod-node-8', name: 'store_assets', arr: 'vod-arr-8' },
+        { num: 9, id: 'vod-node-9', name: 'emit_webhook', arr: null },
+        { num: 10, id: 'vod-node-10', name: 'mark_ready', arr: null }
+      ];
+
+      var isPlaying = false;
+      var currentStepIndex = 0; // 0 to 10
+      var timer = null;
+
+      function setNodeState(nodeId, state) {
+        var node = document.getElementById(nodeId);
+        if (!node) return;
+        node.classList.remove('state-idle', 'state-active', 'state-completed');
+        node.classList.add('state-' + state);
+
+        var statusElem = node.querySelector('.status-icon');
+        if (statusElem) {
+          if (state === 'completed') {
+            statusElem.innerHTML = '✓';
+          } else if (state === 'active') {
+            statusElem.innerHTML = '<span class="chip-pulse"></span>';
+          } else {
+            statusElem.innerHTML = '';
+          }
+        }
+      }
+
+      function updateUI() {
+        // Scrub bar & time
+        var pct = (currentStepIndex / 10) * 100;
+        if (scrubProgress) scrubProgress.style.width = pct + '%';
+
+        var sec = currentStepIndex < 10 ? '0' + currentStepIndex : '10';
+        if (timeReadout) timeReadout.innerText = '00:' + sec + ' / 00:10';
+
+        if (progressNum) {
+          progressNum.innerText = (currentStepIndex < 10 ? '0' + currentStepIndex : '10') + ' / 10';
+        }
+
+        if (currentStepIndex === 0) {
+          if (stageNameText) stageNameText.innerText = 'READY TO EXECUTE';
+        } else if (currentStepIndex <= 10) {
+          var curr = stages[currentStepIndex - 1];
+          if (stageNameText && curr) stageNameText.innerText = curr.name.toUpperCase();
+        }
+
+        if (currentStepIndex === 10) {
+          if (stageNameText) stageNameText.innerText = '10 / 10 COMPLETE';
+          if (controlBtn) controlBtn.innerText = '↻ Replay';
+          if (playIcon) playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+          if (demoScreen) demoScreen.classList.remove('playing');
+          isPlaying = false;
+        }
+      }
+
+      function resetPipeline() {
+        stages.forEach(function (s) {
+          setNodeState(s.id, 'idle');
+          if (s.arr) {
+            var a = document.getElementById(s.arr);
+            if (a) a.classList.remove('flowing');
+          }
+        });
+        currentStepIndex = 0;
+        updateUI();
+      }
+
+      function stepForward() {
+        if (currentStepIndex < 10) {
+          currentStepIndex++;
+
+          // Mark previous as completed
+          if (currentStepIndex > 1) {
+            setNodeState(stages[currentStepIndex - 2].id, 'completed');
+          }
+          // Mark current as active
+          setNodeState(stages[currentStepIndex - 1].id, 'active');
+
+          updateUI();
+
+          if (currentStepIndex < 10 && isPlaying) {
+            timer = setTimeout(stepForward, 800);
+          }
+        }
+      }
+
+      function togglePlayPause() {
+        var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefersReducedMotion) {
+          stages.forEach(function (s) { setNodeState(s.id, 'completed'); });
+          currentStepIndex = 10;
+          updateUI();
+          return;
+        }
+
+        if (currentStepIndex === 10) {
+          resetPipeline();
+        }
+
+        if (isPlaying) {
+          // Pause
+          isPlaying = false;
+          clearTimeout(timer);
+          if (controlBtn) controlBtn.innerText = '▶ Resume Pipeline';
+          if (playIcon) playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+          if (demoScreen) demoScreen.classList.remove('playing');
+        } else {
+          // Play
+          isPlaying = true;
+          if (controlBtn) controlBtn.innerText = '⏸ Pause';
+          if (playIcon) playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+          if (demoScreen) demoScreen.classList.add('playing');
+          stepForward();
+        }
+      }
+
+      if (controlBtn) controlBtn.addEventListener('click', togglePlayPause);
+      if (overlayBtn) overlayBtn.addEventListener('click', togglePlayPause);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initVodPipeline);
+    } else {
+      initVodPipeline();
+    }
+  })();
+</script>

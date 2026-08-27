@@ -1,0 +1,358 @@
+---
+// src/components/WhyOllanodeSection.astro
+const valuePillars = [
+  {
+    number: '01',
+    category: 'UNIFIED ARCHITECTURE',
+    title: 'One control plane for your entire media & edge stack',
+    description: 'Replace fragmented SaaS vendors with a unified DDD Rust core. Transcoding, storage, CDN delivery, DNS, and edge isolates work together natively without third-party API dependencies or sync delays.',
+    highlights: ['Rust & Axum Core', 'NATS JetStream', 'PostgreSQL']
+  },
+  {
+    number: '02',
+    category: 'INFRASTRUCTURE OWNERSHIP',
+    title: 'Zero metered markup & predictable infrastructure costs',
+    description: 'Run on your own bare-metal or cloud servers. OllaNode is self-hosted software with no billing system, no per-minute transcoding fees, and no per-gigabyte bandwidth surcharges.',
+    highlights: ['Self-Hosted', 'No Metered Plans', 'Your Hardware']
+  },
+  {
+    number: '03',
+    category: 'DEVELOPER & AGENT FIRST',
+    title: 'Built for automated workflows & AI-agent execution',
+    description: 'API-first architecture with OpenAPI 3.1 definitions, Model Context Protocol (MCP) support, approval-gated actions, capability maps, and tamper-evident audit logging.',
+    highlights: ['OpenAPI 3.1', 'MCP Server', 'Audit Hash-Chain']
+  },
+  {
+    number: '04',
+    category: 'OPEN SOURCE FOUNDATION',
+    title: '100% Permissive Apache-2.0 open-source dependencies',
+    description: 'Engineered on battle-tested open source — SeaweedFS storage, imgproxy, tusd, Hickory DNS, and Coraza WAF — giving you full auditability and freedom from AGPL restrictions.',
+    highlights: ['Apache-2.0', 'No AGPL', 'Full Auditability']
+  }
+];
+---
+
+<section class="why-ollanode-section" id="why-ollanode">
+  <div class="why-ollanode-wrap">
+    <div class="why-grid">
+      {/* LEFT COLUMN: STICKY HEADER & STATEMENT */}
+      <div class="why-left-sticky">
+        <div class="why-sticky-content">
+          <span class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            WHY OLLANODE
+          </span>
+          
+          <h2 class="why-h2 reveal-up ">
+            Own your <span class="text-orange">Infrastructure.</span><br />
+            Deliver without Vendor limits.
+          </h2>
+
+          <p class="why-lead-desc reveal-up reveal-up">
+            Building modern video and media applications shouldn't mean stitching together a dozen expensive SaaS vendors or surrendering control of your data and bandwidth. OllaNode provides a unified, self-hosted platform where video processing, CDN delivery, storage, DNS, and edge compute run directly on hardware you control.
+          </p>
+
+          <div class="why-trust-pills">
+            <span class="why-pill">Self-Hosted Platform</span>
+            <span class="why-pill-dot">•</span>
+            <span class="why-pill">Apache-2.0 Licensed</span>
+            <span class="why-pill-dot">•</span>
+            <span class="why-pill">API & Agent Native</span>
+          </div>
+
+          <div class="why-scroll-indicator" aria-hidden="true">
+            <span class="scroll-track-line"></span>
+            <span class="scroll-text">Scroll to explore points ↓</span>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN: SCROLLING COMPACT CONTENT POINTS */}
+      <div class="why-right-scroll">
+        {valuePillars.map((pillar) => (
+          <article class="why-point-card" data-why-card>
+            <div class="why-card-top">
+              <span class="why-card-num">{pillar.number}</span>
+              <span class="why-card-category">{pillar.category}</span>
+            </div>
+
+            <h3 class="why-card-title">{pillar.title}</h3>
+            <p class="why-card-desc">{pillar.description}</p>
+
+            <div class="why-card-tags">
+              {pillar.highlights.map((tag) => (
+                <span class="why-tag">{tag}</span>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    function initWhyScrollObserver() {
+      var cards = document.querySelectorAll('[data-why-card]');
+      if (!cards.length || !('IntersectionObserver' in window)) return;
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-active');
+            } else {
+              entry.target.classList.remove('is-active');
+            }
+          });
+        },
+        {
+          rootMargin: '-15% 0px -15% 0px',
+          threshold: 0.2
+        }
+      );
+
+      cards.forEach(function (card) {
+        observer.observe(card);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWhyScrollObserver);
+    } else {
+      initWhyScrollObserver();
+    }
+  })();
+</script>
+
+<style>
+  .why-ollanode-section {
+    position: relative;
+    width: 100%;
+    background: #F4F8FF;
+    padding: 80px 0 95px;
+    border-bottom: 1px solid rgba(255, 90, 61, 0.15);
+    z-index: 2;
+  }
+
+  .why-ollanode-wrap {
+    width: 100%;
+    max-width: var(--maxw, 1320px);
+    margin: 0 auto;
+    padding: 0 var(--gutter, clamp(20px, 4vw, 40px));
+  }
+
+  /* Sticky Side-by-Side Grid Layout */
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: clamp(36px, 5vw, 72px);
+    align-items: start;
+    position: relative;
+  }
+
+  /* Left Column: Sticky positioning */
+  .why-left-sticky {
+    position: sticky;
+    top: 110px;
+    align-self: start;
+    height: auto;
+  }
+
+  .why-sticky-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-right: clamp(0px, 2vw, 16px);
+  }
+
+  .why-h2 {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 3vw, 2.6rem);
+    font-weight: 620;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    color: #1A1D23;
+    margin: 0;
+  }
+
+  .why-lead-desc {
+    font-family: var(--sans);
+    font-size: clamp(0.98rem, 1.15vw, 1.1rem);
+    font-weight: 500;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .why-trust-pills {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #1A1D23;
+    letter-spacing: 0.02em;
+    padding-top: 4px;
+  }
+
+  .why-pill {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    padding: 4px 11px;
+    border-radius: 20px;
+    color: #1A1D23;
+  }
+
+  .why-pill-dot {
+    color: #FF5A3D;
+    font-weight: bold;
+  }
+
+  .why-scroll-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #667085;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .scroll-track-line {
+    width: 20px;
+    height: 2px;
+    background: #FF5A3D;
+    border-radius: 2px;
+  }
+
+  /* Right Column: Compact Vertical Scrolling List */
+  .why-right-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .why-point-card {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 1px 4px rgba(26, 29, 35, 0.03);
+  }
+
+  .why-point-card:hover,
+  .why-point-card.is-active {
+    border-color: #FF5A3D;
+    box-shadow: 0 8px 24px rgba(255, 90, 61, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .why-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 10px;
+  }
+
+  .why-card-num {
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #FF5A3D;
+    letter-spacing: -0.02em;
+  }
+
+  .why-card-category {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #667085;
+  }
+
+  .why-card-title {
+    font-family: var(--sans);
+    font-size: clamp(1.05rem, 1.25vw, 1.2rem);
+    font-weight: 650;
+    line-height: 1.3;
+    color: #1A1D23;
+    margin: 0;
+    letter-spacing: -0.015em;
+  }
+
+  .why-card-desc {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #667085;
+    margin: 0;
+  }
+
+  .why-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 2px;
+  }
+
+  .why-tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    background: #F1F5F9;
+    color: #334155;
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid #E2E8F0;
+  }
+
+  /* Responsive Rules */
+  @media (max-width: 990px) {
+    .why-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .why-left-sticky {
+      position: relative;
+      top: 0;
+    }
+
+    .why-scroll-indicator {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .why-ollanode-section {
+      padding: 55px 0 65px;
+    }
+
+    .why-point-card {
+      padding: 16px 18px;
+      border-radius: 10px;
+    }
+
+    .why-trust-pills {
+      gap: 6px;
+    }
+
+    .why-pill {
+      font-size: 10.5px;
+      padding: 3px 9px;
+    }
+  }
+</style>

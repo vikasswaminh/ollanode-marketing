@@ -4,11 +4,13 @@ const { title = 'Ollanode — Self-hosted video infrastructure & CDN', descripti
 // Absolute URLs for canonical + social cards (Astro.site = https://ollanode.com).
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL('/og-image.png', Astro.site).href;
+const path = Astro.url.pathname;
 const nav = [
-  { href: '/#capabilities', label: 'Platform' },
+  { href: '/#platform-capabilities', label: 'Features' },
+  { href: '/#how-it-works', label: 'Architecture' },
   { href: '/docs', label: 'Docs' },
-  { href: '/blog', label: 'Blog' },
   { href: '/pricing', label: 'Pricing' },
+  { href: '/blog', label: 'Blogs' },
   { href: 'https://login.ollanode.com', label: 'Dashboard' },
 ];
 ---
@@ -35,15 +37,55 @@ const nav = [
     <meta name="twitter:image" content={ogImage} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Chivo+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet" />
     <script is:inline src="/theme.js"></script>
   </head>
   <body>
+    <div class="announce" aria-hidden="true">
+      <div class="announce-track">
+        <span class="announce-item">Power your applications with <b>Video</b>, <b>CDN</b>, <b>Storage</b>, <b>Edge Compute</b>, and <b>Developer Infrastructure</b> — all through <b>OllaNode</b>.</span>
+        <span class="announce-item">Power your applications with <b>Video</b>, <b>CDN</b>, <b>Storage</b>, <b>Edge Compute</b>, and <b>Developer Infrastructure</b> — all through <b>OllaNode</b>.</span>
+      </div>
+    </div>
     <header class="nav">
-      <div class="wrap">
-        <a href="/" class="brand"><span class="mark">◢</span> ollanode</a>
-        <nav class="nav-links">
-          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+      <div class="nav-inner">
+        <a href="/" class="brand" aria-label="Ollanode home">
+          <svg class="brand-logo-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradOrg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5A3D" />
+      <stop offset="100%" stop-color="#FF8A00" />
+    </linearGradient>
+    <linearGradient id="gradDark" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#1A1D23" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+    <filter id="hexShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Dark Node Hexagon representing Infrastructure/Edge -->
+  <path d="M16 2 L28 9 V23 L16 30 L4 23 V9 Z" fill="url(#gradDark)"/>
+  
+  <!-- Connectivity Lines (Node feel) -->
+  <path d="M16 2 V6 M28 9 L25 11 M28 23 L25 21 M16 30 V26 M4 23 L7 21 M4 9 L7 11" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Orange Inner Layer representing Data / Fluidity -->
+  <path d="M16 6 L25 11 V21 L16 26 L7 21 V11 Z" fill="url(#gradOrg)" filter="url(#hexShadow)"/>
+  
+  <!-- Inner White Play button representing Video -->
+  <path d="M13.5 11.5 L21 16 L13.5 20.5 Z" fill="#FFFFFF"/>
+</svg>
+          <span class="wordmark" style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.25rem; letter-spacing: 0.02em; color: #1A1D23;">OLLANODE</span>
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          {nav.map((n, index) => (
+            <>
+              <a href={n.href} class={path === n.href ? 'active' : ''}>{n.label}</a>
+              {index < nav.length - 1 && <span class="nav-divider">|</span>}
+            </>
+          ))}
         </nav>
         <div class="nav-right">
           <button class="icon-btn" id="theme" aria-label="Toggle light/dark theme" title="Toggle theme">
@@ -51,51 +93,179 @@ const nav = [
             <svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
           </button>
           <a class="nav-signin" href="https://login.ollanode.com">Sign in</a>
-          <a class="btn btn-primary chamfer-sm" href="https://login.ollanode.com">Start free</a>
+          <button class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <span></span><span></span><span></span>
+          </button>
         </div>
+      </div>
+      <div class="mobile-menu" id="mobile-menu">
+        <nav aria-label="Mobile">
+          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+          <a href="https://login.ollanode.com" class="nav-signin">Sign in</a>
+        </nav>
       </div>
     </header>
     <main><slot /></main>
-    <footer class="foot">
-      <div class="foot-inner">
-        <div class="foot-grid">
-          <div>
-            <a href="/" class="brand"><span class="mark">◢</span> ollanode</a>
-            <p class="tag">A self-hosted, API-first video + CDN + storage + edge platform you run on your own hardware.</p>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <div class="site-footer-grid">
+          {/* Column 1: Brand & Live Status */}
+          <div class="foot-col-brand">
+            <a href="/" class="brand foot-brand" aria-label="Ollanode home">
+              <svg class="brand-logo-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradOrg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5A3D" />
+      <stop offset="100%" stop-color="#FF8A00" />
+    </linearGradient>
+    <linearGradient id="gradDark" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#1A1D23" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+    <filter id="hexShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Dark Node Hexagon representing Infrastructure/Edge -->
+  <path d="M16 2 L28 9 V23 L16 30 L4 23 V9 Z" fill="url(#gradDark)"/>
+  
+  <!-- Connectivity Lines (Node feel) -->
+  <path d="M16 2 V6 M28 9 L25 11 M28 23 L25 21 M16 30 V26 M4 23 L7 21 M4 9 L7 11" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Orange Inner Layer representing Data / Fluidity -->
+  <path d="M16 6 L25 11 V21 L16 26 L7 21 V11 Z" fill="url(#gradOrg)" filter="url(#hexShadow)"/>
+  
+  <!-- Inner White Play button representing Video -->
+  <path d="M13.5 11.5 L21 16 L13.5 20.5 Z" fill="#FFFFFF"/>
+</svg>
+              <span class="wordmark" style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.25rem; letter-spacing: 0.02em; color: #1A1D23;">OLLANODE</span>
+            </a>
+            <p class="foot-tagline">
+              A self-hosted, API-first video + CDN + storage + edge platform for modern engineering teams. Own your infrastructure, deliver without limits.
+            </p>
+            <div class="foot-status-badge">
+              <span class="status-indicator-dot"></span>
+              <span class="status-text">All Systems Operational · 100+ POPs</span>
+            </div>
           </div>
-          <div>
-            <h4>Product</h4>
-            <ul>
-              <li><a href="/#capabilities">Video &amp; playback</a></li>
-              <li><a href="/#capabilities">CDN &amp; storage</a></li>
-              <li><a href="/#agents">AI agents</a></li>
-              <li><a href="/pricing">Pricing</a></li>
+
+          {/* Column 2: Product Surfaces */}
+          <div class="foot-col">
+            <h4 class="foot-col-title">Product</h4>
+            <ul class="foot-links">
+              <li><a href="/#how-it-works">How It Works</a></li>
+              <li><a href="/#vod-pipeline">VOD Pipeline</a></li>
+              <li><a href="/docs/cdn">CDN Pull Zones</a></li>
+              <li><a href="/docs/storage">Storage &amp; Optimizer</a></li>
+              <li><a href="/docs/dns">Authoritative DNS</a></li>
+              <li><a href="/docs/edge-functions">Edge Functions</a></li>
             </ul>
           </div>
-          <div>
-            <h4>Developers</h4>
-            <ul>
-              <li><a href="/docs/edge-functions">Edge functions</a></li>
-              <li><a href="/#pipeline">VOD pipeline</a></li>
-              <li><a href="/#architecture">Architecture</a></li>
-              <li><a href="https://login.ollanode.com/api">API reference</a></li>
+
+          {/* Column 3: Developers */}
+          <div class="foot-col">
+            <h4 class="foot-col-title">Developers</h4>
+            <ul class="foot-links">
+              <li><a href="/docs/quickstart">Quickstart Guide</a></li>
+              <li><a href="/docs">Documentation</a></li>
+              <li><a href="/docs/playback">Vidstack Player SDK</a></li>
+              <li><a href="/docs/agents">AI Agent Governance</a></li>
+              <li><a href="https://login.ollanode.com/api">API Reference (OpenAPI)</a></li>
             </ul>
           </div>
-          <div>
-            <h4>Project</h4>
-            <ul>
-              <li><a href="https://login.ollanode.com">Dashboard</a></li>
-              <li><a href="/#architecture">License · Apache-2.0</a></li>
-              <li><a href="mailto:hello@ollanode.com">Contact</a></li>
-              <li><a href="https://login.ollanode.com">Self-host</a></li>
+
+          {/* Column 4: Platform & Cloud */}
+          <div class="foot-col">
+            <h4 class="foot-col-title">Platform</h4>
+            <ul class="foot-links">
+              <li><a href="https://login.ollanode.com">Dashboard Sign-in</a></li>
+              <li><a href="/pricing">Pricing Plans</a></li>
+              <li><a href="/docs/quickstart">Self-Host Setup</a></li>
+              <li><a href="mailto:hello@ollanode.com">Contact Engineering</a></li>
+              <li><a href="https://github.com" target="_blank" rel="noopener noreferrer">Apache-2.0 License</a></li>
             </ul>
           </div>
         </div>
-      </div>
-      <div class="foot-base">
-        <span>© {new Date().getFullYear()} Ollanode — Apache-2.0.</span>
-        <span>Self-hosted. Permissive OSS only. Your hardware, your rules.</span>
+
+        {/* Bottom Sub-Footer Bar */}
+        <div class="site-footer-bottom">
+          <div class="foot-copy">
+            <span>© {new Date().getFullYear()} Ollanode, Inc. Licensed under <strong>Apache-2.0</strong>.</span>
+            <span class="foot-subtext">Self-hosted. Permissive OSS only. Your hardware, your rules.</span>
+          </div>
+          <div class="foot-bottom-links">
+            <a href="/docs/quickstart">Security</a>
+            <span class="link-sep">·</span>
+            <a href="/docs">Privacy</a>
+            <span class="link-sep">·</span>
+            <a href="/docs">Terms</a>
+            <span class="link-sep">·</span>
+            <a href="mailto:hello@ollanode.com">Support</a>
+          </div>
+        </div>
       </div>
     </footer>
+    <script is:inline>
+      (function () {
+        var nav = document.querySelector('.nav');
+        if (nav) {
+          var onScroll = function () {
+            if (window.scrollY > 15) {
+              nav.classList.add('scrolled');
+            } else {
+              nav.classList.remove('scrolled');
+            }
+          };
+          window.addEventListener('scroll', onScroll, { passive: true });
+          onScroll();
+        }
+
+        var burger = document.getElementById('nav-burger');
+        var menu = document.getElementById('mobile-menu');
+        if (burger && menu) {
+          burger.addEventListener('click', function () {
+            var open = menu.classList.toggle('open');
+            burger.classList.toggle('open', open);
+            burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+          });
+        // Global Section Scroll Reveal Observer
+        if ('IntersectionObserver' in window) {
+          var sectionObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                sectionObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.01, rootMargin: '0px 0px -80px 0px' });
+
+          document.querySelectorAll('.section-reveal, .reveal-up').forEach(function (el) {
+            sectionObserver.observe(el);
+          });
+        }
+      })();
+    </script>
+
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', function() {
+        if ('IntersectionObserver' in window) {
+          var revealObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.05, rootMargin: '0px 0px -80px 0px' });
+
+          document.querySelectorAll('.reveal-up').forEach(function (el) {
+            revealObserver.observe(el);
+          });
+        }
+      });
+    </script>
   </body>
+
 </html>
