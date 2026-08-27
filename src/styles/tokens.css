@@ -131,7 +131,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: clip;
+  /* overflow-x: clip removed to fix sticky */
 }
 
 h1,
@@ -3229,10 +3229,23 @@ h3 {
 .net-col-right {
   position: -webkit-sticky;
   position: sticky;
-  top: 141px;
+  top: 130px;
   align-self: start;
   height: fit-content;
-  z-index: 30;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  z-index: 10;
+}
+
+/* Hide scrollbar for a cleaner look */
+.net-col-left::-webkit-scrollbar,
+.net-col-right::-webkit-scrollbar {
+  display: none;
+}
+.net-col-left,
+.net-col-right {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .right-sidebar-block {
