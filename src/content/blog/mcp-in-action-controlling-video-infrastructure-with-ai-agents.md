@@ -1069,14 +1069,3 @@ That's how MCP moves from an interesting AI protocol to something genuinely usef
 
 With [Ollanode's API-first video platform](/#platform), MCP can sit alongside the existing REST control plane, giving AI agents a structured way to interact with video, processing, playback, CDN, storage, and governance capabilities while keeping the underlying infrastructure under your control.
 
----
-
-## Related Reading
-
-- **AI & Agents:** [How AI Agents Can Control Infrastructure Safely: Permissions, Approvals, and Audit Trails](/docs/agents)
-- **Video Infrastructure:** [Step-by-Step: How to Generate Dynamic HLS Resolution Ladders (360p to 4K)](/blog/how-to-generate-dynamic-hls-resolution-ladders)
-- **Developer Guides:** [Building an API-First Video Infrastructure Stack for Modern Applications](/blog/introducing-ollanode-self-hosted-video-infrastructure)
-- **Video Processing:** [How Automated Video Transcoding Pipelines Work: From Upload to HLS Playback](/docs/processing)
-- **Security:** [API Authentication and Fine-Grained Scopes for Self-Hosted Video Infrastructure](/docs/authentication)
-- **Open Source:** [Why We Built an Open-Source Mux Alternative in Rust](/blog/why-we-built-open-source-mux-alternative-in-rust)
-- **Pipeline Setup:** [Setting Up Your First Open-Source Video Pipeline with Ollanode](/blog/setting-up-first-open-source-video-pipeline-ollanode)
