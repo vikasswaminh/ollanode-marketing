@@ -16,17 +16,22 @@ const eps = [
       'Code-mixed Hinglish for Indian technical audiences',
     ] },
   { method: 'POST', path: '/v1/tts', scope: 'tts:write',
-    desc: 'Synthesize speech from text. Returns `audio/wav` bytes. Optional `voice` (default `george`); write the response to a file with `-o`.',
-    curl: `curl -X POST https://api.ollanode.com/v1/tts \\
+    desc: 'Synthesize speech → `audio/wav`. Send JSON, or multipart to add a `voice_wav` file to **clone** a voice. `voice` = a built-in name (26, default `george`) or an `http(s)://` / `hf://kyutai/tts-voices/…` URL. `max_tokens` / `frames_after_eos` tune length; quality knobs (temperature, …) are server-level. `GET /v1/voices` lists the catalog. Cloning + `hf://` need the gated Kyutai cloning model (setup required).',
+    curl: `# built-in voice (JSON)
+curl -X POST https://api.ollanode.com/v1/tts \\
   -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: application/json" \\
-  -d '{"text":"Hello from the Ollanode voice API.","voice":"george"}' \\
-  -o hello.wav`,
+  -d '{"text":"Hello from the Ollanode voice API.","voice":"george"}' -o hello.wav
+
+# clone a voice from a sample (multipart) — needs the gated cloning model:
+curl -X POST https://api.ollanode.com/v1/tts \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -F text="Hello from a cloned voice." -F voice_wav=@sample.wav -o cloned.wav`,
     response: `# 200 OK — binary audio/wav  (RIFF/WAVE; save with -o hello.wav)`,
     responseLabel: 'Response (audio/wav)',
     useCases: [
       'Voiceover and narration for generated video',
       'Spoken notifications and IVR prompts',
-      'Accessible read-aloud of transcripts',
+      '26 built-in voices (GET /v1/voices); custom + cloned voices once the cloning model is enabled',
     ] },
   { method: 'POST', path: '/v1/asr', scope: 'asr:write',
     desc: 'Transcribe a short audio clip. POST the raw `audio/wav` bytes as the request body (up to 25 MB); returns the text plus timed segments.',
