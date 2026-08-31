@@ -31,6 +31,8 @@ const caps = [
     d: 'Signed, expiring tokens over a private origin (bytes never served direct), cookie-scoped CDN-cacheable segments, and an embeddable Vidstack player.' },
   { icon: svg('<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 21h10M6 9h5M6 13h8"/>'), t: 'Thumbnails & transcripts',
     d: 'Poster + sampled frames + storyboard sprite/WebVTT; word-level WhisperX transcripts (VTT/SRT), optional diarization, manual chapters, and AI title/description/tags/chapters.' },
+  { icon: svg('<path d="M3 12h1.8M7.4 8.5v7M11 5.5v13M14.6 8.5v7M18.2 12H20"/>'), t: 'Voice',
+    d: 'Text translation (code-mixed Hinglish for Hindi), natural text-to-speech (audio/wav), and speech-to-text — one API on self-hosted inference, no third-party keys or per-character metering.' },
   { icon: svg('<path d="M6.5 18a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18 8.5a4 4 0 0 1 .5 9.5H7z"/><path d="M12 12v5M9.5 14.5 12 12l2.5 2.5"/>'), t: 'CDN',
     d: 'Multi-tenant pull zones on an OpenResty edge: per-zone TTL/CORS/edge rules, hotlink token signing, full + path-granular purge, live traffic analytics.' },
   { icon: svg('<ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3V6M4.5 12v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6"/>'), t: 'Storage',
@@ -138,7 +140,7 @@ const heroCode = `<span class="pr">$</span> <span class="cmd">curl -X POST https
       <div class="sec-head">
         <span class="eyebrow">What it does</span>
         <h2>Everything, behind one project-scoped REST API.</h2>
-        <p>Twelve product surfaces — video, delivery, storage, DNS, edge, and governance — from a single self-hosted control plane.</p>
+        <p>Thirteen product surfaces — video, voice, delivery, storage, DNS, edge, and governance — from a single self-hosted control plane.</p>
       </div>
       <div class="cards">
         {caps.map((c) => (

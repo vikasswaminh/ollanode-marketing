@@ -1,0 +1,75 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import Endpoint from '../../components/Endpoint.astro';
+
+const eps = [
+  { method: 'POST', path: '/v1/translate', scope: 'translate:write',
+    desc: 'Translate text between languages. Hindi targets return natural code-mixed Hinglish — English technical terms, product names, and acronyms are preserved. Typically sub-second.',
+    curl: `curl -X POST https://api.ollanode.com/v1/translate \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: application/json" \\
+  -d '{"text":"The router forwards this traffic to the next hop.","source_language":"en","target_language":"hi"}'`,
+    response: `{ "translation": "Router इस traffic को next hop पर forward करता है।", "backend": "gateway" }`,
+    useCases: [
+      'Live meeting and video-caption translation',
+      'Localizing subtitles and UI strings',
+      'Code-mixed Hinglish for Indian technical audiences',
+    ] },
+  { method: 'POST', path: '/v1/tts', scope: 'tts:write',
+    desc: 'Synthesize speech from text. Returns `audio/wav` bytes. Optional `voice` (default `george`); write the response to a file with `-o`.',
+    curl: `curl -X POST https://api.ollanode.com/v1/tts \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: application/json" \\
+  -d '{"text":"Hello from the Ollanode voice API.","voice":"george"}' \\
+  -o hello.wav`,
+    response: `# 200 OK — binary audio/wav  (RIFF/WAVE; save with -o hello.wav)`,
+    responseLabel: 'Response (audio/wav)',
+    useCases: [
+      'Voiceover and narration for generated video',
+      'Spoken notifications and IVR prompts',
+      'Accessible read-aloud of transcripts',
+    ] },
+  { method: 'POST', path: '/v1/asr', scope: 'asr:write',
+    desc: 'Transcribe a short audio clip. POST the raw `audio/wav` bytes as the request body (up to 25 MB); returns the text plus timed segments.',
+    curl: `curl -X POST https://api.ollanode.com/v1/asr \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: audio/wav" \\
+  --data-binary @clip.wav`,
+    response: `{
+  "text": "Hello from the Ollanode voice API.",
+  "segments": [ { "start": 0.0, "end": 2.4, "text": "Hello from the Ollanode voice API." } ]
+}`,
+    useCases: [
+      'Voice-note and command transcription',
+      'Short-clip captioning',
+      'Voice input for agents',
+    ] },
+];
+
+const compose = `// Translate a line, then speak the translation — a minimal dub step.
+const key = process.env.OLLANODE_API_KEY;
+const j = (b) => ({ method: "POST", headers: { Authorization: \`Bearer \${key}\`, "Content-Type": "application/json" }, body: JSON.stringify(b) });
+
+const { translation } = await fetch("https://api.ollanode.com/v1/translate",
+  j({ text: "The router forwards this traffic.", source_language: "en", target_language: "hi" })
+).then((r) => r.json());
+
+const wav = await fetch("https://api.ollanode.com/v1/tts",
+  j({ text: translation, voice: "george" })
+).then((r) => r.arrayBuffer());   // audio/wav bytes — play or store`;
+---
+<DocsLayout active="voice" title="Voice — Ollanode Docs" description="Translate text, synthesize speech (audio/wav), and transcribe short audio clips — through the same project-scoped Ollanode API, on self-hosted inference.">
+  <div class="docs-hero">
+    <span class="eyebrow">Docs / Voice</span>
+    <h1>Voice</h1>
+    <p class="lede">Translate text, synthesize speech, and transcribe audio through the same project-scoped API — backed by Ollanode's own self-hosted inference. No third-party keys, no per-character SaaS metering.</p>
+    <div class="docs-chips"><span class="chip">self-hosted</span><span class="chip">sub-second translate</span><span class="chip">audio/wav</span><span class="chip">clips ≤ 25 MB</span></div>
+  </div>
+
+  <h2>Endpoints</h2>
+  {eps.map((e) => <Endpoint {...e} />)}
+
+  <h2>Compose them</h2>
+  <p>The routes are ordinary JSON/audio calls, so you can chain them — translate a line and immediately speak it for a lightweight dubbing step, or transcribe a clip and translate the result.</p>
+  <CodeBlock code={compose} label="translate → speak" />
+
+  <div class="note">Grant <code>translate:write</code> / <code>tts:write</code> / <code>asr:write</code> (fine-grained grants go in <code>extra_scopes</code>; the <a href="/docs/agents">agent</a> role preset includes them). These routes are for on-demand text and short audio clips — for full-length video transcripts use the async <a href="/docs/processing">transcript</a> flow instead. Everything runs on your own deployment; the inference services are internal and never exposed.</div>
+</DocsLayout>
