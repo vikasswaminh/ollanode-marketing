@@ -67,7 +67,7 @@ const wav = await fetch("https://api.ollanode.com/v1/tts",
   j({ text: translation, voice: "george" })
 ).then((r) => r.arrayBuffer());   // audio/wav bytes — play or store`;
 
-// The 24 built-in voices grouped by their native language (same data GET /v1/voices returns
+// The 28 built-in voices grouped by their native language (same data GET /v1/voices returns
 // per voice). Pick a voice whose language matches your text.
 const voicesByLang = [
   ['English', ['george (default)', 'alba', 'anna', 'marius', 'javert', 'vera', 'fantine', 'charles', 'paul', 'eponine', 'azelma', 'mary', 'jane', 'michael', 'eve', 'bill_boerst', 'peter_yearsley', 'stuart_bell', 'caro_davy']],
