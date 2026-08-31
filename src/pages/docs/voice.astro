@@ -16,7 +16,7 @@ const eps = [
       'Code-mixed Hinglish for Indian technical audiences',
     ] },
   { method: 'POST', path: '/v1/tts', scope: 'tts:write',
-    desc: 'Synthesize speech → `audio/wav`. Send JSON, or multipart to add a `voice_wav` file to **clone** a voice. `voice` = a built-in name (24, default `george`) or an `http(s)://` / `hf://kyutai/tts-voices/…` URL. **Voices are language-specific** — pick one matching your text (the voice sets the timbre; your text sets the spoken language; see the table below). `max_tokens` / `frames_after_eos` tune length; quality knobs (temperature, …) are server-level. `GET /v1/voices` lists the catalog with each voice’s language. Cloning + `hf://` need the gated Kyutai cloning model (setup required).',
+    desc: 'Synthesize speech → `audio/wav`. Send JSON, or multipart to add a `voice_wav` file to **clone** a voice. `voice` = a built-in name (28, default `george`) or an `http(s)://` / `hf://kyutai/tts-voices/…` URL. **Voices are language-specific** — pick one matching your text (the voice sets the timbre; your text sets the spoken language; see the table below). The 4 Hindi voices (`hf_*`/`hm_*`) are served by a native Hindi engine and auto-routed. `max_tokens` / `frames_after_eos` tune length; quality knobs (temperature, …) are server-level. `GET /v1/voices` lists the catalog with each voice’s language. Cloning + `hf://` need the gated Kyutai cloning model (setup required).',
     curl: `# built-in voice (JSON)
 curl -X POST https://api.ollanode.com/v1/tts \\
   -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: application/json" \\
@@ -31,7 +31,7 @@ curl -X POST https://api.ollanode.com/v1/tts \\
     useCases: [
       'Voiceover and narration for generated video',
       'Spoken notifications and IVR prompts',
-      '24 built-in voices across 6 languages (GET /v1/voices); custom + cloned voices once the cloning model is enabled',
+      '28 built-in voices across 7 languages incl. native Hindi (GET /v1/voices); custom + cloned voices once the cloning model is enabled',
     ] },
   { method: 'POST', path: '/v1/asr', scope: 'asr:write',
     desc: 'Transcribe a short audio clip. POST the raw `audio/wav` bytes as the request body (up to 25 MB); returns the text plus timed segments. The language is **auto-detected** by default; pass an optional `?language=<ISO-639-1>` (e.g. `en`) to hint it — useful when a short clip could be ambiguous.',
@@ -76,6 +76,7 @@ const voicesByLang = [
   ['German', ['juergen']],
   ['Portuguese', ['rafael']],
   ['French', ['estelle']],
+  ['Hindi', ['hf_alpha (female)', 'hf_beta (female)', 'hm_omega (male)', 'hm_psi (male)']],
 ];
 ---
 <DocsLayout active="voice" title="Voice — Ollanode Docs" description="Translate text, synthesize speech (audio/wav), and transcribe short audio clips — through the same project-scoped Ollanode API, on self-hosted inference.">
