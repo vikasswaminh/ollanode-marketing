@@ -5,7 +5,7 @@ import Endpoint from '../../components/Endpoint.astro';
 
 const eps = [
   { method: 'POST', path: '/v1/translate', scope: 'translate:write',
-    desc: 'Translate text between languages. `source_language` / `target_language` are ISO-639-1 codes — `en`, `hi`, `es`, `fr`, `de`, `it`, `pt`, `zh`. Hindi targets return natural code-mixed Hinglish — English technical terms, product names, and acronyms are preserved. Typically sub-second.',
+    desc: 'Translate text between languages. `source_language` / `target_language` are ISO-639-1 codes. Hindi targets return natural code-mixed Hinglish — English technical terms, product names, and acronyms are preserved. Typically sub-second.',
     curl: `curl -X POST https://api.ollanode.com/v1/translate \\
   -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: application/json" \\
   -d '{"text":"The router forwards this traffic to the next hop.","source_language":"en","target_language":"hi"}'`,
@@ -16,32 +16,47 @@ const eps = [
       'Code-mixed Hinglish for Indian technical audiences',
     ] },
   { method: 'POST', path: '/v1/tts', scope: 'tts:write',
-    desc: 'Synthesize speech → `audio/wav`. Send JSON, or multipart to add a `voice_wav` file to **clone** a voice. `voice` = a built-in name (28, default `george`) or an `http(s)://` / `hf://kyutai/tts-voices/…` URL. **Voices are language-specific** — pick one matching your text (the voice sets the timbre; your text sets the spoken language; see the table below). The 4 Hindi voices (`hf_*`/`hm_*`) are served by a native Hindi engine and auto-routed. `max_tokens` / `frames_after_eos` tune length; quality knobs (temperature, …) are server-level. `GET /v1/voices` lists the catalog with each voice’s language. Cloning + `hf://` need the gated Kyutai cloning model (setup required).',
-    curl: `# built-in voice (JSON)
-curl -X POST https://api.ollanode.com/v1/tts \\
+    desc: 'Synthesize speech → `audio/wav` (24 kHz). Powered by **Chatterbox Multilingual — 23 languages** with **emotion control**. Send JSON `{input, language, voice?, exaggeration?, cfg_weight?, temperature?, repetition_penalty?, min_p?, top_p?}`. `exaggeration` sets expressiveness (0 = flat, ~0.7 = lively, >1 = dramatic). `voice` names a registered/cloned voice (see below); omit for the built-in voice. `input` also accepts the legacy alias `text`.',
+    curl: `curl -X POST https://api.ollanode.com/v1/tts \\
   -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: application/json" \\
-  -d '{"text":"Hello from the Ollanode voice API.","voice":"george"}' -o hello.wav
-
-# clone a voice from a sample (multipart) — needs the gated cloning model:
-curl -X POST https://api.ollanode.com/v1/tts \\
-  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
-  -F text="Hello from a cloned voice." -F voice_wav=@sample.wav -o cloned.wav`,
-    response: `# 200 OK — binary audio/wav  (RIFF/WAVE; save with -o hello.wav)`,
+  -d '{"input":"Welcome to the live demo.","language":"en","exaggeration":0.7}' -o hello.wav`,
+    response: `# 200 OK — binary audio/wav (24 kHz; save with -o hello.wav)`,
     responseLabel: 'Response (audio/wav)',
     useCases: [
       'Voiceover and narration for generated video',
-      'Spoken notifications and IVR prompts',
-      '28 built-in voices across 7 languages incl. native Hindi (GET /v1/voices); custom + cloned voices once the cloning model is enabled',
+      'Expressive spoken notifications and IVR prompts',
+      '23 languages from one endpoint — English, Hindi, Spanish, French, German, Chinese, Japanese, Arabic, and more',
     ] },
+  { method: 'POST', path: '/v1/tts/clone', scope: 'tts:write',
+    desc: '**Zero-shot voice cloning** in one call — upload a clean 5–10 s reference clip and speak any text in that voice, in any of the 23 languages. Multipart `file` (reference audio) + `input` (text) + `language?` + the same generation params as `/v1/tts`. Returns `audio/wav`.',
+    curl: `curl -X POST https://api.ollanode.com/v1/tts/clone \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" \\
+  -F file=@reference.wav -F input="Now I speak in the reference voice." -F language=en -F exaggeration=0.6 \\
+  -o cloned.wav`,
+    response: `# 200 OK — binary audio/wav (speech in the reference voice)`,
+    responseLabel: 'Response (audio/wav)',
+    useCases: [
+      'Branded / personal voices for narration',
+      'Consistent character voices across languages',
+      'Dub a speaker into another language in their own voice',
+    ] },
+  { method: 'POST', path: '/v1/voices/{name}', scope: 'voices:write',
+    desc: 'Register a **named voice** for reuse: upload a 5–10 s reference clip once, then synthesize in that voice any time via `POST /v1/tts` with `voice: "<name>"` — no need to re-send the sample.',
+    curl: `curl -X POST https://api.ollanode.com/v1/voices/anchor \\
+  -H "Authorization: Bearer $OLLANODE_API_KEY" -F file=@anchor.wav`,
+    response: `{ "registered": "anchor" }`,
+    useCases: [
+      'A stable voice library for your product',
+      'Reusable brand / presenter voices',
+    ] },
+  { method: 'GET', path: '/v1/voices', scope: 'voices:read',
+    desc: 'List your registered/cloned voices plus the 23 supported languages and the per-request generation controls.',
+    curl: `curl https://api.ollanode.com/v1/voices -H "Authorization: Bearer $OLLANODE_API_KEY"`,
+    response: `{ "engine": "chatterbox-multilingual", "registered": ["anchor"], "languages": { "en": "English", "hi": "Hindi", ... } }`,
+    useCases: ['Populate a voice picker', 'Discover supported languages + controls'] },
   { method: 'POST', path: '/v1/asr', scope: 'asr:write',
-    desc: 'Transcribe a short audio clip. POST the raw `audio/wav` bytes as the request body (up to 25 MB); returns the text plus timed segments. The language is **auto-detected** by default; pass an optional `?language=<ISO-639-1>` (e.g. `en`) to hint it — useful when a short clip could be ambiguous.',
-    curl: `# auto-detect language:
-curl -X POST https://api.ollanode.com/v1/asr \\
-  -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: audio/wav" \\
-  --data-binary @clip.wav
-
-# hint the language (optional):
-curl -X POST "https://api.ollanode.com/v1/asr?language=en" \\
+    desc: 'Transcribe a short audio clip. POST the raw `audio/wav` bytes as the request body (up to 25 MB); returns the text plus timed segments. Language is **auto-detected**; pass `?language=<ISO-639-1>` to hint it.',
+    curl: `curl -X POST "https://api.ollanode.com/v1/asr?language=en" \\
   -H "Authorization: Bearer $OLLANODE_API_KEY" -H "Content-Type: audio/wav" \\
   --data-binary @clip.wav`,
     response: `{
@@ -55,52 +70,53 @@ curl -X POST "https://api.ollanode.com/v1/asr?language=en" \\
     ] },
 ];
 
-const compose = `// Translate a line, then speak the translation — a minimal dub step.
+const compose = `// Speech -> speech: transcribe, translate, and re-speak in the SAME voice.
 const key = process.env.OLLANODE_API_KEY;
-const j = (b) => ({ method: "POST", headers: { Authorization: \`Bearer \${key}\`, "Content-Type": "application/json" }, body: JSON.stringify(b) });
+const auth = { Authorization: \`Bearer \${key}\` };
 
-const { translation } = await fetch("https://api.ollanode.com/v1/translate",
-  j({ text: "The router forwards this traffic.", source_language: "en", target_language: "hi" })
+// 1) transcribe the input clip
+const { text } = await fetch("https://api.ollanode.com/v1/asr?language=en",
+  { method: "POST", headers: { ...auth, "Content-Type": "audio/wav" }, body: clipBytes }
 ).then((r) => r.json());
 
-const wav = await fetch("https://api.ollanode.com/v1/tts",
-  j({ text: translation, voice: "george" })
-).then((r) => r.arrayBuffer());   // audio/wav bytes — play or store`;
+// 2) translate it
+const { translation } = await fetch("https://api.ollanode.com/v1/translate",
+  { method: "POST", headers: { ...auth, "Content-Type": "application/json" },
+    body: JSON.stringify({ text, source_language: "en", target_language: "hi" }) }
+).then((r) => r.json());
 
-// The 28 built-in voices grouped by their native language (same data GET /v1/voices returns
-// per voice). Pick a voice whose language matches your text.
-const voicesByLang = [
-  ['English', ['george (default)', 'alba', 'anna', 'marius', 'javert', 'vera', 'fantine', 'charles', 'paul', 'eponine', 'azelma', 'mary', 'jane', 'michael', 'eve', 'bill_boerst', 'peter_yearsley', 'stuart_bell', 'caro_davy']],
-  ['Italian', ['giovanni']],
-  ['Spanish', ['lola']],
-  ['German', ['juergen']],
-  ['Portuguese', ['rafael']],
-  ['French', ['estelle']],
-  ['Hindi', ['hf_alpha (female)', 'hf_beta (female)', 'hm_omega (male)', 'hm_psi (male)']],
+// 3) speak the translation in the ORIGINAL speaker's voice (one-off clone)
+const form = new FormData();
+form.append("file", new Blob([clipBytes]), "ref.wav");
+form.append("input", translation); form.append("language", "hi");
+const wav = await fetch("https://api.ollanode.com/v1/tts/clone", { method: "POST", headers: auth, body: form })
+  .then((r) => r.arrayBuffer());   // Hindi speech in the speaker's own voice`;
+
+// Chatterbox Multilingual — 23 languages. Zero-shot cloning works across all of them.
+const languages = [
+  'English', 'Hindi', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Chinese',
+  'Japanese', 'Korean', 'Arabic', 'Russian', 'Turkish', 'Dutch', 'Polish', 'Swedish',
+  'Norwegian', 'Danish', 'Finnish', 'Greek', 'Hebrew', 'Malay', 'Swahili',
 ];
 ---
-<DocsLayout active="voice" title="Voice — Ollanode Docs" description="Translate text, synthesize speech (audio/wav), and transcribe short audio clips — through the same project-scoped Ollanode API, on self-hosted inference.">
+<DocsLayout active="voice" title="Voice — Ollanode Docs" description="Multilingual text-to-speech (23 languages, emotion control), zero-shot voice cloning, translation, and transcription — through one project-scoped Ollanode API on self-hosted inference.">
   <div class="docs-hero">
     <span class="eyebrow">Docs / Voice</span>
     <h1>Voice</h1>
-    <p class="lede">Translate text, synthesize speech, and transcribe audio through the same project-scoped API — backed by Ollanode's own self-hosted inference. No third-party keys, no per-character SaaS metering.</p>
-    <div class="docs-chips"><span class="chip">self-hosted</span><span class="chip">sub-second translate</span><span class="chip">audio/wav</span><span class="chip">clips ≤ 25 MB</span></div>
+    <p class="lede">Multilingual speech synthesis, zero-shot voice cloning, translation, and transcription through one project-scoped API — backed by Ollanode's own inference. No third-party keys, no per-character SaaS metering.</p>
+    <div class="docs-chips"><span class="chip">23 languages</span><span class="chip">voice cloning</span><span class="chip">emotion control</span><span class="chip">audio/wav</span></div>
   </div>
 
   <h2>Endpoints</h2>
   {eps.map((e) => <Endpoint {...e} />)}
 
-  <h2>Voices by language</h2>
-  <p>Each built-in <code>voice</code> has a native language — pass one that matches your text (the voice provides the timbre; your text provides the words). <code>GET /v1/voices</code> returns this same list with a <code>language</code> field per voice.</p>
-  <ul>
-    {voicesByLang.map(([lang, names]) => (
-      <li><strong>{lang}</strong> — <span set:html={names.map((n) => `<code>${n}</code>`).join(', ')} /></li>
-    ))}
-  </ul>
+  <h2>Languages</h2>
+  <p>One <code>/v1/tts</code> endpoint speaks <strong>23 languages</strong>, and zero-shot voice cloning works across all of them — clone a voice once, then have it speak any language.</p>
+  <p set:html={languages.map((l) => `<code>${l}</code>`).join(' · ')} />
 
   <h2>Compose them</h2>
-  <p>The routes are ordinary JSON/audio calls, so you can chain them — translate a line and immediately speak it for a lightweight dubbing step, or transcribe a clip and translate the result.</p>
-  <CodeBlock code={compose} label="translate → speak" />
+  <p>The routes are ordinary JSON/audio calls, so you can chain them — the classic pipeline is transcribe → translate → speak, optionally re-speaking in the original speaker's own voice.</p>
+  <CodeBlock code={compose} label="speech → speech (same voice)" />
 
-  <div class="note">Grant <code>translate:write</code> / <code>tts:write</code> / <code>asr:write</code> (fine-grained grants go in <code>extra_scopes</code>; the <a href="/docs/agents">agent</a> role preset includes them). These routes are for on-demand text and short audio clips — for full-length video transcripts use the async <a href="/docs/processing">transcript</a> flow instead. Everything runs on your own deployment; the inference services are internal and never exposed.</div>
+  <div class="note">Grant <code>translate:write</code> / <code>tts:write</code> / <code>asr:write</code> / <code>voices:read</code> / <code>voices:write</code> (fine-grained grants go in <code>extra_scopes</code>; the <a href="/docs/agents">agent</a> role preset includes them). These routes are for on-demand text and short audio clips — for full-length video transcripts use the async <a href="/docs/processing">transcript</a> flow. Try it live in the <a href="https://login.ollanode.com/playground">Voice Playground</a>.</div>
 </DocsLayout>
