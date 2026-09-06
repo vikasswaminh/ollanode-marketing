@@ -8,7 +8,7 @@ author:
   avatar: "⚡"
 publishedDate: "August 24, 2026"
 readingTime: "12 min read"
-tags: ["Guides", "VOD", "HLS", "Self-Hosted", "Storage", "CDN", "NATS"]
+tags: ["Guides", "VOD", "HLS", "Self-Hosted", "Storage", "CDN", "Event-Driven"]
 featured: false
 ---
 
@@ -37,7 +37,7 @@ This is a technical walkthrough, not a marketing pitch. Every step includes the 
 | **What should production add?** | Durable storage, worker scaling, observability, secrets management, redundancy, and automated deployment. |
 | **What is the most important security step?** | Verify webhook signatures and use signed playback URLs where content is restricted. |
 
-To set up your first open-source video pipeline with OllaNode, you need a Linux host or container environment, object storage (local disk for testing, S3-compatible for anything real), a job queue (NATS JetStream by default), and the OllaNode services themselves. In short: install OllaNode → configure storage → start the workers → create a project → upload a video → let the pipeline transcode, package, and deliver it as adaptive HLS.
+To set up your first open-source video pipeline with OllaNode, you need a Linux host or container environment, object storage (local disk for testing, object-storage-compatible for anything real), a job queue (an event bus by default), and the OllaNode services themselves. In short: install OllaNode → configure storage → start the workers → create a project → upload a video → let the pipeline transcode, package, and deliver it as adaptive HLS.
 
 The whole process, on a single machine, typically takes under an hour for a first working pipeline. Scaling to production traffic is a separate, later phase, covered in Step 12 and the scaling section below. Treat local setup and production readiness as two different milestones — conflating them is the most common reason first attempts stall out. Review our [Quickstart Developer Docs](/docs/quickstart) for immediate setup commands.
 
@@ -78,11 +78,11 @@ Before touching a terminal, it helps to know what you are actually deploying. Ol
 
 The API service is the entry point for uploads, asset queries, project management, and webhook configuration.
 
-The job orchestrator sits between the API and the workers. When a video is uploaded, the API publishes a job to the message stream (NATS JetStream by default) and returns immediately, keeping upload requests fast regardless of how long transcoding takes.
+The job orchestrator sits between the API and the workers. When a video is uploaded, the API publishes a job to the message stream (an event bus by default) and returns immediately, keeping upload requests fast regardless of how long transcoding takes.
 
-Transcoding workers subscribe to that job stream and do the actual encoding, using FFmpeg under the hood. OllaNode's Rust code is the coordination layer: deciding which jobs run, in what order, with what priority, and what happens on failure or retry.
+Transcoding workers subscribe to that job stream and do the actual encoding, using the built-in media pipeline under the hood. OllaNode's Rust code is the coordination layer: deciding which jobs run, in what order, with what priority, and what happens on failure or retry.
 
-The storage layer holds source files, renditions, thumbnails, and transcripts — decoupled from processing so you can point it at local disk during development and swap in S3-compatible storage later without touching pipeline logic. Learn more in our [Object Storage Docs](/docs/storage).
+The storage layer holds source files, renditions, thumbnails, and transcripts — decoupled from processing so you can point it at local disk during development and swap in object-storage-compatible storage later without touching pipeline logic. Learn more in our [Object Storage Docs](/docs/storage).
 
 The delivery layer handles CDN pull-zone configuration, signed URL generation, and cache behavior for the manifests and segments the transcoding stage produces. Read about our [Edge CDN Delivery](/docs/cdn).
 
@@ -96,8 +96,8 @@ Before installing anything, make sure you have the following in place:
 
 - A Linux host (bare metal, VM, or container orchestrator) with at least 4 CPU cores and 8 GB of RAM for a first test environment. Production sizing is a separate calculation, covered later.
 - Docker and Docker Compose, or a Kubernetes cluster if you plan to deploy that way from the start.
-- Object storage: local disk is fine for testing; an S3-compatible bucket (AWS S3, Cloudflare R2, MinIO, Backblaze B2) is strongly recommended before you touch anything beyond a demo.
-- A PostgreSQL-compatible database for project, asset, and playback-policy metadata. Docker Compose will provision one for you locally if you do not already have one.
+- Object storage: local disk is fine for testing; an object-storage-compatible bucket (from a managed cloud provider or a self-hosted cluster) is strongly recommended before you touch anything beyond a demo.
+- A relational (SQL) database for project, asset, and playback-policy metadata. Docker Compose will provision one for you locally if you do not already have one.
 - A domain or subdomain you control, for playback URLs and CDN configuration later in the guide.
 - Basic familiarity with environment variables, reverse proxies, container logs, and reading structured JSON API responses.
 
@@ -134,33 +134,33 @@ You should see the API, database, message stream, and at least one worker contai
 Every OllaNode deployment needs to know where source files, processed renditions, and metadata live. This is set through environment variables or a config file, depending on your deployment method.
 
 At minimum, you will configure:
-- **Storage backend** — local filesystem for testing, or S3-compatible credentials for anything beyond a demo.
+- **Storage backend** — local filesystem for testing, or object-storage-compatible credentials for anything beyond a demo.
 - **Database connection** — for project metadata, asset records, and playback policies.
 - **Base URL** — the domain your API and playback services will be reachable at.
 - **Encryption keys** — used for signed playback URLs and webhook payload verification.
-- **Job stream connection** — where NATS JetStream is reachable, if you are not using the default Docker Compose network.
+- **Job stream connection** — where the event bus is reachable, if you are not using the default Docker Compose network.
 
 A minimal `.env` for local testing might look like:
 
 ```env
 STORAGE_BACKEND=local
 STORAGE_PATH=/data/ollanode
-DATABASE_URL=postgres://ollanode:ollanode@db:5432/ollanode
+DATABASE_URL=<your-database-connection-string>
 BASE_URL=http://localhost:8080
 SIGNING_SECRET=replace-this-with-a-random-32-byte-value
-NATS_URL=nats://nats:4222
+EVENT_BUS_URL=<your-event-bus-endpoint>
 ```
 
-Switch `STORAGE_BACKEND` to `s3` and supply your bucket credentials before you move past local testing. Local disk storage does not survive container rebuilds, has no built-in redundancy, and is not meant for anything beyond initial validation.
+Switch `STORAGE_BACKEND` to `object-store` and supply your bucket credentials before you move past local testing. Local disk storage does not survive container rebuilds, has no built-in redundancy, and is not meant for anything beyond initial validation.
 
 A production-oriented `.env` typically adds a few more values:
 
 ```env
-STORAGE_BACKEND=s3
-S3_BUCKET=your-video-bucket
-S3_REGION=us-east-1
-S3_ACCESS_KEY=your-access-key
-S3_SECRET_KEY=your-secret-key
+STORAGE_BACKEND=object-store
+STORAGE_BUCKET=your-video-bucket
+STORAGE_REGION=us-east-1
+STORAGE_ACCESS_KEY=your-access-key
+STORAGE_SECRET_KEY=your-secret-key
 CDN_BASE_URL=https://cdn.yourapp.com
 WEBHOOK_SIGNING_SECRET=replace-this-with-a-separate-random-value
 ```
@@ -171,16 +171,16 @@ Keep `SIGNING_SECRET` and `WEBHOOK_SIGNING_SECRET` different — reusing one sec
 
 ## Step 3: Set Up the Job Orchestration Layer
 
-Video processing is asynchronous by design — you do not want an upload API call to block until transcoding finishes, especially for longer source files. OllaNode uses NATS JetStream by default to coordinate jobs between the API and the worker processes, with Temporal available as an optional workflow engine for teams that need more complex orchestration logic, such as multi-stage approval workflows or cross-system coordination beyond a single pipeline run.
+Video processing is asynchronous by design — you do not want an upload API call to block until transcoding finishes, especially for longer source files. OllaNode uses an event bus by default to coordinate jobs between the API and the worker processes, with a workflow engine available as an optional alternative for teams that need more complex orchestration logic, such as multi-stage approval workflows or cross-system coordination beyond a single pipeline run.
 
-If you used the Docker Compose file from Step 1, NATS JetStream is already running as part of the stack. Confirm it is healthy before moving on:
+If you used the Docker Compose file from Step 1, the event bus is already running as part of the stack. Confirm it is healthy before moving on:
 
 ```bash
 docker compose ps
-docker compose logs nats
+docker compose logs event-bus
 ```
 
-You should see the orchestrator connect to the message stream and register its job queues on startup. If those log lines are missing, the orchestrator likely started before NATS was ready — restarting the orchestrator container alone (not the whole stack) usually resolves it.
+You should see the orchestrator connect to the message stream and register its job queues on startup. If those log lines are missing, the orchestrator likely started before the event bus was ready — restarting the orchestrator container alone (not the whole stack) usually resolves it.
 
 If workers are not picking up jobs later in this guide, check here first. A queue that accepts jobs but never drains them is a job-orchestration problem, not a transcoding problem: the former looks like "processing" states that never change, while the latter produces explicit failure events.
 
@@ -213,7 +213,7 @@ curl -X POST https://your-ollanode-host/v1/videos \
 
 OllaNode validates the container format, codec, and duration before accepting the file, and returns an asset ID you can use to track processing status. A typical response includes the asset ID, its initial status (usually validating or queued), and a timestamp. See our [Video Management API Docs](/docs/videos).
 
-If validation fails, the API response tells you exactly which check failed — malformed containers and unsupported source codecs are the most common causes. If testing with a file from an unusual tool (some screen recorders produce nonstandard MP4 containers), try re-muxing it with FFmpeg locally first.
+If validation fails, the API response tells you exactly which check failed — malformed containers and unsupported source codecs are the most common causes. If testing with a file from an unusual tool (some screen recorders produce nonstandard MP4 containers), try re-muxing it with a local command-line media tool first.
 
 Once accepted, poll the asset status endpoint or wait for the webhook in Step 10 to see it move through `validating` → `processing` → `ready`.
 
@@ -238,7 +238,7 @@ ollanode projects configure my-first-pipeline \
   --codec h264
 ```
 
-FFmpeg does the actual encoding work under the hood; OllaNode's job orchestration decides what gets encoded, in what order, and with what priority. If you have both high-priority content (a course that just went live) and low-priority backfill (re-encoding an old catalog), set job priorities so the former does not wait behind the latter.
+The built-in media pipeline does the actual encoding work under the hood; OllaNode's job orchestration decides what gets encoded, in what order, and with what priority. If you have both high-priority content (a course that just went live) and low-priority backfill (re-encoding an old catalog), set job priorities so the former does not wait behind the latter.
 
 Codec choice matters too. H.264 remains the safest default for broad device compatibility. If your audience skews modern and bandwidth cost matters more than universal compatibility, evaluate H.265 or AV1 as an addition to, not a replacement for, an H.264 baseline.
 
@@ -328,7 +328,7 @@ If everything on this list works, you have a functioning self-hosted video pipel
 
 Local testing validates the architecture. Production requires a few additional decisions, none of which are unique to video infrastructure, but all of which matter more here because the failure modes are visible to end users as broken playback.
 
-- **Storage**: move fully to S3-compatible object storage with proper lifecycle rules and backups — local disk should never hold production assets.
+- **Storage**: move fully to object-storage-compatible storage with proper lifecycle rules and backups — local disk should never hold production assets.
 - **Scaling workers**: add more transcoding workers behind the queue as upload volume grows, rather than scaling one worker vertically.
 - **Observability**: wire up centralized logging and monitoring for the API, workers, and queue so failures surface before customers notice. See the checklist below.
 - **Secrets management**: move keys and credentials out of `.env` files and into a proper secrets manager.
@@ -354,7 +354,7 @@ None of this is unique to OllaNode — it's the same operational discipline any 
 ## Troubleshooting Reference
 
 - **Uploads succeed but processing never starts**: Check that the job orchestrator is connected to the message stream (Step 3) and that at least one worker is healthy.
-- **Assets fail validation immediately**: Confirm the source file's container and codec are supported. Re-mux locally with FFmpeg to rule out a nonstandard container.
+- **Assets fail validation immediately**: Confirm the source file's container and codec are supported. Re-mux locally with a command-line media tool to rule out a nonstandard container.
 - **Playback URL returns a 403**: Almost always signed-URL misconfiguration — either the signing secret used to generate the URL doesn't match the one the delivery service verifies against, or the token has expired.
 - **Webhook events never arrive**: Verify your endpoint is publicly reachable from OllaNode's host, check for a firewall blocking outbound requests, and confirm the webhook URL was saved correctly in project settings.
 - **Renditions are missing from the manifest**: Check worker logs for that asset ID — a partial rendition failure often still produces a manifest, just with fewer variants than expected.
@@ -446,7 +446,7 @@ No. A CPU-only setup is enough to validate the full pipeline, from upload throug
 On a single machine with Docker Compose, most developers have a working end-to-end test — upload, transcode, HLS playback — running in under an hour.
 
 ### What storage backend should I use for testing?
-Local disk is fine for initial testing. Move to S3-compatible object storage before handling any production traffic, since local disk does not survive container rebuilds and has no built-in redundancy.
+Local disk is fine for initial testing. Move to object-storage-compatible storage before handling any production traffic, since local disk does not survive container rebuilds and has no built-in redundancy.
 
 ### Does Ollanode support live streaming during setup?
 Not currently. This guide covers video-on-demand pipeline setup. OllaNode does not currently provide RTMP ingest or live-streaming support.
@@ -467,7 +467,7 @@ Not required, but strongly recommended for anything beyond fully public content.
 Leaving storage on local disk past the testing phase. It is the single most common cause of lost or inaccessible video after a pipeline has been running for a while.
 
 ### Is Ollanode open source?
-Yes. It's distributed under the Apache-2.0 license, and the full source is available for inspection, self-hosting, and modification, written in Rust with FFmpeg handling the actual transcoding work.
+Yes. It's distributed under the Apache-2.0 license, and the full source is available for inspection, self-hosting, and modification, written in Rust with a built-in media pipeline handling the actual transcoding work.
 
 ---
 

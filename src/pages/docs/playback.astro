@@ -58,7 +58,7 @@ const analytics = [
     <span class="eyebrow">Docs / Video</span>
     <h1>Playback &amp; delivery</h1>
     <p class="lede">Bytes are never served direct — the playback service proxies and rewrites every HLS URI through itself, gated by a signed, expiring token (or the cookie it sets). Here's how to get a URL, embed a player, and read analytics.</p>
-    <div class="docs-chips"><span class="chip">signed HMAC token</span><span class="chip">private origin</span><span class="chip">AES-128</span><span class="chip">Vidstack embed</span></div>
+    <div class="docs-chips"><span class="chip">signed HMAC token</span><span class="chip">private origin</span><span class="chip">AES-128</span><span class="chip">player embed</span></div>
   </div>
 
   <h2>Get a playback URL + token</h2>
@@ -76,7 +76,7 @@ const analytics = [
   {sidecar.map((e) => <Endpoint {...e} />)}
 
   <h2>Embeddable player</h2>
-  <p>A self-contained Vidstack player with quality selector, storyboard hover-scrub, chapters, and captions pre-wired. Framing is allowed anywhere; a parent page can drive seeks via <code>{'postMessage({ type: "ollanode-seek", seconds })'}</code>.</p>
+  <p>A self-contained web player with quality selector, storyboard hover-scrub, chapters, and captions pre-wired. Framing is allowed anywhere; a parent page can drive seeks via <code>{'postMessage({ type: "ollanode-seek", seconds })'}</code>.</p>
   <CodeBlock code={embed} label="html" />
 
   <h2>Progressive download (restricted)</h2>

@@ -29,7 +29,7 @@ This is a technical walkthrough: learn the theory, avoid wasted storage, and tes
 | **What is a resolution ladder?** | A set of encoded renditions — resolution + bitrate pairs — that let an HLS player switch quality automatically as network conditions change. |
 | **What does "dynamic" mean here?** | The ladder is generated based on the source video's own resolution and characteristics, not a fixed list applied to every upload regardless of content. |
 | **What's the default rung range?** | 360p up to 4K, with no upscaling — a 720p source never generates a fake 1080p or 4K rendition. |
-| **What codec should I start with?** | H.264 for maximum device compatibility; H.265/NVENC and an SVT-AV1 tier are available as opt-in, config-gated additions. |
+| **What codec should I start with?** | H.264 for maximum device compatibility; GPU-accelerated H.265 and an AV1 tier are available as opt-in, config-gated additions. |
 | **Do I need a GPU to build a first ladder?** | No. CPU-based H.264 encoding is sufficient to validate the whole ladder end to end. |
 | **What's the biggest mistake first-time ladders make?** | Using a single fixed ladder for every source resolution, wasting encode time and storage generating renditions nobody's connection will ever request. |
 
@@ -43,7 +43,7 @@ To generate a dynamic HLS resolution ladder with Ollanode, you configure a targe
   <p><strong>A ladder is a menu, not a mandate:</strong> Every rung in an HLS ladder is a real encoded rendition; the player picks one per segment based on measured bandwidth, so an unnecessary rung is pure wasted encode time and storage.</p>
   <p><strong>Dynamic beats fixed:</strong> A source-aware ladder generates only the rungs that make sense for a given upload's native resolution, instead of blindly producing a fixed 360p-through-4K set for every file regardless of what was actually uploaded.</p>
   <p><strong>No-upscale is a hard rule, not an option:</strong> Ollanode's transcoder never generates a rendition above a source's native resolution — a 720p upload never produces a fake 1080p or 4K rung. See the <a href="/#platform">VOD Pipeline Overview</a>.</p>
-  <p><strong>Codec tiering is config-gated, not automatic:</strong> H.264 is the safe default; H.265/NVENC and the SVT-AV1 tier are real, shipped capabilities you opt into per project once you understand your audience's device mix.</p>
+  <p><strong>Codec tiering is config-gated, not automatic:</strong> H.264 is the safe default; GPU-accelerated H.265 and the AV1 tier are real, shipped capabilities you opt into per project once you understand your audience's device mix.</p>
   <p><strong>Ladders can be scoped per project or per asset:</strong> A course platform's screen recordings and a marketing team's cinematic trailers rarely need the same rung set — configure both, don't force one default across a mixed catalog.</p>
   <p><strong>Bandwidth accuracy in the manifest is what makes ABR actually work:</strong> A ladder with inaccurate BANDWIDTH values in the master playlist causes players to make bad switching decisions even if the encodes themselves are fine. Learn more about <a href="/docs/playback">Playback & Delivery</a>.</p>
 </div>
@@ -70,11 +70,11 @@ Before configuring anything, it helps to understand where ladder logic actually 
 
 **Metadata extraction** is where ladder logic actually begins, before any encoding starts — it reads the source file's real resolution, frame rate, and audio configuration, everything the transcode stage needs to decide which rungs apply to this specific file.
 
-**Transcode** is where FFmpeg does the encoding, producing the H.264 (and optionally H.265/NVENC) renditions your configuration specifies, clamped against the source's native resolution.
+**Transcode** is where the media pipeline does the encoding, producing the H.264 (and optionally GPU-accelerated H.265) renditions your configuration specifies, clamped against the source's native resolution.
 
 **Generate_hls** packages those renditions into CMAF/fMP4 segments and writes the master and variant playlists — the `.m3u8` files a player reads, carrying BANDWIDTH and RESOLUTION attributes per rung.
 
-Because this all runs asynchronously through NATS JetStream (or Temporal, if enabled), a wider ladder or a slower codec simply means a longer background job, never a longer-held upload request. Keep this three-stage map in mind — every step below falls into metadata-driven decisions, encode-time configuration, or manifest-level verification.
+Because this all runs asynchronously through the event bus (or the workflow engine, if enabled), a wider ladder or a slower codec simply means a longer background job, never a longer-held upload request. Keep this three-stage map in mind — every step below falls into metadata-driven decisions, encode-time configuration, or manifest-level verification.
 
 ---
 
@@ -88,7 +88,7 @@ Before touching any configuration, make sure you have the following in place:
 - An understanding of your audience's device and connection mix, or a plan to find out — this informs every rung decision more than any generic list.
 - API access to your Ollanode project with a valid API key. See [Authentication & Scopes](/docs/auth).
 
-You do not need a GPU to complete this guide. H.264 CPU encoding is sufficient to validate the entire ladder architecture. GPU-accelerated H.265/NVENC becomes worth evaluating once you're encoding at real volume, covered in Step 5 and Step 12.
+You do not need a GPU to complete this guide. H.264 CPU encoding is sufficient to validate the entire ladder architecture. GPU-accelerated H.265 becomes worth evaluating once you're encoding at real volume, covered in Step 5 and Step 12.
 
 ---
 
@@ -163,15 +163,15 @@ This pairing — one test below your ceiling, one test at or above it — is the
 
 ---
 
-## Step 5: Choose Your Codec Tier — H.264, H.265, or SVT-AV1
+## Step 5: Choose Your Codec Tier — H.264, H.265, or AV1
 
 Codec choice is a separate dial from resolution and bitrate, and it interacts with your ladder in ways worth understanding before you flip any switches.
 
 - **H.264** remains the correct default for the vast majority of ladders — decodable by essentially every device and browser in active use, requiring no special hardware, and what Ollanode's transcoder uses out of the box. Start here and stay here until you have a specific, informed reason to deviate.
-- **H.265 (HEVC)**, with optional NVENC hardware acceleration, is a config-gated addition, off by default. It delivers meaningfully smaller files at comparable quality but needs GPU hardware to encode efficiently, and device support, while broad, isn't universal — treat it as an addition to your H.264 baseline, not a replacement.
-- **SVT-AV1** sits at the frontier: better compression efficiency than either H.264 or H.265, but the most hardware- and encode-time-intensive of the three, with the narrowest device support today. It's a real, shipped tier, worth evaluating for high-volume catalogs where modest per-file savings compound — not a starting point for a first ladder.
+- **H.265 (HEVC)**, with optional GPU hardware acceleration, is a config-gated addition, off by default. It delivers meaningfully smaller files at comparable quality but needs GPU hardware to encode efficiently, and device support, while broad, isn't universal — treat it as an addition to your H.264 baseline, not a replacement.
+- **AV1** sits at the frontier: better compression efficiency than either H.264 or H.265, but the most hardware- and encode-time-intensive of the three, with the narrowest device support today. It's a real, shipped tier, worth evaluating for high-volume catalogs where modest per-file savings compound — not a starting point for a first ladder.
 
-A pragmatic approach: ship H.264 as your universal baseline, and treat H.265 or SVT-AV1 as an optional higher tier your player requests only after confirming device support — never the only tier available, since a codec your audience can't decode isn't an optimization, it's a broken stream.
+A pragmatic approach: ship H.264 as your universal baseline, and treat H.265 or AV1 as an optional higher tier your player requests only after confirming device support — never the only tier available, since a codec your audience can't decode isn't an optimization, it's a broken stream.
 
 ---
 
@@ -270,7 +270,7 @@ If your 4K rung consistently sees near-zero request volume, that's a real signal
 
 The ladder you've configured handles a single project's typical content well. A broader strategy adds a few more decisions on top:
 - **Content-aware presets**: maintain named presets — "screen recording," "high motion," "cinematic" — and assign uploads to the right one by content type.
-- **GPU-accelerated tiers**: move H.265 or SVT-AV1 onto GPU workers as encode volume grows, meaningfully reducing per-minute cost versus CPU-only.
+- **GPU-accelerated tiers**: move H.265 or AV1 onto GPU workers as encode volume grows, meaningfully reducing per-minute cost versus CPU-only.
 - **Per-title encoding**: the most advanced version analyzes each source's actual complexity, not just resolution, adjusting bitrate targets per title for real savings on simple content and real gains on complex content.
 - **Worker scaling**: as upload volume grows, scale transcoding workers horizontally behind the job queue rather than making one worker larger.
 
@@ -296,7 +296,7 @@ None of these are required for a functioning ladder — they're natural next ste
 - **A rendition looks worse than expected at its target resolution**: Check bitrate against resolution and content complexity — almost always a bitrate problem, not a codec problem.
 - **Manifest BANDWIDTH values look stale after a change**: Re-run the asset through processing, or check that packaging picked up the updated configuration.
 - **Players switch renditions constantly, causing quality flicker**: Check bitrate spacing between adjacent rungs, or investigate an unstable network path.
-- **A codec tier fails to play on a subset of devices**: Confirm you're not serving H.265 or SVT-AV1 as the only tier — a universal H.264 fallback should always be present.
+- **A codec tier fails to play on a subset of devices**: Confirm you're not serving H.265 or AV1 as the only tier — a universal H.264 fallback should always be present.
 - **4K rungs show near-zero delivery**: Check player logic and CDN configuration before assuming the audience doesn't want it.
 
 ---
@@ -356,7 +356,7 @@ An HLS resolution ladder is a set of quality options — each a specific resolut
 A fixed ladder applies the same rung set to every upload regardless of its actual resolution, which means lower-resolution sources get "upscaled" into higher renditions that contain no real additional detail — wasted encode time and storage with no benefit to viewers. A dynamic ladder reads each source's native resolution and only generates the rungs that source can honestly support.
 
 **Do I need a GPU to build my first dynamic ladder?**
-No. CPU-based H.264 encoding is enough to configure, test, and validate the full ladder architecture described in this guide, from 360p through 4K. GPU acceleration becomes worth evaluating once you're encoding H.265 or SVT-AV1 tiers at real production volume.
+No. CPU-based H.264 encoding is enough to configure, test, and validate the full ladder architecture described in this guide, from 360p through 4K. GPU acceleration becomes worth evaluating once you're encoding H.265 or AV1 tiers at real production volume.
 
 **What resolutions should my ladder actually include?**
 360p through 4K is a reasonable general-purpose range, but the specific rungs in between should reflect your actual audience's devices and connections, not a generic industry list. Start with the baseline in Step 2, then adjust based on the per-rung request volume you observe in production monitoring.
@@ -364,7 +364,7 @@ No. CPU-based H.264 encoding is enough to configure, test, and validate the full
 **How do I stop the pipeline from upscaling low-resolution sources?**
 Enable the no-upscale clamping setting on your project or asset configuration, then verify it directly by uploading a source below your ladder's ceiling resolution and confirming the resulting manifest doesn't include rungs above that source's native resolution, as covered in Step 4.
 
-**Should I enable H.265 or SVT-AV1 for smaller files?**
+**Should I enable H.265 or AV1 for smaller files?**
 Both are real, config-gated capabilities that deliver smaller files at comparable quality, but neither should replace a universal H.264 baseline — device support for both remains narrower than H.264's, and a codec tier your audience can't decode isn't a bandwidth optimization, it's a broken stream for those viewers.
 
 **Can different videos in the same project use different ladders?**

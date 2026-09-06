@@ -31,11 +31,11 @@ curl -X POST https://api.ollanode.com/v1/dns/zones/dnsz_abc/records \\
   { method: 'DELETE', path: '/v1/dns/zones/{id}/records/{rid}', scope: 'dns:delete', desc: 'Delete a record. Agent keys are approval-gated.' },
 ];
 ---
-<DocsLayout active="dns" title="DNS — Ollanode Docs" description="Authoritative DNS: zones and records (A/AAAA/CNAME/TXT/MX/NS) served from Postgres on :53.">
+<DocsLayout active="dns" title="DNS — Ollanode Docs" description="Authoritative DNS: zones and records (A/AAAA/CNAME/TXT/MX/NS) served from the database on :53.">
   <div class="docs-hero">
     <span class="eyebrow">Docs / Delivery</span>
     <h1>DNS</h1>
-    <p class="lede">Ollanode runs an authoritative DNS server (Hickory) on <code>:53</code> that answers straight from Postgres. These endpoints are the write path; changes propagate to the in-memory authorities in about 15 seconds.</p>
+    <p class="lede">Ollanode runs an authoritative DNS server on <code>:53</code> that answers straight from the database. These endpoints are the write path; changes propagate to the in-memory authorities in about 15 seconds.</p>
     <div class="docs-chips"><span class="chip">authoritative</span><span class="chip">A/AAAA/CNAME/TXT/MX/NS</span><span class="chip">UDP + TCP :53</span></div>
   </div>
 

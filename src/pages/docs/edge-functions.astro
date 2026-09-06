@@ -160,7 +160,7 @@ return new Response("ok");` },
   { n: 3, title: 'Feature flags & A/B', tag: 'kv', desc: 'Serve config / flags / experiment buckets from KV without a redeploy.',
     code: `const flags = JSON.parse(await kvGet("flags"));
 return Response.json({ newPlayer: flags.newPlayer ?? false });` },
-  { n: 4, title: 'Geo routing & blocking', tag: 'geo', desc: 'Read Cloudflare’s CF-IPCountry header to localize, route, or geo-block — free, no lookup service.',
+  { n: 4, title: 'Geo routing & blocking', tag: 'geo', desc: 'Read the edge’s country geo-header to localize, route, or geo-block — free, no lookup service.',
     code: `const cc = req.headers.get("cf-ipcountry");
 if (["RU","KP"].includes(cc)) return new Response("blocked",{status:451});
 return Response.json({ country: cc });` },
@@ -256,7 +256,7 @@ const tagColor = {
   active="edge-functions"
   wide
   title="Edge Functions — Ollanode Docs"
-  description="Deploy JavaScript/TypeScript that runs at the edge in a V8 isolate. Full API reference, curl examples, KV, cron, versions, observability, and 20 real-world use cases."
+  description="Deploy JavaScript/TypeScript that runs at the edge in a sandboxed isolate. Full API reference, curl examples, KV, cron, versions, observability, and 20 real-world use cases."
 >
   <!-- Hero -->
   <section class="border-b border-line">
@@ -265,17 +265,17 @@ const tagColor = {
       <h1 class="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-paper sm:text-6xl">Run code at the edge.</h1>
       <p class="mt-5 max-w-2xl text-lg text-paper-muted">
         Deploy <span class="text-paper">JavaScript &amp; TypeScript</span> that runs in a
-        <span class="text-paper">V8 isolate</span> next to your CDN. Write a standard
+        <span class="text-paper">sandboxed isolate</span> next to your CDN. Write a standard
         <code class="font-mono text-paper">Deno.serve(handler)</code>, we route
         <code class="font-mono text-paper">/__fn/&lt;id&gt;</code> to it, and deploys propagate in seconds.
       </p>
       <div class="mt-6 flex flex-wrap gap-2 font-mono text-[11px] uppercase tracking-widest text-paper-faint">
-        {['V8 isolates','Deno.serve','KV store','Cron','Secrets','Versions','Egress-isolated','~35ms cold start'].map((t) => (
+        {['Sandboxed isolates','Deno.serve','KV store','Cron','Secrets','Versions','Egress-isolated','~35ms cold start'].map((t) => (
           <span class="chamfer-sm border border-line px-3 py-1.5">{t}</span>
         ))}
       </div>
       <p class="mt-6 max-w-2xl text-sm text-paper-faint">
-        Runtime: Deno / V8 (Supabase Edge Runtime under the hood). It is <span class="text-paper-muted">JavaScript/TypeScript</span> —
+        Runtime: a secure sandboxed runtime. It is <span class="text-paper-muted">JavaScript/TypeScript</span> —
         there is no Rust/WASM function runtime; Rust is what the platform backend is written in.
       </p>
     </div>
@@ -317,7 +317,7 @@ curl https://api.ollanode.com/v1/functions/$FID/stats \\
           ['Entry point', 'Your `code` is the index.ts entry. Export a Deno.serve(handler) — that’s the whole contract.'],
           ['Multi-file', 'Add helpers via the `files` map (path → content). index.ts imports them with relative paths.'],
           ['TypeScript', 'TS runs as-is — no build step. Types are erased at load.'],
-          ['Remote imports', 'import anything from https://esm.sh/… or deno.land — fetched + cached on first run.'],
+          ['Remote imports', 'import anything from https://esm.sh/… or any ESM URL — fetched + cached on first run.'],
           ['Secrets', 'Set `env`; read with Deno.env.get(). Sealed at rest, decrypted only in the isolate.'],
           ['Egress-isolated', 'Functions reach the public internet + the KV binding, but NOT your internal services. SSRF-safe by construction.'],
           ['KV binding', 'OLLANODE_KV_URL + OLLANODE_KV_TOKEN are injected automatically — a per-project key/value store with no credential to manage.'],
@@ -430,7 +430,7 @@ curl -H "x-fn-key: $KEY" https://api.ollanode.com/__fn/$FID   # 200
           {[
             ['Egress isolation', 'Functions run on an isolated network. They can call the public internet and the KV binding, but cannot reach your database, object store, or other services.'],
             ['Per-function rate limit', 'Each function is capped at 100 req/s (burst 200). Sustained abuse returns HTTP 429 — one hammered function can’t starve the shared runtime.'],
-            ['WAF passthrough', 'The OWASP-CRS WAF fronts the API but treats /v1/functions as detection-only, so legitimate code (which may contain SQL/HTML) is never falsely blocked.'],
+            ['WAF passthrough', 'The WAF fronts the API but treats /v1/functions as detection-only, so legitimate code (which may contain SQL/HTML) is never falsely blocked.'],
           ].map((c) => (
             <div class="chamfer border border-line bg-surface-1 p-5">
               <div class="font-mono text-sm font-semibold text-paper">{c[0]}</div>

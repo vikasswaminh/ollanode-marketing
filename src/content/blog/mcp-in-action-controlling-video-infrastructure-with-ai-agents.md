@@ -176,7 +176,7 @@ Ollanode's long-running video operations run asynchronously in workers rather th
 
 That distinction becomes extremely important when an AI agent is involved.
 
-The model doesn't need to "wait for FFmpeg."
+The model doesn't need to "wait for the transcoder."
 
 It needs to understand: **what started → what state it is in → what happened → what should happen next.**
 
@@ -573,7 +573,7 @@ This is where traditional API integrations often become awkward.
 A user asks: *"Process this 4K video."*  
 The agent calls a processing operation. The transcoder might take several minutes.
 
-The AI application should not sit there waiting for a normal HTTP request to remain open until FFmpeg finishes.
+The AI application should not sit there waiting for a normal HTTP request to remain open until the transcoder finishes.
 
 Instead:
 
@@ -624,7 +624,7 @@ This matches how Ollanode already handles long-running video processing: asynchr
 
 MCP's evolving support for long-running work and Tasks also reflects the broader need for agent workflows to handle operations that don't finish in one request/response interaction.
 
-The agent's job is therefore not *"wait until FFmpeg finishes."* It's *"understand the state of the workflow and decide what to do next."*
+The agent's job is therefore not *"wait until the transcoder finishes."* It's *"understand the state of the workflow and decide what to do next."*
 
 ---
 

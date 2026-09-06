@@ -33,7 +33,7 @@ const rw = [
 
 const update = {
   method: 'PATCH', path: '/v1/zones/{id}', scope: 'zones:write',
-  desc: 'Update any field. `cors:""` clears the header; `signed:true/false` enables/disables signing; `rules` **replaces** the whole ordered edge-rule set (max 50). Changes re-publish to all edges over NATS.',
+  desc: 'Update any field. `cors:""` clears the header; `signed:true/false` enables/disables signing; `rules` **replaces** the whole ordered edge-rule set (max 50). Changes re-publish to all edges over the event bus.',
   curl: `curl -X PATCH https://api.ollanode.com/v1/zones/zone_abc \\
   -H "Authorization: Bearer $OLLANODE_API_KEY" \\
   -H "Content-Type: application/json" \\
@@ -88,11 +88,11 @@ const signScheme = `# For a hotlink-protected zone every edge request needs ?exp
 # Missing / expired / mismatched -> 403 at the edge.
 GET https://cdn.example.com/video.mp4?exp=1735689600&token=<hex>`;
 ---
-<DocsLayout active="cdn" title="CDN pull zones — Ollanode Docs" description="Multi-tenant pull zones on an OpenResty edge: caching, purge, hotlink signing, edge rules, CORS, and analytics.">
+<DocsLayout active="cdn" title="CDN pull zones — Ollanode Docs" description="Multi-tenant pull zones on a CDN edge: caching, purge, hotlink signing, edge rules, CORS, and analytics.">
   <div class="docs-hero">
     <span class="eyebrow">Docs / Delivery</span>
     <h1>CDN pull zones</h1>
-    <p class="lede">A pull zone maps an inbound hostname to an origin (or a storage zone) and defines how the OpenResty edge caches and gates that traffic — with per-zone TTL, CORS, ordered edge rules, hotlink signing, and instant purge.</p>
+    <p class="lede">A pull zone maps an inbound hostname to an origin (or a storage zone) and defines how the CDN edge caches and gates that traffic — with per-zone TTL, CORS, ordered edge rules, hotlink signing, and instant purge.</p>
     <div class="docs-chips"><span class="chip">cache + purge</span><span class="chip">hotlink signing</span><span class="chip">edge rules</span><span class="chip">analytics</span></div>
   </div>
 
@@ -116,5 +116,5 @@ GET https://cdn.example.com/video.mp4?exp=1735689600&token=<hex>`;
 
   <h2>Analytics</h2>
   <Endpoint {...analytics} />
-  <div class="note">The edge tags every response on the zone's hostname with <code>X-Cache-Status: HIT | MISS | …</code>. Config/purge propagate to edges over NATS — eventually-consistent, sub-minute.</div>
+  <div class="note">The edge tags every response on the zone's hostname with <code>X-Cache-Status: HIT | MISS | …</code>. Config/purge propagate to edges over the event bus — eventually-consistent, sub-minute.</div>
 </DocsLayout>
