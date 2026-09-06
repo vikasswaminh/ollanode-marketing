@@ -4,7 +4,7 @@ import CodeBlock from '../../components/CodeBlock.astro';
 import Endpoint from '../../components/Endpoint.astro';
 
 const zones = [
-  { method: 'POST', path: '/v1/storage-zones', scope: 'storage:write', desc: 'Create a storage zone (a project-scoped, S3-style bucket).',
+  { method: 'POST', path: '/v1/storage-zones', scope: 'storage:write', desc: 'Create a storage zone (a project-scoped, object-storage-style bucket).',
     curl: `curl -X POST https://api.ollanode.com/v1/storage-zones \\
   -H "Authorization: Bearer $OLLANODE_API_KEY" \\
   -H "Content-Type: application/json" -d '{"name":"site-assets"}'`,
@@ -39,18 +39,18 @@ const files = [
 
 const image = {
   method: 'GET', path: '/v1/storage-zones/{id}/image-url', scope: 'storage:read',
-  desc: 'Return a signed imgproxy URL that resizes/reformats/recompresses a stored image on the fly. Params: `path` (required), `w`, `h`, `resize` (`fit`|`fill`|`force`), `q` (1–100), `format` (`webp`|`avif`|`jpg`).',
+  desc: 'Return a signed image-optimizer URL that resizes/reformats/recompresses a stored image on the fly. Params: `path` (required), `w`, `h`, `resize` (`fit`|`fill`|`force`), `q` (1–100), `format` (`webp`|`avif`|`jpg`).',
   curl: `curl "https://api.ollanode.com/v1/storage-zones/stz_abc/image-url?path=images/hero.jpg&w=200&format=webp&q=80" \\
   -H "Authorization: Bearer $OLLANODE_API_KEY"
 # -> { "url":"https://api.ollanode.com/<sig>/rs:fit:200:0:0/q:80/f:webp/<enc-source>" }`,
   useCases: ['Generate a responsive `srcset` from a single stored master.', 'Serve AVIF/WebP to modern browsers, JPEG to the rest.'],
 };
 ---
-<DocsLayout active="storage" title="Storage & images — Ollanode Docs" description="S3-style storage zones with presigned upload, file management, CDN-fronting, and an on-the-fly image optimizer.">
+<DocsLayout active="storage" title="Storage & images — Ollanode Docs" description="Object-storage-style storage zones with presigned upload, file management, CDN-fronting, and an on-the-fly image optimizer.">
   <div class="docs-hero">
     <span class="eyebrow">Docs / Delivery</span>
     <h1>Storage &amp; images</h1>
-    <p class="lede">Per-tenant S3-style buckets: upload with short-lived presigned PUTs, list and delete files, front a zone with a CDN pull zone, and transform images on the fly through a signed optimizer.</p>
+    <p class="lede">Per-tenant object-storage-style buckets: upload with short-lived presigned PUTs, list and delete files, front a zone with a CDN pull zone, and transform images on the fly through a signed optimizer.</p>
     <div class="docs-chips"><span class="chip">presigned upload</span><span class="chip">CDN-frontable</span><span class="chip">image optimizer</span></div>
   </div>
 
@@ -67,6 +67,6 @@ const image = {
   <p>There's no separate endpoint — create a <a href="/docs/cdn">pull zone</a> with <code>storage_zone_id</code> instead of <code>origin_url</code>, and the edge serves the zone's files with caching, <code>X-Cache-Status</code>, optional hotlink signing, CORS, and edge rules.</p>
 
   <h2>Image optimizer</h2>
-  <p><span class="mono">⚙️</span> Config-gated: requires <code>IMGPROXY_KEY</code> + <code>IMGPROXY_SALT</code>. Verified live: a 30&nbsp;KB JPEG → 2.9&nbsp;KB WebP at 200px.</p>
+  <p><span class="mono">⚙️</span> Config-gated: requires the image-optimizer signing key + salt. Verified live: a 30&nbsp;KB JPEG → 2.9&nbsp;KB WebP at 200px.</p>
   <Endpoint {...image} />
 </DocsLayout>

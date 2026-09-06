@@ -285,7 +285,7 @@
             </div>
             <h3 class="card-h3">CDN Pull Zones</h3>
             <p class="card-p">
-              Multi-tenant pull zones on OpenResty, routed by Host. Full purge bumps a cache version; the next request is a MISS again, then HIT.
+              Multi-tenant pull zones at the edge, routed by Host. Full purge bumps a cache version; the next request is a MISS again, then HIT.
             </p>
             <div class="card-snippet">
               <span class="snip-part">request</span> → <span class="snip-part">edge</span> → <span class="snip-part miss">MISS</span> → <span class="snip-part hit">HIT</span>
@@ -295,7 +295,7 @@
 
           {/* BACK (FLIPPED SPECS) */}
           <div class="flip-card-back">
-            <span class="back-badge">OPENRESTY NGINX CORE</span>
+            <span class="back-badge">EDGE CACHE CORE</span>
             <h4 class="back-h4">CDN Technical Specs</h4>
             <ul class="back-specs-list">
               <li>✓ Multi-tenant Host header routing</li>
@@ -322,7 +322,7 @@
             </div>
             <h3 class="card-h3">Storage + Image Optimizer</h3>
             <p class="card-p">
-              S3-style zones with presigned upload and a signed on-the-fly optimizer via imgproxy — resize, format, quality.
+              Object-storage-style zones with presigned upload and a signed on-the-fly image optimizer — resize, format, quality.
             </p>
             <div class="card-snippet highlight">
               <span class="snip-metric">39 KB JPEG → 2.9 KB WebP</span>
@@ -333,10 +333,10 @@
 
           {/* BACK (FLIPPED SPECS) */}
           <div class="flip-card-back">
-            <span class="back-badge">IMGPROXY + S3 CORE</span>
+            <span class="back-badge">IMAGE OPTIMIZER CORE</span>
             <h4 class="back-h4">Storage &amp; Optimizer Specs</h4>
             <ul class="back-specs-list">
-              <li>✓ S3-compatible REST API endpoints</li>
+              <li>✓ Object-storage-compatible REST API endpoints</li>
               <li>✓ On-the-fly image resizing &amp; cropping</li>
               <li>✓ Automatic AVIF &amp; WebP format selection</li>
               <li>✓ Presigned URL upload signatures</li>
@@ -360,7 +360,7 @@
             </div>
             <h3 class="card-h3">Authoritative DNS</h3>
             <p class="card-p">
-              Hickory serves your zones and records (A/AAAA/CNAME/TXT/MX/NS) straight from Postgres.
+              The authoritative DNS server serves your zones and records (A/AAAA/CNAME/TXT/MX/NS) straight from the database.
             </p>
             <div class="card-snippet cmd">
               <code>dig demo.ollanode.com</code>
@@ -371,11 +371,11 @@
 
           {/* BACK (FLIPPED SPECS) */}
           <div class="flip-card-back">
-            <span class="back-badge">HICKORY + POSTGRES</span>
+            <span class="back-badge">AUTHORITATIVE DNS</span>
             <h4 class="back-h4">Authoritative DNS Specs</h4>
             <ul class="back-specs-list">
-              <li>✓ Hickory DNS engine serving Port 53</li>
-              <li>✓ Direct PostgreSQL record synchronization</li>
+              <li>✓ Authoritative DNS engine serving Port 53</li>
+              <li>✓ Direct database record synchronization</li>
               <li>✓ Supports A, AAAA, CNAME, TXT, MX, NS</li>
               <li>✓ Sub-millisecond DNS query response</li>
               <li>✓ Built-in zone transfer protection</li>
@@ -397,21 +397,21 @@
             </div>
             <h3 class="card-h3">Edge Functions</h3>
             <p class="card-p">
-              Deploy JS/TS and run it at the edge in a V8 isolate — no cold container, no server to manage.
+              Deploy JS/TS and run it at the edge in a sandboxed isolate — no cold container, no server to manage.
             </p>
             <div class="card-snippet code">
               <code>GET /_fn/&lt;id&gt; → your code</code>
-              <span class="snip-sub">V8 isolate · 200 OK</span>
+              <span class="snip-sub">Sandboxed isolate · 200 OK</span>
             </div>
             <div class="flip-hint">Hover to flip card ↻</div>
           </div>
 
           {/* BACK (FLIPPED SPECS) */}
           <div class="flip-card-back">
-            <span class="back-badge">V8 ISOLATE RUNTIME</span>
+            <span class="back-badge">ISOLATE RUNTIME</span>
             <h4 class="back-h4">Edge Functions Specs</h4>
             <ul class="back-specs-list">
-              <li>✓ Sub-millisecond V8 Isolate cold start</li>
+              <li>✓ Sub-millisecond isolate cold start</li>
               <li>✓ Native JavaScript &amp; TypeScript execution</li>
               <li>✓ Edge request/response transformation</li>
               <li>✓ Zero container overhead or server management</li>

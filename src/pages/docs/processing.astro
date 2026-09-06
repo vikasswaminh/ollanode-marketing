@@ -33,7 +33,7 @@ const thumbs = [
 
 const transcript = {
   method: 'GET', path: '/v1/videos/{id}/transcript', scope: 'videos:read',
-  desc: 'The WhisperX transcript: status, detected `language`, presigned VTT + SRT URLs, and word/segment timings. `404` until the transcript stage completes.',
+  desc: 'The word-level transcript: status, detected `language`, presigned VTT + SRT URLs, and word/segment timings. `404` until the transcript stage completes.',
   curl: `curl https://api.ollanode.com/v1/videos/vid_7Qk3.../transcript \\
   -H "Authorization: Bearer $OLLANODE_API_KEY"`,
   response: `{ "status":"ready", "language":"en",
@@ -83,8 +83,8 @@ const ai = {
   </div>
 
   <h2>Transcode options</h2>
-  <p>Encoding is driven by three per-video fields set on <a href="/docs/videos">create</a>: <code>quality_preset</code> (<code>low</code> 0.6× · <code>standard</code> 1.0× · <code>high</code> 1.5× · <code>av1</code> royalty-free SVT-AV1), <code>max_height</code>, and <code>encrypt</code> (AES-128). The pipeline builds an adaptive ladder capped at the source height (no upscaling) and fits it to the source's real bitrate.</p>
-  <div class="note"><b>Server-config, not API fields (⚙️ off by default):</b> the codec (<code>libx264</code> default; <code>libx265</code>/NVENC) and EBU R128 loudness normalization are set in the pipeline config, not per request. Non-encrypted output is CMAF/fMP4 (<code>.m4s</code>); encrypted output is MPEG-TS (<code>.ts</code>) with <code>#EXT-X-KEY</code>.</div>
+  <p>Encoding is driven by three per-video fields set on <a href="/docs/videos">create</a>: <code>quality_preset</code> (<code>low</code> 0.6× · <code>standard</code> 1.0× · <code>high</code> 1.5× · <code>av1</code> royalty-free AV1), <code>max_height</code>, and <code>encrypt</code> (AES-128). The pipeline builds an adaptive ladder capped at the source height (no upscaling) and fits it to the source's real bitrate.</p>
+  <div class="note"><b>Server-config, not API fields (⚙️ off by default):</b> the codec (<code>H.264</code> default; <code>H.265</code> or GPU-accelerated) and EBU R128 loudness normalization are set in the pipeline config, not per request. Non-encrypted output is CMAF/fMP4 (<code>.m4s</code>); encrypted output is MPEG-TS (<code>.ts</code>) with <code>#EXT-X-KEY</code>.</div>
 
   <h2>Assets</h2>
   <Endpoint {...assets} />
@@ -96,7 +96,7 @@ const ai = {
   {thumbs.map((e) => <Endpoint {...e} />)}
 
   <h2>Transcripts</h2>
-  <p>WhisperX generates word-level transcripts automatically. <span class="mono">⚙️</span> Speaker diarization needs <code>HF_TOKEN</code> and is off by default; an external faster-whisper backend is available via <code>WHISPER_URL</code>.</p>
+  <p>The pipeline generates word-level transcripts automatically. <span class="mono">⚙️</span> Speaker diarization needs <code>HF_TOKEN</code> and is off by default; an external transcription backend is available via a configurable endpoint.</p>
   <Endpoint {...transcript} />
 
   <h2>Subtitles</h2>

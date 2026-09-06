@@ -178,7 +178,7 @@ Rust gives OllaNode memory safety without requiring a garbage collector, strong 
 
 OllaNode is structured as a Rust workspace rather than one giant application. The architecture separates domain logic from infrastructure adapters, which makes it easier to reason about the system and replace individual integrations.
 
-The point is not that Rust automatically makes a video platform fast. FFmpeg and the underlying media workloads still do the heavy lifting for encoding. The point is that the control plane coordinating those workloads should be predictable, efficient, and maintainable.
+The point is not that Rust automatically makes a video platform fast. The underlying media workloads still do the heavy lifting for encoding. The point is that the control plane coordinating those workloads should be predictable, efficient, and maintainable.
 
 We wanted the code that decides what happens to a video — when it enters the system, how processing is queued, when assets become available, what gets delivered, and which permissions apply — to be infrastructure software we could reason about at the systems level.
 
@@ -191,7 +191,7 @@ The simplest way to understand OllaNode as a Mux alternative is to compare the r
 | Dimension | Managed Mux Model | Self-Hosted OllaNode Model |
 | :--- | :--- | :--- |
 | **Control Plane** | Managed SaaS vendor dashboard & API | Self-hosted Rust control plane on your servers |
-| **Billing Abstraction** | Per-minute encoding, storage & delivery fees | Bare infrastructure (compute, S3, CDN bandwidth) |
+| **Billing Abstraction** | Per-minute encoding, storage & delivery fees | Bare infrastructure (compute, object storage, CDN bandwidth) |
 | **Code Ownership** | Proprietary closed-source SaaS | **Apache-2.0** open source |
 | **Data Residency** | Vendor-hosted cloud regions | Your hardware, VPC, or preferred cloud account |
 | **Operational Work** | Minimal infrastructure operations | Your team manages compute, queue, storage & scaling |
@@ -229,9 +229,9 @@ $$\text{Upload} \longrightarrow \text{Validate} \longrightarrow \text{Metadata} 
 
 That design matters for cost as well as reliability. A synchronous request that waits for video processing is difficult to scale. A queue-based workflow lets API services hand long-running jobs to workers and allows the system to process work independently. Learn more in our [VOD Pipeline Documentation](/docs/videos).
 
-OllaNode's architecture uses NATS JetStream by default for event-driven job orchestration, with Temporal available as an optional workflow engine. The video pipeline can produce adaptive HLS renditions, thumbnails, transcripts, and delivery assets without forcing the API request to remain open.
+OllaNode's architecture uses an event bus by default for event-driven job orchestration, with a workflow engine available as an optional alternative. The video pipeline can produce adaptive HLS renditions, thumbnails, transcripts, and delivery assets without forcing the API request to remain open.
 
-The important comparison point is that OllaNode is not simply "FFmpeg in a Docker container." FFmpeg is a powerful media processing tool. A video platform needs the systems around it: job orchestration, authentication, storage, playback security, CDN delivery, webhooks, monitoring, and APIs.
+The important comparison point is that OllaNode is not simply "an encoder in a Docker container." A standalone encoder is a powerful media processing tool. A video platform needs the systems around it: job orchestration, authentication, storage, playback security, CDN delivery, webhooks, monitoring, and APIs.
 
 That is the infrastructure layer OllaNode is designed to provide.
 

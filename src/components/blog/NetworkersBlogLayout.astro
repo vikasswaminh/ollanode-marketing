@@ -222,7 +222,7 @@ const gridArticles = mainFeatured
 <!-- CLIENT-SIDE COMBINED CATEGORY STRIP & SEARCH FILTERING SCRIPT -->
 <script>
   // Astro bundles this script as a module and automatically defers it until the DOM is ready.
-  // It is immune to Cloudflare Rocket Loader and caching lifecycle bugs.
+  // It is immune to CDN script-loader optimizers and caching lifecycle bugs.
   
   const catBtns = document.querySelectorAll('.cat-strip-btn');
   const itemCards = document.querySelectorAll('.blog-item-card');
