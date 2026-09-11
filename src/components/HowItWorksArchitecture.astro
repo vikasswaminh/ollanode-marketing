@@ -2,311 +2,1086 @@
 // src/components/HowItWorksArchitecture.astro
 ---
 
-<section class="band alt how-it-works-sec" id="how-it-works">
-  <div class="wrap">
-    <div class="how-it-works-grid">
-      {/* LEFT COLUMN: Content & Control */}
-      <div class="how-left">
-        <span class="eyebrow">
-          <span class="eyebrow-dot"></span>
-          HOW IT WORKS
-        </span>
-        <h2 class="how-h2 reveal-up ">
-          Built for developers.<br />
-          Designed for ownership.
-        </h2>
-        <p class="how-desc reveal-up">
-          OllaNode orchestrates your video, storage, and edge infrastructure through a unified control plane. You run the app and API — our control plane handles storage, background processing, and global edge delivery.
-        </p>
-        <div class="how-cta-wrap">
-          <button
-            type="button"
-            id="how-it-works-cta-btn"
-            class="btn btn-primary chamfer-sm"
-            aria-label="Explore the architecture flow process"
-          >
-            Explore the process →
+<section class="how-it-works-sec" id="how-it-works" aria-label="How OllaNode Works Architecture">
+  <div class="how-it-works-container">
+    
+    <!-- HEADER -->
+    <div class="how-header">
+      <div class="how-eyebrow-wrap">
+        <span class="how-beacon-dot"></span>
+        <span class="how-eyebrow">ARCHITECTURE &amp; WORKFLOW</span>
+      </div>
+      <h2 class="how-title">
+        How OllaNode works. <span class="text-orange">From ingest to edge.</span>
+      </h2>
+      <p class="how-subtitle">
+        A unified control plane that orchestrates media transcoding, storage, and global CDN delivery on your own infrastructure — with zero third-party vendor lock-in.
+      </p>
+    </div>
+
+    <!-- MAIN ARCHITECTURE CANVAS BOARD -->
+    <div class="arch-board">
+      
+      <!-- TOP CONTROL / STATUS BAR -->
+      <div class="arch-top-bar">
+        <div class="arch-status-pill">
+          <span class="live-dot-pulse"></span>
+          <span class="status-text">SYSTEM TOPOLOGY ACTIVE</span>
+          <span class="status-ver">v1.0 REST + MCP</span>
+        </div>
+        
+        <div class="arch-actions">
+          <button type="button" class="sim-btn" id="run-pipeline-sim">
+            <span class="sim-icon">▶</span>
+            <span id="sim-btn-text">Simulate Live Flow</span>
           </button>
+          <a href="/docs" class="arch-link-btn">
+            <span>Explore Docs</span>
+            <span>→</span>
+          </a>
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Interactive Architecture Diagram */}
-      <div class="how-right" role="region" aria-label="Interactive Architecture Diagram">
-        <div class="graph-card">
-          <div class="graph-grid-bg" aria-hidden="true"></div>
-
-          {/* TOPOLOGY GRAPH */}
-          <div class="graph-container" id="arch-graph-container">
-            {/* 1. USERS NODE */}
-            <div class="arch-node node-users state-idle" id="node-users" data-node="users">
-              <div class="node-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-              </div>
-              <div class="node-info">
-                <div class="node-title">Users</div>
-                <div class="node-badge">Client / Browser</div>
-              </div>
-              <span class="status-indicator"></span>
+      <!-- INTERACTIVE PIPELINE GRID -->
+      <div class="arch-pipeline-wrap">
+        <div class="arch-pipeline-grid">
+          
+          <!-- STAGE 1: INGEST & APP -->
+          <div class="arch-stage-card stage-app" id="stage-1" data-step="1">
+            <div class="stage-header">
+              <span class="stage-step-num">01</span>
+              <span class="stage-tag">INGEST</span>
             </div>
 
-            <div class="connector-v" id="conn-1">↓</div>
-
-            {/* 2. APP NODE */}
-            <div class="arch-node node-app state-idle" id="node-app" data-node="app">
-              <div class="node-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <line x1="3" y1="9" x2="21" y2="9" />
-                  <line x1="9" y1="21" x2="9" y2="9" />
-                </svg>
-              </div>
-              <div class="node-info">
-                <div class="node-title">App</div>
-                <div class="node-badge">Application Layer</div>
-              </div>
-              <span class="status-indicator"></span>
+            <div class="stage-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
             </div>
 
-            <div class="connector-v" id="conn-2">↓</div>
+            <h3 class="stage-title">Your Application</h3>
+            <p class="stage-sub">Web, Mobile &amp; Backend</p>
 
-            {/* 3. API NODE */}
-            <div class="arch-node node-api state-idle" id="node-api" data-node="api">
-              <div class="node-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="16 18 22 12 16 6" />
-                  <polyline points="8 6 2 12 8 18" />
-                </svg>
-              </div>
-              <div class="node-info">
-                <div class="node-title">API</div>
-                <div class="node-badge">REST Gateway</div>
-              </div>
-              <span class="status-indicator"></span>
+            <div class="stage-badge-box">
+              <span class="micro-badge">POST /v1/videos</span>
+              <span class="micro-badge micro-green">TUS Resumable</span>
             </div>
 
-            <div class="connector-v" id="conn-3">↓</div>
+            <div class="stage-glow-indicator"></div>
+          </div>
 
-            {/* 4. CONTROL PLANE (PROMINENT / CENTRAL BRAIN) */}
-            <div class="arch-node node-control state-idle" id="node-control" data-node="control">
-              <div class="central-aura"></div>
-              <div class="node-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="2" width="20" height="8" rx="2" />
-                  <rect x="2" y="14" width="20" height="8" rx="2" />
-                  <line x1="6" y1="6" x2="6.01" y2="6" />
-                  <line x1="6" y1="18" x2="6.01" y2="18" />
-                </svg>
-              </div>
-              <div class="node-info">
-                <div class="node-title">Control Plane</div>
-                <div class="node-badge">Central Orchestration</div>
-              </div>
-              <span class="status-indicator"></span>
+          <!-- CONNECTOR 1 -->
+          <div class="arch-connector" id="conn-1">
+            <div class="connector-line">
+              <span class="packet-dot"></span>
+            </div>
+            <span class="connector-label">REST / SDK</span>
+          </div>
+
+          <!-- STAGE 2: OLLANODE CONTROL HUB -->
+          <div class="arch-stage-card stage-hub" id="stage-2" data-step="2">
+            <div class="stage-header">
+              <span class="stage-step-num stage-num-orange">02</span>
+              <span class="stage-tag stage-tag-orange">CONTROL PLANE</span>
             </div>
 
-            {/* DUAL BRANCH CONNECTORS */}
-            <div class="branch-split-label" id="conn-branch">
-              <span>Dispatches in Parallel</span>
+            <div class="stage-icon-box icon-hub">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                <circle cx="12" cy="12" r="3.5" fill="currentColor"/>
+              </svg>
             </div>
 
-            {/* 5. PARALLEL BRANCHES (STORAGE & PROCESS) */}
-            <div class="branch-row">
-              {/* STORAGE NODE */}
-              <div class="arch-node node-branch state-idle" id="node-storage" data-node="storage">
-                <div class="node-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <ellipse cx="12" cy="5" rx="9" ry="3" />
-                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+            <h3 class="stage-title stage-title-hub">OllaNode Core</h3>
+            <p class="stage-sub">Rust Orchestration Hub</p>
+
+            <div class="stage-specs-list">
+              <div class="spec-item">
+                <span class="spec-dot"></span>
+                <span>Async Event Bus</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-dot"></span>
+                <span>Job Dispatcher</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-dot"></span>
+                <span>HMAC Security</span>
+              </div>
+            </div>
+
+            <div class="hub-ambient-glow"></div>
+          </div>
+
+          <!-- CONNECTOR 2 -->
+          <div class="arch-connector" id="conn-2">
+            <div class="connector-line">
+              <span class="packet-dot"></span>
+            </div>
+            <span class="connector-label">Dispatches</span>
+          </div>
+
+          <!-- STAGE 3: SELF-HOSTED INFRASTRUCTURE FABRIC -->
+          <div class="arch-infra-enclosure" id="stage-3" data-step="3">
+            <div class="infra-enclosure-header">
+              <div class="infra-title-tag">
+                <span class="infra-dot-beacon"></span>
+                <span>YOUR INFRASTRUCTURE FABRIC</span>
+              </div>
+              <span class="infra-sub-tag">Self-Hosted / Cloud Agnostic</span>
+            </div>
+
+            <div class="infra-nodes-row">
+              
+              <!-- Worker 1: Transcode -->
+              <div class="infra-mini-node" id="sub-node-transcode">
+                <div class="mini-icon icon-purple">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
                   </svg>
                 </div>
-                <div class="node-info">
-                  <div class="node-title">Storage</div>
-                  <div class="node-badge">Storage &amp; Optimizer</div>
+                <div class="mini-info">
+                  <span class="mini-title">Transcoder</span>
+                  <span class="mini-desc">360p→4K HLS</span>
                 </div>
-                <span class="status-indicator"></span>
+                <span class="mini-status-dot"></span>
               </div>
 
-              {/* PROCESS NODE */}
-              <div class="arch-node node-branch state-idle" id="node-process" data-node="process">
-                <div class="node-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                    <polyline points="2 17 12 22 22 17" />
-                    <polyline points="2 12 12 17 22 12" />
+              <div class="infra-internal-arrow">➔</div>
+
+              <!-- Worker 2: Storage -->
+              <div class="infra-mini-node" id="sub-node-storage">
+                <div class="mini-icon icon-teal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
                   </svg>
                 </div>
-                <div class="node-info">
-                  <div class="node-title">Process</div>
-                  <div class="node-badge">Async Workers</div>
+                <div class="mini-info">
+                  <span class="mini-title">S3 Storage</span>
+                  <span class="mini-desc">AVIF Optimizer</span>
                 </div>
-                <span class="status-indicator"></span>
+                <span class="mini-status-dot"></span>
               </div>
-            </div>
 
-            <div class="connector-v" id="conn-5">↓</div>
+              <div class="infra-internal-arrow">➔</div>
 
-            {/* 6. CDN / EDGE NODE */}
-            <div class="arch-node node-edge state-idle" id="node-edge" data-node="edge">
-              <div class="node-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
+              <!-- Worker 3: DNS & Edge -->
+              <div class="infra-mini-node" id="sub-node-dns">
+                <div class="mini-icon icon-indigo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9S14.5 18.5 12 21c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z"/>
+                  </svg>
+                </div>
+                <div class="mini-info">
+                  <span class="mini-title">DNS &amp; Routing</span>
+                  <span class="mini-desc">Port :53 UDP</span>
+                </div>
+                <span class="mini-status-dot"></span>
               </div>
-              <div class="node-info">
-                <div class="node-title">CDN / Edge</div>
-                <div class="node-badge">Edge Pull Zones</div>
-              </div>
-              <span class="status-indicator"></span>
-            </div>
 
-            <div class="connector-v return-link" id="conn-6">
-              <span>Delivers Back →</span>
             </div>
           </div>
+
+          <!-- CONNECTOR 3 -->
+          <div class="arch-connector" id="conn-3">
+            <div class="connector-line">
+              <span class="packet-dot"></span>
+            </div>
+            <span class="connector-label">Edge Pull</span>
+          </div>
+
+          <!-- STAGE 4: GLOBAL EDGE & CDN -->
+          <div class="arch-stage-card stage-cdn" id="stage-4" data-step="4">
+            <div class="stage-header">
+              <span class="stage-step-num">03</span>
+              <span class="stage-tag">DELIVERY</span>
+            </div>
+
+            <div class="stage-icon-box icon-cyan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+            </div>
+
+            <h3 class="stage-title">Global CDN</h3>
+            <p class="stage-sub">Edge Pull Zones</p>
+
+            <div class="stage-badge-box">
+              <span class="micro-badge">&lt; 150ms Purge</span>
+              <span class="micro-badge micro-blue">Signed Tokens</span>
+            </div>
+
+            <div class="stage-glow-indicator"></div>
+          </div>
+
+          <!-- CONNECTOR 4 -->
+          <div class="arch-connector" id="conn-4">
+            <div class="connector-line">
+              <span class="packet-dot"></span>
+            </div>
+            <span class="connector-label">Stream</span>
+          </div>
+
+          <!-- STAGE 5: END USERS & AI AGENTS -->
+          <div class="arch-stage-card stage-users" id="stage-5" data-step="5">
+            <div class="stage-header">
+              <span class="stage-step-num">04</span>
+              <span class="stage-tag">CONSUMERS</span>
+            </div>
+
+            <div class="stage-icon-box icon-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+
+            <h3 class="stage-title">Viewers &amp; Agents</h3>
+            <p class="stage-sub">4K Playback + MCP</p>
+
+            <div class="stage-badge-box">
+              <span class="micro-badge micro-green">Instant Buffer</span>
+              <span class="micro-badge">MCP Native</span>
+            </div>
+
+            <div class="stage-glow-indicator"></div>
+          </div>
+
         </div>
       </div>
+
+      <!-- LIVE LOG FEED TERMINAL STRIP -->
+      <div class="arch-terminal-strip">
+        <div class="terminal-header">
+          <span class="term-dot dot-r"></span>
+          <span class="term-dot dot-y"></span>
+          <span class="term-dot dot-g"></span>
+          <span class="term-title">PIPELINE EXECUTION LOG</span>
+        </div>
+        <div class="terminal-body" id="arch-terminal-log">
+          <span class="term-prompt">$</span> <span class="term-msg">System initialized. Awaiting video ingest payload...</span>
+        </div>
+      </div>
+
     </div>
+
   </div>
 </section>
 
+<style>
+/* ================= HOW IT WORKS ARCHITECTURE MASTERPIECE ================= */
+.how-it-works-sec {
+  position: relative;
+  width: 100%;
+  background: #FFFFFF;
+  padding: 68px 0 76px;
+  border-bottom: 1px solid #CBD5E1;
+  overflow: hidden;
+}
+
+.how-it-works-container {
+  width: 100%;
+  max-width: var(--maxw, 1320px);
+  margin: 0 auto;
+  padding: 0 var(--gutter, clamp(20px, 4vw, 40px));
+}
+
+/* Header */
+.how-header {
+  text-align: center;
+  max-width: 860px;
+  margin: 0 auto 44px;
+}
+
+.how-eyebrow-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  background: #FFF0EB;
+  border: 1px solid #FFD6CC;
+  margin-bottom: 14px;
+}
+
+.how-beacon-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FF5A3D;
+  box-shadow: 0 0 8px #FF5A3D;
+  animation: beaconPulse 1.8s infinite;
+}
+
+@keyframes beaconPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.how-eyebrow {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 750;
+  color: #FF5A3D;
+  letter-spacing: 0.08em;
+}
+
+.how-title {
+  font-family: var(--sans, 'Inter', sans-serif);
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 620;
+  color: #1A1D23;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin: 0 0 16px 0;
+}
+
+.text-orange {
+  background: linear-gradient(135deg, #FF7A4D 0%, #FF5A3D 45%, #D43210 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #FF5A3D;
+  display: inline-block;
+}
+
+.how-subtitle {
+  font-family: var(--sans, 'Inter', sans-serif);
+  font-size: clamp(0.98rem, 1.15vw, 1.1rem);
+  font-weight: 500;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Architecture Board (DARK) */
+.arch-board {
+  width: 100%;
+  background: #0D1117;
+  border: 1.5px solid #1E293B;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 16px 44px -8px rgba(15, 23, 42, 0.2), 0 4px 16px rgba(255, 90, 61, 0.08);
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.arch-board::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 90, 61, 0.6), transparent);
+}
+
+/* Board Top Status Bar */
+.arch-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 16px;
+}
+
+.arch-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 12px;
+  border-radius: 8px;
+  color: #94A3B8;
+}
+
+.live-dot-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+}
+
+.status-text {
+  color: #F1F5F9;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.status-ver {
+  color: #64748B;
+  margin-left: 6px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.arch-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sim-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #FF5A3D;
+  border: 1px solid #FF5A3D;
+  color: #FFFFFF;
+  font-family: var(--sans, 'Inter', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 7px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255, 90, 61, 0.35);
+  transition: all 0.2s ease;
+}
+
+.sim-btn:hover:not(:disabled) {
+  background: #E0482B;
+  transform: translateY(-1px);
+  box-shadow: 0 0 22px rgba(255, 90, 61, 0.55);
+}
+
+.sim-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.sim-icon {
+  font-size: 0.72rem;
+}
+
+.arch-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #E2E8F0;
+  font-family: var(--sans, 'Inter', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.arch-link-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Pipeline Horizontal Flow */
+.arch-pipeline-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 90, 61, 0.4) rgba(15, 23, 42, 0.6);
+}
+
+.arch-pipeline-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.arch-pipeline-wrap::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 4px;
+}
+
+.arch-pipeline-wrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 90, 61, 0.4);
+  border-radius: 4px;
+}
+
+.arch-pipeline-wrap::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 90, 61, 0.7);
+}
+
+.arch-pipeline-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 980px;
+}
+
+/* Stage Card (DARK) */
+.arch-stage-card {
+  position: relative;
+  background: #161B22;
+  border: 1.5px solid #21262D;
+  border-radius: 16px;
+  padding: 16px 14px;
+  width: 154px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arch-stage-card:hover {
+  border-color: rgba(255, 90, 61, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -4px rgba(255, 90, 61, 0.18);
+}
+
+.arch-stage-card.is-active {
+  border-color: #FF5A3D;
+  background: #1C1E26;
+  box-shadow: 0 0 24px rgba(255, 90, 61, 0.4);
+  transform: scale(1.04);
+}
+
+.stage-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stage-step-num {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 750;
+  color: #64748B;
+}
+
+.stage-num-orange {
+  color: #FF5A3D;
+}
+
+.stage-tag {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.stage-tag-orange {
+  color: #FF7A63;
+  background: rgba(255, 90, 61, 0.18);
+  border: 1px solid rgba(255, 90, 61, 0.3);
+}
+
+.stage-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F1F5F9;
+  margin-bottom: 10px;
+}
+
+.stage-icon-box svg {
+  width: 22px;
+  height: 22px;
+}
+
+.icon-hub {
+  background: rgba(255, 90, 61, 0.2);
+  border: 1.5px solid #FF5A3D;
+  color: #FF5A3D;
+  box-shadow: 0 0 16px rgba(255, 90, 61, 0.35);
+}
+
+.icon-cyan { color: #38BDF8; background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.25); }
+.icon-green { color: #34D399; background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.25); }
+
+.stage-title {
+  font-family: var(--sans, 'Inter', sans-serif);
+  font-size: 0.92rem;
+  font-weight: 750;
+  color: #F8FAFC;
+  margin: 0 0 3px 0;
+  line-height: 1.25;
+}
+
+.stage-title-hub {
+  color: #FFFFFF;
+}
+
+.stage-sub {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.62rem;
+  color: #94A3B8;
+  margin: 0 0 12px 0;
+}
+
+.stage-badge-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.micro-badge {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.58rem;
+  color: #CBD5E1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.micro-green { color: #34D399; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.08); }
+.micro-blue { color: #60A5FA; border-color: rgba(96, 165, 250, 0.2); background: rgba(96, 165, 250, 0.08); }
+
+/* Center Hub Node (OllaNode Core) */
+.stage-hub {
+  width: 172px;
+  background: #1A1F2C;
+  border: 2px solid #FF5A3D;
+  box-shadow: 0 0 28px rgba(255, 90, 61, 0.22);
+}
+
+.stage-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.6rem;
+  color: #E2E8F0;
+}
+
+.spec-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FF5A3D;
+  flex-shrink: 0;
+}
+
+/* Connectors */
+.arch-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  width: 44px;
+}
+
+.connector-line {
+  width: 100%;
+  height: 2px;
+  background: #334155;
+  position: relative;
+  overflow: hidden;
+}
+
+.packet-dot {
+  position: absolute;
+  top: -2px;
+  left: -6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF5A3D;
+  box-shadow: 0 0 6px #FF5A3D;
+}
+
+.arch-connector.is-flowing .packet-dot {
+  animation: flowPacket 0.9s linear infinite;
+}
+
+@keyframes flowPacket {
+  0% { left: -6px; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.connector-label {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.52rem;
+  color: #64748B;
+  white-space: nowrap;
+}
+
+/* Self-Hosted Infrastructure Enclosure */
+.arch-infra-enclosure {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1.5px dashed rgba(255, 90, 61, 0.45);
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.arch-infra-enclosure:hover,
+.arch-infra-enclosure.is-active {
+  border-color: #FF5A3D;
+  background: rgba(26, 31, 44, 0.85);
+  box-shadow: 0 0 24px rgba(255, 90, 61, 0.2);
+}
+
+.infra-enclosure-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.infra-title-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.62rem;
+  font-weight: 750;
+  color: #FF7A63;
+  letter-spacing: 0.05em;
+}
+
+.infra-dot-beacon {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FF5A3D;
+}
+
+.infra-sub-tag {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.55rem;
+  color: #64748B;
+}
+
+.infra-nodes-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.infra-mini-node {
+  background: #161B22;
+  border: 1px solid #30363D;
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 120px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.infra-mini-node:hover {
+  border-color: #FF5A3D;
+  transform: translateY(-2px);
+}
+
+.mini-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mini-icon svg { width: 14px; height: 14px; }
+.icon-purple { color: #C084FC; background: rgba(192, 132, 252, 0.15); border: 1px solid rgba(192, 132, 252, 0.3); }
+.icon-teal { color: #2DD4BF; background: rgba(45, 212, 191, 0.15); border: 1px solid rgba(45, 212, 191, 0.3); }
+.icon-indigo { color: #818CF8; background: rgba(129, 140, 248, 0.15); border: 1px solid rgba(129, 140, 248, 0.3); }
+
+.mini-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mini-title {
+  font-family: var(--sans, 'Inter', sans-serif);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #F1F5F9;
+}
+
+.mini-desc {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.55rem;
+  color: #94A3B8;
+}
+
+.infra-internal-arrow {
+  color: #64748B;
+  font-size: 0.72rem;
+}
+
+/* Terminal Log Strip */
+.arch-terminal-strip {
+  margin-top: 20px;
+  background: #06090E;
+  border: 1px solid #1E293B;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding-right: 12px;
+  flex-shrink: 0;
+}
+
+.term-dot { width: 6px; height: 6px; border-radius: 50%; }
+.dot-r { background: #EF4444; }
+.dot-y { background: #F59E0B; }
+.dot-g { background: #10B981; }
+
+.term-title {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.62rem;
+  font-weight: 750;
+  color: #64748B;
+  letter-spacing: 0.05em;
+}
+
+.terminal-body {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+  color: #34D399;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.term-prompt {
+  color: #FF5A3D;
+  margin-right: 4px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .arch-top-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .arch-actions {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+
+  .sim-btn,
+  .arch-link-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .how-it-works-sec {
+    padding: 44px 0 52px;
+  }
+
+  .how-header {
+    margin-bottom: 24px;
+  }
+
+  .how-title {
+    font-size: clamp(1.8rem, 6.5vw, 2.3rem);
+  }
+
+  .how-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .arch-board {
+    padding: 16px 12px;
+    border-radius: 16px;
+  }
+
+  .arch-top-bar {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .arch-status-pill {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    padding: 5px 10px;
+  }
+
+  .status-ver {
+    display: none;
+  }
+
+  .arch-terminal-strip {
+    margin-top: 14px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .terminal-header {
+    padding-right: 8px;
+  }
+
+  .terminal-body {
+    font-size: 0.65rem;
+  }
+}
+</style>
+
 <script is:inline>
-  (function () {
-    function initHowItWorks() {
-      var btn = document.getElementById('how-it-works-cta-btn');
-      if (!btn) return;
+(function () {
+  function initPipelineSimulation() {
+    var btn = document.getElementById('run-pipeline-sim');
+    var btnText = document.getElementById('sim-btn-text');
+    var logElem = document.getElementById('arch-terminal-log');
+    if (!btn || !btnText || !logElem) return;
 
-      var nodeUsers = document.getElementById('node-users');
-      var nodeApp = document.getElementById('node-app');
-      var nodeApi = document.getElementById('node-api');
-      var nodeControl = document.getElementById('node-control');
-      var nodeStorage = document.getElementById('node-storage');
-      var nodeProcess = document.getElementById('node-process');
-      var nodeEdge = document.getElementById('node-edge');
+    var stage1 = document.getElementById('stage-1');
+    var stage2 = document.getElementById('stage-2');
+    var stage3 = document.getElementById('stage-3');
+    var stage4 = document.getElementById('stage-4');
+    var stage5 = document.getElementById('stage-5');
 
-      var conn1 = document.getElementById('conn-1');
-      var conn2 = document.getElementById('conn-2');
-      var conn3 = document.getElementById('conn-3');
-      var connBranch = document.getElementById('conn-branch');
-      var conn5 = document.getElementById('conn-5');
-      var conn6 = document.getElementById('conn-6');
+    var conn1 = document.getElementById('conn-1');
+    var conn2 = document.getElementById('conn-2');
+    var conn3 = document.getElementById('conn-3');
+    var conn4 = document.getElementById('conn-4');
 
-      var allNodes = [nodeUsers, nodeApp, nodeApi, nodeControl, nodeStorage, nodeProcess, nodeEdge];
-      var allConns = [conn1, conn2, conn3, connBranch, conn5, conn6];
+    var isRunning = false;
 
-      var isAnimating = false;
-      var currentStep = 0;
-      var timer = null;
-
-      function setNodeState(node, state) {
-        if (!node) return;
-        node.classList.remove('state-idle', 'state-active', 'state-completed');
-        node.classList.add('state-' + state);
-
-        var statusElem = node.querySelector('.status-indicator');
-        if (statusElem) {
-          if (state === 'completed') {
-            statusElem.innerHTML = '<span class="completed-check">✓</span>';
-          } else if (state === 'active') {
-            statusElem.innerHTML = '<span class="active-pulse"></span>';
-          } else {
-            statusElem.innerHTML = '';
-          }
-        }
+    var steps = [
+      {
+        stage: stage1,
+        conn: conn1,
+        msg: 'POST /v1/videos payload received via TUS upload conduit (video_4k.mp4)...',
+        delay: 800
+      },
+      {
+        stage: stage2,
+        conn: conn2,
+        msg: 'OllaNode Hub orchestrator: HMAC validated. Job queued on Rust async event bus...',
+        delay: 900
+      },
+      {
+        stage: stage3,
+        conn: conn3,
+        msg: 'Workers: Generating 360p→4K HLS ladders + S3 storage push + DNS :53 sync...',
+        delay: 1100
+      },
+      {
+        stage: stage4,
+        conn: conn4,
+        msg: 'Global CDN edge pull zones populated. Sub-150ms instant purge cache primed...',
+        delay: 900
+      },
+      {
+        stage: stage5,
+        conn: null,
+        msg: 'Stream ready. Expiring token validated. Delivering 4K HLS to player & MCP Agents.',
+        delay: 1000
       }
+    ];
 
-      function resetAll() {
-        allNodes.forEach(function (node) {
-          setNodeState(node, 'idle');
-        });
-        allConns.forEach(function (conn) {
-          if (conn) conn.classList.remove('flowing');
-        });
-        btn.innerText = 'Explore the process →';
-        btn.disabled = false;
-        isAnimating = false;
-        currentStep = 0;
-      }
-
-      function updateStep(step) {
-        currentStep = step;
-
-        if (step === 1) {
-          setNodeState(nodeUsers, 'active');
-        } else if (step === 2) {
-          setNodeState(nodeUsers, 'completed');
-          if (conn1) conn1.classList.add('flowing');
-          setNodeState(nodeApp, 'active');
-        } else if (step === 3) {
-          setNodeState(nodeApp, 'completed');
-          if (conn1) conn1.classList.remove('flowing');
-          if (conn2) conn2.classList.add('flowing');
-          setNodeState(nodeApi, 'active');
-        } else if (step === 4) {
-          setNodeState(nodeApi, 'completed');
-          if (conn2) conn2.classList.remove('flowing');
-          if (conn3) conn3.classList.add('flowing');
-          setNodeState(nodeControl, 'active');
-        } else if (step === 5) {
-          setNodeState(nodeControl, 'completed');
-          if (conn3) conn3.classList.remove('flowing');
-          if (connBranch) connBranch.classList.add('flowing');
-          setNodeState(nodeStorage, 'active');
-          setNodeState(nodeProcess, 'active');
-        } else if (step === 6) {
-          setNodeState(nodeStorage, 'completed');
-          setNodeState(nodeProcess, 'completed');
-          if (connBranch) connBranch.classList.remove('flowing');
-          if (conn5) conn5.classList.add('flowing');
-          setNodeState(nodeEdge, 'active');
-        } else if (step === 7) {
-          setNodeState(nodeEdge, 'completed');
-          if (conn5) conn5.classList.remove('flowing');
-          if (conn6) conn6.classList.add('flowing');
-          setNodeState(nodeUsers, 'active');
-        } else if (step === 8) {
-          allNodes.forEach(function (n) { setNodeState(n, 'completed'); });
-          if (conn6) conn6.classList.remove('flowing');
-          btn.innerText = 'Replay process ↻';
-          btn.disabled = false;
-          isAnimating = false;
-          return;
-        }
-
-        if (step < 8) {
-          timer = setTimeout(function () {
-            updateStep(step + 1);
-          }, 750);
-        }
-      }
-
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (isAnimating) return;
-
-        var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (prefersReducedMotion) {
-          updateStep(8);
-          return;
-        }
-
-        resetAll();
-        isAnimating = true;
-        btn.disabled = true;
-        btn.innerText = 'Exploring process...';
-        updateStep(1);
+    function clearAllStates() {
+      [stage1, stage2, stage3, stage4, stage5].forEach(function (s) {
+        if (s) s.classList.remove('is-active');
+      });
+      [conn1, conn2, conn3, conn4].forEach(function (c) {
+        if (c) c.classList.remove('is-flowing');
       });
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initHowItWorks);
-    } else {
-      initHowItWorks();
+    function runStep(index) {
+      if (index >= steps.length) {
+        setTimeout(function () {
+          clearAllStates();
+          btn.disabled = false;
+          btnText.innerText = 'Replay Simulation ↻';
+          isRunning = false;
+        }, 1200);
+        return;
+      }
+
+      var curr = steps[index];
+      clearAllStates();
+      if (curr.stage) curr.stage.classList.add('is-active');
+      if (curr.conn) curr.conn.classList.add('is-flowing');
+
+      logElem.innerHTML = '<span class="term-prompt">$</span> <span class="term-msg">' + curr.msg + '</span>';
+
+      setTimeout(function () {
+        runStep(index + 1);
+      }, curr.delay);
     }
-  })();
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (isRunning) return;
+      isRunning = true;
+      btn.disabled = true;
+      btnText.innerText = 'Simulating Pipeline...';
+      clearAllStates();
+      runStep(0);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPipelineSimulation);
+  } else {
+    initPipelineSimulation();
+  }
+})();
 </script>

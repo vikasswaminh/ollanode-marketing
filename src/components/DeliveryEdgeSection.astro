@@ -1,425 +1,818 @@
 ---
 // src/components/DeliveryEdgeSection.astro
+
+const edgeCards = [
+  {
+    id: 'cdn-pull-zones',
+    number: '01',
+    category: 'GLOBAL EDGE CDN',
+    title: 'CDN Pull Zones',
+    summary: 'Multi-tenant pull zones at the edge, routed by Host with origin shielding.',
+    snippetPrimary: 'request → edge → MISS → HIT',
+    snippetSub: 'Per-zone TTL · Origin Shielding',
+    colorClass: 'icon-bg-blue',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>`,
+    details: [
+      'Multi-tenant routing by Host header with origin shield',
+      'Instant full cache purge bumping zone cache version',
+      'Path-granular TTL rules and custom CORS policies',
+      'Hotlink token signing with expiring HMAC keys'
+    ],
+    docLink: '/docs/cdn',
+    docText: 'View CDN docs'
+  },
+  {
+    id: 'storage-image-optimizer',
+    number: '02',
+    category: 'OBJECT STORAGE & ASSETS',
+    title: 'Storage + Image Optimizer',
+    summary: 'Object-storage zones with presigned upload and signed on-the-fly image optimizer.',
+    snippetPrimary: '39 KB JPEG → 2.9 KB WebP',
+    snippetSub: '2000px → 640px (-52% bytes)',
+    colorClass: 'icon-bg-orange',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#FF5A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`,
+    details: [
+      'S3-compatible API & TUS multipart direct uploads',
+      'On-the-fly AVIF & WebP image transformation',
+      'Up to -52% file size reduction with zero quality loss',
+      'Expiring HMAC presigned direct upload URLs'
+    ],
+    docLink: '/docs/storage',
+    docText: 'View Storage docs'
+  },
+  {
+    id: 'authoritative-dns',
+    number: '03',
+    category: 'DIRECT :53 ENGINE',
+    title: 'Authoritative DNS',
+    summary: 'Serves your zones and records (A/AAAA/CNAME/TXT/MX/NS) straight from the database.',
+    snippetPrimary: 'dig demo.ollanode.com',
+    snippetSub: '; SOA · NS · A · HTTPS :53',
+    colorClass: 'icon-bg-green',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+    details: [
+      'High-speed UDP/TCP DNS service on port :53',
+      'Sub-second cluster database sync with zero lag',
+      'SOA, NS, A, AAAA, CNAME, TXT, MX record engine',
+      'Integrated BGP Anycast global routing support'
+    ],
+    docLink: '/docs/dns',
+    docText: 'View DNS docs'
+  },
+  {
+    id: 'edge-functions',
+    number: '04',
+    category: 'ISOLATE COMPUTE',
+    title: 'Edge Functions',
+    summary: 'Deploy JS/TS and run it at the edge in a sandboxed isolate — no cold container.',
+    snippetPrimary: 'GET /_fn/<id> → your code',
+    snippetSub: 'Sandboxed isolate · 200 OK',
+    colorClass: 'icon-bg-purple',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#9333EA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+    details: [
+      'Lightweight V8 isolates with <5ms cold starts',
+      'Standard Web APIs (Fetch, Request, Response)',
+      'Per-request memory isolation & execution limits',
+      'Low-latency access to edge cache and KV storage'
+    ],
+    docLink: '/docs/edge-functions',
+    docText: 'View Functions docs'
+  },
+  {
+    id: 'smart-caching-purge',
+    number: '05',
+    category: 'CACHE INVALIDATION',
+    title: 'Smart Caching & Real-Time Purging',
+    summary: 'Multi-tenant caching with sub-150ms instant worldwide cache invalidation.',
+    snippetPrimary: 'PURGE /v1/zones/:id/cache',
+    snippetSub: '<150ms global propagation',
+    colorClass: 'icon-bg-orange',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#FF5A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,
+    details: [
+      'Sub-150ms global purge propagation',
+      'Intelligent stale-while-revalidate caching',
+      'Zero-downtime cache rollover without stampedes',
+      'Header-level bypass rules for authenticated calls'
+    ],
+    docLink: '/docs/cdn',
+    docText: 'View Cache docs'
+  },
+  {
+    id: 'ddos-security',
+    number: '06',
+    category: 'EDGE SECURITY',
+    title: 'DDoS & WAF Protection',
+    summary: 'Automated Layer 3/4/7 threat mitigation with rate limiting and origin cloaking.',
+    snippetPrimary: 'WAF inspection: 0.8ms',
+    snippetSub: 'Block · Allow · Rate-limit',
+    colorClass: 'icon-bg-blue',
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+    details: [
+      'OWASP Core ruleset executed directly at the edge',
+      'Sliding window IP & token rate limiting',
+      'Origin shield prevents direct byte requests to backend',
+      'Cryptographic HMAC headers on upstream calls'
+    ],
+    docLink: '/docs/authentication',
+    docText: 'View Security docs'
+  }
+];
 ---
 
-<section class="band alt delivery-edge-sec" id="delivery-edge">
-  <div class="wrap">
-    {/* TOP SPLIT: CONTENT LEFT + GLOBAL EDGE NETWORK VISUALIZATION RIGHT */}
-    <div class="delivery-top-grid">
-      {/* LEFT CONTENT COLUMN */}
-      <div class="delivery-left">
-        <span class="eyebrow">
-          <span class="eyebrow-dot"></span>
-          DELIVERY &amp; EDGE
-        </span>
-        <h2 class="delivery-h2 reveal-up ">
-          Deliver Faster.<br />
-          Everywhere.
-        </h2>
-        <p class="delivery-desc reveal-up reveal-up">
-          A global edge network and powerful infrastructure to store, optimize and deliver your content with ultra-low latency.
-        </p>
+<section class="delivery-edge-section" id="delivery-edge">
+  <div class="delivery-edge-wrap">
+    <div class="delivery-split-grid">
+      
+      {/* LEFT COLUMN: STICKY HEADER & INTERACTIVE HEADING NAV */}
+      <div class="delivery-left-sticky">
+        <div class="delivery-sticky-content">
+          <div class="delivery-eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>DELIVERY &amp; EDGE</span>
+          </div>
 
-        {/* 2X2 CHECKLIST */}
-        <div class="delivery-checklist">
-          <div class="check-item reveal-up reveal-up">
-            <span class="check-icon">✓</span>
-            <span class="check-text">Global Edge Locations</span>
-          </div>
-          <div class="check-item reveal-up reveal-up">
-            <span class="check-icon">✓</span>
-            <span class="check-text">DDoS Protection</span>
-          </div>
-          <div class="check-item reveal-up reveal-up">
-            <span class="check-icon">✓</span>
-            <span class="check-text">Smart Caching</span>
-          </div>
-          <div class="check-item reveal-up reveal-up">
-            <span class="check-icon">✓</span>
-            <span class="check-text">Real-time Purging</span>
-          </div>
-        </div>
+          <h2 class="delivery-h2 reveal-up">
+            Deliver Faster.<br />
+            Everywhere.
+          </h2>
 
-        <div class="delivery-cta-wrap">
-          <a href="/docs/cdn" class="btn btn-primary chamfer-sm">
-            Learn More About CDN →
-          </a>
+          <p class="delivery-lead-desc reveal-up">
+            A global edge network and powerful infrastructure to store, optimize and deliver your content with ultra-low latency.
+          </p>
+
+          {/* INTERACTIVE HEADINGS LIST (CLICKING FLIPS & FOCUSES THE CARD) */}
+          <div class="delivery-nav-menu" role="tablist" aria-label="Edge capabilities navigation">
+            <span class="nav-menu-label">CLICK HEADING TO FLIP CARD ↓</span>
+            {edgeCards.map((card) => (
+              <button
+                type="button"
+                class="delivery-nav-item"
+                data-target-id={card.id}
+                aria-label={`Show detail for ${card.title}`}
+              >
+                <span class="nav-item-num">{card.number}</span>
+                <span class="nav-item-title">{card.title}</span>
+                <span class="nav-item-arrow">→</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* RIGHT TECHNICAL NETWORK VISUALIZER (MATCHING REFERENCE SCREENSHOT) */}
-      <div class="delivery-right" role="region" aria-label="Global Edge Delivery Network Visualizer">
-        <div class="map-card network-card">
-          
-          {/* TOP BANNER */}
-          <div class="map-top-banner">
-            <div class="map-status-pill">
-              <span class="live-dot-pulse"></span>
-              <span class="banner-title">GLOBAL EDGE NETWORK ACTIVE</span>
-            </div>
-            <span class="banner-sub">100+ Edge POPs &amp; Anycast Routing</span>
-          </div>
+      {/* RIGHT COLUMN: COMPACT INTERACTIVE 3D FLIPPABLE CARDS */}
+      <div class="delivery-right-cards">
+        {edgeCards.map((card) => (
+          <div class="flip-card-wrapper" id={`card-${card.id}`} data-card-id={card.id} title="Click anywhere on card to flip">
+            <div class="flip-card-inner">
+              
+              {/* FRONT FACE (COMPACT SUMMARY) */}
+              <div class="card-face card-front">
+                <div class="card-top">
+                  <div class="card-top-left">
+                    <div class={`card-icon ${card.colorClass}`} set:html={card.icon}></div>
+                    <span class="card-category">{card.category}</span>
+                  </div>
+                  <div class="card-top-right">
+                    <span class="card-num">{card.number}</span>
+                    <span class="flip-hint-pill" title="Click to flip">
+                      <span class="flip-hint-text">Flip</span>
+                      <span class="flip-icon">↺</span>
+                    </span>
+                  </div>
+                </div>
 
-          {/* WORLD MAP SVG VISUALIZATION */}
-          <div class="network-svg-wrapper">
-            <svg viewBox="0 0 1000 500" class="world-map-svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-              <defs>
-                {/* Node Glow Filter */}
-                <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="6" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
+                <h3 class="card-title">{card.title}</h3>
+                <p class="card-desc">{card.summary}</p>
 
-                {/* Intense Outer Halo Filter */}
-                <filter id="auraHalo" x="-100%" y="-100%" width="300%" height="300%">
-                  <feGaussianBlur stdDeviation="14" result="blur" />
-                </filter>
-              </defs>
-
-              {/* CARTOGRAPHIC HIGH-DEFINITION GEOGRAPHIC WORLD CONTINENTS */}
-              <g class="world-continents" fill="#1E2636" stroke="rgba(255, 90, 61, 0.35)" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round">
-                {/* North America Main Mass */}
-                <path d="M 40,75 L 55,60 L 70,55 L 90,65 L 110,48 L 135,38 L 160,35 L 185,32 L 210,38 L 230,35 L 245,45 L 260,40 L 280,55 L 270,75 L 250,70 L 235,90 L 255,100 L 270,95 L 285,115 L 260,120 L 245,110 L 235,135 L 255,150 L 245,175 L 230,170 L 220,190 L 205,198 L 190,195 L 175,205 L 165,225 L 155,210 L 162,190 L 145,180 L 130,185 L 115,160 L 95,145 L 75,130 L 55,115 L 45,95 Z" />
-                {/* Alaska Peninsula & Aleutian Chain */}
-                <path d="M 40,75 L 30,85 L 20,90 L 10,95 L 18,100 L 32,92 L 45,85 Z" />
-                {/* Florida Peninsula */}
-                <path d="M 220,190 L 226,215 L 218,225 L 212,200 Z" />
-                {/* Baja California */}
-                <path d="M 130,165 L 142,195 L 138,205 L 126,170 Z" />
-                {/* Mexico & Yucatan Peninsula */}
-                <path d="M 165,225 L 185,220 L 205,228 L 215,220 L 225,235 L 200,245 L 180,238 Z" />
-                {/* Central America Isthmus */}
-                <path d="M 200,245 L 215,250 L 230,265 L 245,260 L 240,268 L 220,265 L 205,252 Z" />
-                {/* West Indies / Caribbean Arc */}
-                <path d="M 218,226 L 245,224 L 248,228 L 220,230 Z M 252,228 L 272,230 L 270,235 L 250,233 Z M 275,232 L 285,234 L 284,238 L 274,236 Z" />
-
-                {/* Greenland */}
-                <path d="M 275,25 L 300,18 L 322,20 L 338,30 L 348,48 L 338,68 L 315,82 L 290,82 L 272,68 L 265,48 Z" />
-                {/* Baffin & Canadian Arctic Archipelago */}
-                <path d="M 232,28 L 255,26 L 268,48 L 245,65 L 228,52 Z M 205,25 L 222,22 L 228,38 L 212,42 Z M 175,32 L 195,28 L 198,42 L 178,45 Z" />
-
-                {/* South America Continent */}
-                <path d="M 242,268 L 262,260 L 288,262 L 318,274 L 348,288 L 362,312 L 368,338 L 352,368 L 338,398 L 312,432 L 292,468 L 282,485 L 272,476 L 280,442 L 292,412 L 298,378 L 288,342 L 268,312 L 252,290 L 235,278 Z" />
-                {/* Tierra del Fuego & Falklands */}
-                <path d="M 270,478 L 282,478 L 280,488 L 268,486 Z M 298,482 L 308,480 L 309,488 L 296,487 Z" />
-
-                {/* Europe Continent & Balkans */}
-                <path d="M 428,72 L 442,60 L 458,54 L 482,48 L 508,50 L 522,64 L 532,86 L 542,96 L 528,116 L 512,110 L 498,122 L 490,114 L 482,132 L 468,144 L 448,146 L 432,140 L 426,124 L 416,112 L 420,92 Z" />
-                {/* Scandinavian Peninsula */}
-                <path d="M 458,54 L 472,36 L 492,26 L 512,32 L 532,48 L 545,35 L 535,62 L 522,78 L 505,88 L 488,76 L 478,82 L 468,68 Z" />
-                {/* Iberian Peninsula */}
-                <path d="M 416,112 L 434,110 L 440,126 L 430,144 L 410,142 L 408,124 Z" />
-                {/* Italy Boot & Islands */}
-                <path d="M 468,122 L 478,126 L 486,146 L 480,154 L 472,136 Z M 470,156 L 480,155 L 476,164 Z M 458,130 L 464,128 L 462,140 L 456,142 Z" />
-                {/* British Isles */}
-                <path d="M 402,74 L 416,66 L 424,80 L 420,98 L 406,104 L 400,86 Z M 386,80 L 396,76 L 400,88 L 390,94 Z" />
-
-                {/* Africa Continent */}
-                <path d="M 408,148 L 438,146 L 468,148 L 498,152 L 528,154 L 552,168 L 575,188 L 582,212 L 568,242 L 552,272 L 540,308 L 525,342 L 505,372 L 488,388 L 472,382 L 458,362 L 450,332 L 442,298 L 430,258 L 412,228 L 395,202 L 400,174 Z" />
-                {/* Horn of Africa */}
-                <path d="M 552,168 L 572,178 L 588,202 L 575,218 L 562,198 Z" />
-                {/* Madagascar Island */}
-                <path d="M 565,308 L 575,320 L 572,356 L 558,362 L 554,332 Z" />
-
-                {/* Middle East (Arabia, Turkey, Iran) */}
-                <path d="M 528,124 L 558,116 L 592,120 L 618,132 L 608,162 L 588,178 L 578,208 L 565,230 L 542,232 L 535,210 L 550,190 L 532,162 Z" />
-
-                {/* Asia & Siberia Mass */}
-                <path d="M 532,86 L 572,72 L 628,60 L 698,46 L 768,42 L 828,44 L 882,56 L 932,72 L 962,86 L 942,116 L 912,132 L 878,122 L 852,140 L 838,166 L 812,186 L 782,216 L 752,246 L 738,272 L 725,262 L 732,236 L 712,222 L 682,236 L 662,256 L 638,266 L 622,236 L 638,206 L 658,182 L 625,156 L 592,152 L 558,142 Z" />
-                {/* Indian Subcontinent */}
-                <path d="M 638,206 L 672,202 L 682,236 L 662,272 L 642,286 L 628,256 L 634,226 Z" />
-                {/* Sri Lanka */}
-                <path d="M 660,279 L 668,276 L 666,289 L 658,287 Z" />
-                {/* Korean Peninsula */}
-                <path d="M 830,148 L 840,146 L 844,170 L 832,174 Z" />
-                {/* Japanese Archipelago */}
-                <path d="M 862,122 L 882,112 L 890,135 L 875,152 Z M 850,150 L 865,142 L 870,166 L 854,170 Z M 842,168 L 852,165 L 854,175 L 844,176 Z" />
-
-                {/* Southeast Asia & Indochina */}
-                <path d="M 712,222 L 742,216 L 758,240 L 746,270 L 728,278 L 722,252 Z" />
-                {/* Philippines Archipelago */}
-                <path d="M 795,210 L 808,205 L 812,235 L 798,240 Z M 802,242 L 815,240 L 812,260 L 795,256 Z" />
-                {/* Indonesian Archipelago */}
-                <path d="M 718,284 L 752,278 L 782,290 L 748,300 Z M 758,264 L 788,258 L 792,284 L 762,286 Z M 790,294 L 838,290 L 842,304 L 792,306 Z M 846,284 L 892,278 L 905,300 L 850,304 Z" />
-
-                {/* Australia Continent */}
-                <path d="M 758,344 L 792,324 L 832,318 L 862,334 L 892,358 L 900,394 L 882,424 L 852,444 L 812,446 L 772,428 L 752,394 L 748,364 Z" />
-                {/* Tasmania */}
-                <path d="M 852,450 L 866,448 L 862,464 L 850,462 Z" />
-                {/* New Zealand */}
-                <path d="M 918,404 L 930,394 L 938,420 L 926,426 Z M 906,430 L 920,424 L 926,454 L 910,456 Z" />
-              </g>
-
-              {/* INTERCONNECTING GLOWING CURVED ARCS */}
-              <g class="network-arcs" fill="none" stroke="#FF5A3D" stroke-width="2" stroke-opacity="0.7">
-                <!-- US West to US East -->
-                <path d="M 100 145 Q 165 110 235 135" />
-                <!-- US East to Europe -->
-                <path d="M 235 135 Q 340 85 450 110" />
-                <!-- US East to South America -->
-                <path d="M 235 135 Q 285 230 345 330" />
-                <!-- Europe to Middle East -->
-                <path d="M 450 110 Q 515 145 580 195" />
-                <!-- Europe to Tokyo -->
-                <path d="M 450 110 Q 660 70 870 150" />
-                <!-- Middle East to Nairobi -->
-                <path d="M 580 195 Q 568 235 565 280" />
-                <!-- Middle East to Tokyo -->
-                <path d="M 580 195 Q 725 130 870 150" />
-                <!-- Middle East to Singapore -->
-                <path d="M 580 195 Q 660 235 740 285" />
-                <!-- Tokyo to Singapore -->
-                <path d="M 870 150 Q 800 215 740 285" />
-                <!-- Singapore to Sydney -->
-                <path d="M 740 285 Q 805 345 870 410" />
-              </g>
-
-              {/* GLOWING ORANGE POP NETWORK NODES */}
-              <!-- Node 1: US West (Seattle/SF) -->
-              <g class="map-pop-node" transform="translate(100, 145)">
-                <circle r="22" fill="#FF5A3D" opacity="0.35" filter="url(#auraHalo)" />
-                <circle r="10" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="5" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 2: US East (New York) -->
-              <g class="map-pop-node" transform="translate(235, 135)">
-                <circle r="26" fill="#FF5A3D" opacity="0.45" filter="url(#auraHalo)" />
-                <circle r="12" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="6" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 3: South America (São Paulo) -->
-              <g class="map-pop-node" transform="translate(345, 330)">
-                <circle r="22" fill="#FF5A3D" opacity="0.35" filter="url(#auraHalo)" />
-                <circle r="10" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="5" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 4: Europe (London/Frankfurt) -->
-              <g class="map-pop-node" transform="translate(450, 110)">
-                <circle r="26" fill="#FF5A3D" opacity="0.45" filter="url(#auraHalo)" />
-                <circle r="12" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="6" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 5: Middle East (Dubai) -->
-              <g class="map-pop-node" transform="translate(580, 195)">
-                <circle r="24" fill="#FF5A3D" opacity="0.38" filter="url(#auraHalo)" />
-                <circle r="11" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="5.5" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 6: East Africa (Nairobi) -->
-              <g class="map-pop-node" transform="translate(565, 280)">
-                <circle r="22" fill="#FF5A3D" opacity="0.35" filter="url(#auraHalo)" />
-                <circle r="10" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="5" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 7: East Asia (Tokyo) -->
-              <g class="map-pop-node" transform="translate(870, 150)">
-                <circle r="24" fill="#FF5A3D" opacity="0.38" filter="url(#auraHalo)" />
-                <circle r="11" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="5.5" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 8: Southeast Asia (Singapore) -->
-              <g class="map-pop-node" transform="translate(740, 285)">
-                <circle r="28" fill="#FF5A3D" opacity="0.5" filter="url(#auraHalo)" />
-                <circle r="13" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="6.5" fill="#FFFFFF" />
-              </g>
-
-              <!-- Node 9: Australia (Sydney) -->
-              <g class="map-pop-node" transform="translate(870, 410)">
-                <circle r="22" fill="#FF5A3D" opacity="0.35" filter="url(#auraHalo)" />
-                <circle r="10" fill="#FF5A3D" filter="url(#nodeGlow)" />
-                <circle r="5" fill="#FFFFFF" />
-              </g>
-            </svg>
-
-            {/* FLOATING LATENCY TOOLTIP BADGE (SINGAPORE) */}
-            <div class="map-singapore-badge">
-              <span class="singapore-city">Singapore</span>
-              <div class="singapore-ping">
-                <span class="ping-dot"></span>
-                <span class="ping-text">18ms</span>
+                <div class="card-snippet-box">
+                  <span class="code-line-primary">{card.snippetPrimary}</span>
+                  <span class="code-line-sub">· {card.snippetSub}</span>
+                </div>
               </div>
+
+              {/* BACK FACE (COMPLETE TECHNICAL DETAILS) */}
+              <div class="card-face card-back">
+                <div class="card-top">
+                  <div class="card-top-left">
+                    <span class="back-badge">FULL DETAIL</span>
+                    <span class="back-title-tag">{card.title}</span>
+                  </div>
+                  <div class="card-top-right">
+                    <span class="flip-back-pill" title="Click to flip back">
+                      <span class="flip-hint-text">Back</span>
+                      <span class="flip-icon">↺</span>
+                    </span>
+                  </div>
+                </div>
+
+                <ul class="card-detail-list">
+                  {card.details.map((detail) => (
+                    <li class="detail-list-item">
+                      <span class="detail-bullet-dot"></span>
+                      <span>{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div class="card-back-footer">
+                  <a href={card.docLink} class="card-doc-link" onclick="event.stopPropagation()">
+                    <span>{card.docText}</span>
+                    <span class="link-arr">→</span>
+                  </a>
+                </div>
+              </div>
+
             </div>
           </div>
-
-          {/* THREE INFRASTRUCTURE STATISTICS BAR */}
-          <div class="network-stats-bar">
-            <div class="stat-item">
-              <span class="stat-num">100+</span>
-              <span class="stat-lbl">Edge POPs</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-              <span class="stat-num">&lt;20ms</span>
-              <span class="stat-lbl">Edge Latency</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-              <span class="stat-num">99.99%</span>
-              <span class="stat-lbl">Availability</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    {/* BOTTOM ROW: 4 x 3D FLIP CARDS GRID */}
-    <div class="delivery-cards-grid">
-      {/* CARD 1: CDN PULL ZONES */}
-      <div class="flip-card-perspective">
-        <div class="flip-card-inner" tabindex="0">
-          {/* FRONT */}
-          <div class="flip-card-front">
-            <div class="card-top-icon icon-blue">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
-              </svg>
-            </div>
-            <h3 class="card-h3">CDN Pull Zones</h3>
-            <p class="card-p">
-              Multi-tenant pull zones at the edge, routed by Host. Full purge bumps a cache version; the next request is a MISS again, then HIT.
-            </p>
-            <div class="card-snippet">
-              <span class="snip-part">request</span> → <span class="snip-part">edge</span> → <span class="snip-part miss">MISS</span> → <span class="snip-part hit">HIT</span>
-            </div>
-            <div class="flip-hint">Hover to flip card ↻</div>
-          </div>
-
-          {/* BACK (FLIPPED SPECS) */}
-          <div class="flip-card-back">
-            <span class="back-badge">EDGE CACHE CORE</span>
-            <h4 class="back-h4">CDN Technical Specs</h4>
-            <ul class="back-specs-list">
-              <li>✓ Multi-tenant Host header routing</li>
-              <li>✓ Cache-Control &amp; ETag header parsing</li>
-              <li>✓ Instant cache purge via version key</li>
-              <li>✓ Zero origin request loop protection</li>
-              <li>✓ Sub-10ms edge cache retrieval</li>
-            </ul>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* CARD 2: STORAGE + IMAGE OPTIMIZER */}
-      <div class="flip-card-perspective">
-        <div class="flip-card-inner" tabindex="0">
-          {/* FRONT */}
-          <div class="flip-card-front">
-            <div class="card-top-icon icon-orange">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <ellipse cx="12" cy="5" rx="9" ry="3" />
-                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-              </svg>
-            </div>
-            <h3 class="card-h3">Storage + Image Optimizer</h3>
-            <p class="card-p">
-              Object-storage-style zones with presigned upload and a signed on-the-fly image optimizer — resize, format, quality.
-            </p>
-            <div class="card-snippet highlight">
-              <span class="snip-metric">39 KB JPEG → 2.9 KB WebP</span>
-              <span class="snip-sub">@200px f/q/zs</span>
-            </div>
-            <div class="flip-hint">Hover to flip card ↻</div>
-          </div>
-
-          {/* BACK (FLIPPED SPECS) */}
-          <div class="flip-card-back">
-            <span class="back-badge">IMAGE OPTIMIZER CORE</span>
-            <h4 class="back-h4">Storage &amp; Optimizer Specs</h4>
-            <ul class="back-specs-list">
-              <li>✓ Object-storage-compatible REST API endpoints</li>
-              <li>✓ On-the-fly image resizing &amp; cropping</li>
-              <li>✓ Automatic AVIF &amp; WebP format selection</li>
-              <li>✓ Presigned URL upload signatures</li>
-              <li>✓ Zero egress charges on local storage</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* CARD 3: AUTHORITATIVE DNS */}
-      <div class="flip-card-perspective">
-        <div class="flip-card-inner" tabindex="0">
-          {/* FRONT */}
-          <div class="flip-card-front">
-            <div class="card-top-icon icon-green">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </div>
-            <h3 class="card-h3">Authoritative DNS</h3>
-            <p class="card-p">
-              The authoritative DNS server serves your zones and records (A/AAAA/CNAME/TXT/MX/NS) straight from the database.
-            </p>
-            <div class="card-snippet cmd">
-              <code>dig demo.ollanode.com</code>
-              <span class="snip-sub">→ SOA + NS UDP · TCP · :53</span>
-            </div>
-            <div class="flip-hint">Hover to flip card ↻</div>
-          </div>
-
-          {/* BACK (FLIPPED SPECS) */}
-          <div class="flip-card-back">
-            <span class="back-badge">AUTHORITATIVE DNS</span>
-            <h4 class="back-h4">Authoritative DNS Specs</h4>
-            <ul class="back-specs-list">
-              <li>✓ Authoritative DNS engine serving Port 53</li>
-              <li>✓ Direct database record synchronization</li>
-              <li>✓ Supports A, AAAA, CNAME, TXT, MX, NS</li>
-              <li>✓ Sub-millisecond DNS query response</li>
-              <li>✓ Built-in zone transfer protection</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* CARD 4: EDGE FUNCTIONS */}
-      <div class="flip-card-perspective">
-        <div class="flip-card-inner" tabindex="0">
-          {/* FRONT */}
-          <div class="flip-card-front">
-            <div class="card-top-icon icon-purple">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
-            </div>
-            <h3 class="card-h3">Edge Functions</h3>
-            <p class="card-p">
-              Deploy JS/TS and run it at the edge in a sandboxed isolate — no cold container, no server to manage.
-            </p>
-            <div class="card-snippet code">
-              <code>GET /_fn/&lt;id&gt; → your code</code>
-              <span class="snip-sub">Sandboxed isolate · 200 OK</span>
-            </div>
-            <div class="flip-hint">Hover to flip card ↻</div>
-          </div>
-
-          {/* BACK (FLIPPED SPECS) */}
-          <div class="flip-card-back">
-            <span class="back-badge">ISOLATE RUNTIME</span>
-            <h4 class="back-h4">Edge Functions Specs</h4>
-            <ul class="back-specs-list">
-              <li>✓ Sub-millisecond isolate cold start</li>
-              <li>✓ Native JavaScript &amp; TypeScript execution</li>
-              <li>✓ Edge request/response transformation</li>
-              <li>✓ Zero container overhead or server management</li>
-              <li>✓ Sandboxed memory security model</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    function initDeliveryCardInteractivity() {
+      var navButtons = document.querySelectorAll('.delivery-nav-item');
+      var cardWrappers = document.querySelectorAll('.flip-card-wrapper');
+
+      if (!cardWrappers.length) return;
+
+      // Function to toggle or set flip state on a card
+      function flipCard(cardWrapper, shouldFlip) {
+        if (!cardWrapper) return;
+        var inner = cardWrapper.querySelector('.flip-card-inner');
+        if (!inner) return;
+
+        if (typeof shouldFlip === 'boolean') {
+          if (shouldFlip) {
+            inner.classList.add('is-flipped');
+          } else {
+            inner.classList.remove('is-flipped');
+          }
+        } else {
+          inner.classList.toggle('is-flipped');
+        }
+      }
+
+      // Reset all flipped cards back to front face
+      function resetAllCardsToFront() {
+        cardWrappers.forEach(function (wrapper) {
+          var inner = wrapper.querySelector('.flip-card-inner');
+          if (inner && inner.classList.contains('is-flipped')) {
+            inner.classList.remove('is-flipped');
+          }
+        });
+      }
+
+      // 1. CLICK ANYWHERE ON CARD TO FLIP (Front <-> Back)
+      cardWrappers.forEach(function (cardWrapper) {
+        cardWrapper.addEventListener('click', function (e) {
+          // If the click is on an anchor tag inside the card, allow navigation and don't toggle flip
+          if (e.target.closest('a')) return;
+          flipCard(cardWrapper);
+        });
+      });
+
+      // 2. LEFT HEADINGS CLICK HANDLER
+      navButtons.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          var targetId = btn.getAttribute('data-target-id');
+          if (!targetId) return;
+
+          var targetCard = document.getElementById('card-' + targetId);
+          if (!targetCard) return;
+
+          // Highlight active nav item
+          navButtons.forEach(function (b) { b.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+
+          // Scroll target card into view smoothly
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          // Flip card to show complete detail
+          flipCard(targetCard, true);
+
+          // Subtle highlight animation
+          targetCard.classList.add('is-highlighted');
+          setTimeout(function () {
+            targetCard.classList.remove('is-highlighted');
+          }, 1200);
+        });
+      });
+
+      // 3. AUTOMATICALLY FLIP BACK TO FRONT ON SCROLL
+      var isScrollingTimer;
+      window.addEventListener('scroll', function () {
+        clearTimeout(isScrollingTimer);
+        isScrollingTimer = setTimeout(function () {
+          resetAllCardsToFront();
+          navButtons.forEach(function (b) { b.classList.remove('is-active'); });
+        }, 180);
+      }, { passive: true });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDeliveryCardInteractivity);
+    } else {
+      initDeliveryCardInteractivity();
+    }
+  })();
+</script>
+
+<style>
+  .delivery-edge-section {
+    position: relative;
+    width: 100%;
+    background: radial-gradient(120% 120% at 50% 10%, rgba(30, 41, 59, 0.45) 0%, rgba(15, 23, 42, 0.9) 50%, #070A0F 100%), linear-gradient(180deg, #070A0F 0%, #0B101D 50%, #070A0F 100%);
+    padding: 85px 0 95px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 2;
+  }
+
+  .delivery-edge-wrap {
+    width: 100%;
+    max-width: var(--maxw, 1320px);
+    margin: 0 auto;
+    padding: 0 var(--gutter, clamp(20px, 4vw, 40px));
+  }
+
+  /* SPLIT GRID: STICKY LEFT + SCROLLING CARDS RIGHT */
+  .delivery-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: clamp(32px, 4.5vw, 60px);
+    align-items: start;
+    position: relative;
+  }
+
+  /* LEFT STICKY COLUMN */
+  .delivery-left-sticky {
+    position: sticky;
+    top: 110px;
+    align-self: start;
+    height: auto;
+  }
+
+  .delivery-sticky-content {
+    display: flex;
+    flex-direction: column;
+    padding-right: clamp(0px, 2vw, 12px);
+  }
+
+  /* EYEBROW */
+  .delivery-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 90, 61, 0.12);
+    border: 1.5px solid rgba(255, 90, 61, 0.3);
+    border-radius: 999px;
+    padding: 4px 13px;
+    font-family: var(--mono, monospace);
+    font-size: 11px;
+    font-weight: 600;
+    color: #FF7A4D;
+    letter-spacing: 0.14em;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+
+  .eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #FF5A3D;
+    box-shadow: 0 0 0 3px rgba(255, 90, 61, 0.25);
+  }
+
+  /* CRISP WHITE HEADING IN DARK MODE */
+  .delivery-h2 {
+    font-family: var(--sans, 'Inter', sans-serif);
+    font-size: clamp(1.9rem, 2.8vw, 2.45rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+    color: #FFFFFF;
+    margin: 0 0 14px;
+  }
+
+  .delivery-lead-desc {
+    font-family: var(--sans, 'Inter', sans-serif);
+    font-size: clamp(0.92rem, 1.05vw, 1.02rem);
+    font-weight: 400;
+    color: #94A3B8;
+    line-height: 1.6;
+    margin: 0 0 22px;
+  }
+
+  /* INTERACTIVE HEADING MENU */
+  .delivery-nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-menu-label {
+    font-family: var(--mono, monospace);
+    font-size: 10px;
+    font-weight: 650;
+    color: #64748B;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+  }
+
+  .delivery-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #0F172A;
+    border: 1px solid #1E293B;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: var(--sans, sans-serif);
+    font-size: 13px;
+    font-weight: 650;
+    color: #CBD5E1;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .delivery-nav-item:hover {
+    border-color: #FF5A3D;
+    background: #1E2235;
+    color: #FF7A4D;
+    transform: translateX(3px);
+  }
+
+  .delivery-nav-item.is-active {
+    border-color: #FF5A3D;
+    background: rgba(255, 90, 61, 0.15);
+    color: #FFFFFF;
+    box-shadow: 0 3px 12px rgba(255, 90, 61, 0.25);
+  }
+
+  .nav-item-num {
+    font-family: var(--mono, monospace);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #FF7A4D;
+  }
+
+  .nav-item-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-item-arrow {
+    font-size: 12px;
+    color: #64748B;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .delivery-nav-item:hover .nav-item-arrow,
+  .delivery-nav-item.is-active .nav-item-arrow {
+    transform: translateX(3px);
+    color: #FF7A4D;
+  }
+
+  /* RIGHT COLUMN: SMALL COMPACT 3D FLIPPABLE CARDS */
+  .delivery-right-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .flip-card-wrapper {
+    perspective: 1000px;
+    width: 100%;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .flip-card-wrapper.is-highlighted {
+    animation: card-pulse-highlight 1s ease-in-out;
+  }
+
+  @keyframes card-pulse-highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 140px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+
+  .flip-card-inner.is-flipped {
+    transform: rotateY(180deg);
+  }
+
+  /* CARD FACES - DARK MODE */
+  .card-face {
+    position: relative;
+    width: 100%;
+    background: #0D1525;
+    border: 1.5px solid #1E293B;
+    border-radius: 12px;
+    padding: 14px 18px 13px;
+    display: flex;
+    flex-direction: column;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .flip-card-wrapper:hover .card-face {
+    border-color: #FF5A3D;
+    box-shadow: 0 8px 26px rgba(255, 90, 61, 0.16);
+  }
+
+  .card-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: rotateY(180deg);
+    background: #090E1A;
+    border-color: rgba(255, 90, 61, 0.4);
+  }
+
+  /* COMPACT CARD TOP */
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+  }
+
+  .card-top-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-top-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .card-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .icon-bg-blue { background: rgba(37, 99, 235, 0.18); }
+  .icon-bg-orange { background: rgba(255, 90, 61, 0.18); }
+  .icon-bg-green { background: rgba(22, 163, 74, 0.18); }
+  .icon-bg-purple { background: rgba(147, 51, 234, 0.18); }
+
+  .card-num {
+    font-family: var(--mono, monospace);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #FF7A4D;
+  }
+
+  .card-category {
+    font-family: var(--mono, monospace);
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #94A3B8;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 1.5px 6px;
+    border-radius: 4px;
+  }
+
+  .flip-hint-pill,
+  .flip-back-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 90, 61, 0.12);
+    border: 1px solid rgba(255, 90, 61, 0.3);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: var(--mono, monospace);
+    font-size: 10px;
+    font-weight: 700;
+    color: #FF7A4D;
+    transition: all 0.2s ease;
+  }
+
+  .flip-card-wrapper:hover .flip-hint-pill {
+    background: #FF5A3D;
+    color: #FFFFFF;
+    border-color: #FF5A3D;
+  }
+
+  .flip-icon {
+    font-size: 11px;
+    display: inline-block;
+    line-height: 1;
+  }
+
+  /* CARD TITLE & DESC */
+  .card-title {
+    font-family: var(--sans, 'Inter', sans-serif);
+    font-size: 14.5px;
+    font-weight: 650;
+    line-height: 1.25;
+    color: #F8FAFC;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .card-desc {
+    font-family: var(--sans, 'Inter', sans-serif);
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #94A3B8;
+    margin: 0 0 8px;
+  }
+
+  /* COMPACT SNIPPET */
+  .card-snippet-box {
+    background: #070B14;
+    border: 1px solid #1E293B;
+    border-radius: 6px;
+    padding: 5px 9px;
+    font-family: var(--mono, monospace);
+    font-size: 10.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .code-line-primary {
+    color: #E2E8F0;
+    font-weight: 650;
+  }
+
+  .code-line-sub {
+    color: #64748B;
+    font-size: 9.5px;
+  }
+
+  /* BACK FACE DETAILS */
+  .back-badge {
+    font-family: var(--mono, monospace);
+    font-size: 9px;
+    font-weight: 750;
+    color: #FF7A4D;
+    background: rgba(255, 90, 61, 0.15);
+    border: 1px solid rgba(255, 90, 61, 0.35);
+    padding: 1.5px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.06em;
+  }
+
+  .back-title-tag {
+    font-family: var(--sans, sans-serif);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+
+  .card-detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 2px 0 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .detail-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-family: var(--sans, sans-serif);
+    font-size: 11.5px;
+    color: #CBD5E1;
+    line-height: 1.35;
+  }
+
+  .detail-bullet-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #FF5A3D;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .card-back-footer {
+    margin-top: auto;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .card-doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--sans, sans-serif);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #FF7A4D;
+    text-decoration: none;
+    transition: gap 0.2s ease, color 0.2s ease;
+  }
+
+  .card-doc-link:hover {
+    color: #FFA07A;
+    text-decoration: underline;
+    gap: 7px;
+  }
+
+  /* RESPONSIVE LAYOUT */
+  @media (max-width: 990px) {
+    .delivery-split-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .delivery-left-sticky {
+      position: relative;
+      top: 0;
+    }
+
+    .delivery-nav-menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .delivery-edge-section {
+      padding: 48px 0 58px;
+    }
+
+    .delivery-head {
+      margin-bottom: 24px;
+    }
+
+    .delivery-h2 {
+      font-size: clamp(1.8rem, 6.5vw, 2.3rem);
+    }
+
+    .delivery-nav-menu {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .card-face {
+      padding: 12px 14px;
+    }
+
+    .card-snippet-box {
+      font-size: 9.5px;
+      padding: 4px 8px;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+    }
+  }
+</style>

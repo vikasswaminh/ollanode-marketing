@@ -16,8 +16,8 @@
           </svg>
         </div>
         <div class="banner-text-group">
-          <h2 class="banner-title reveal-up ">Ready to take control of your infrastructure?</h2>
-          <p class="banner-subtext reveal-up">Join developers who trust OllaNode to build, scale and deliver without limits.</p>
+          <h2 class="banner-title">Ready to take control of your infrastructure?</h2>
+          <p class="banner-subtext">Join developers who trust OllaNode to build, scale and deliver without limits.</p>
         </div>
       </div>
 
@@ -38,10 +38,13 @@
   .quick-start-orange-sec {
     position: relative;
     width: 100%;
-    background: #0B0E14;
-    padding: 38px 0;
+    background: radial-gradient(120% 180% at 50% 0%, rgba(99, 102, 241, 0.15) 0%, rgba(30, 27, 75, 0.45) 45%, #090D16 100%),
+                linear-gradient(135deg, #090D16 0%, #0F172A 45%, #1E1B4B 85%, #0B0F17 100%);
+    padding: 44px 0;
     overflow: hidden;
-    box-shadow: none; border-top: 1px solid #FF5A3D; border-bottom: 1px solid #FF5A3D;
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     z-index: 5;
   }
 
@@ -72,14 +75,14 @@
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background: #FF5A3D;
-    border: none;
+    background: linear-gradient(135deg, #FF6A3D 0%, #FF4B24 50%, #D43210 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     display: grid;
     place-items: center;
     color: #FFFFFF;
     flex-shrink: 0;
     backdrop-filter: blur(4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 18px rgba(255, 75, 36, 0.4);
   }
 
   .rocket-svg {
@@ -107,9 +110,12 @@
     font-family: var(--sans);
     font-size: clamp(0.88rem, 1vw, 0.98rem);
     font-weight: 450;
-    color: rgba(255, 255, 255, 0.92);
+    color: #E2E8F0;
     margin: 0;
     line-height: 1.4;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
   }
 
   .banner-ctas {
@@ -120,18 +126,19 @@
   }
 
   .banner-btn-primary {
-    background: #FF5A3D;
+    background: linear-gradient(135deg, #FF6A3D 0%, #FF4B24 45%, #D43210 100%);
     color: #FFFFFF;
     font-family: var(--sans);
     font-size: 13.5px;
     font-weight: 750;
     padding: 13px 26px;
     border-radius: 8px;
+    border: 1px solid #D43210;
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(255, 75, 36, 0.32);
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
@@ -139,16 +146,17 @@
   }
 
   .banner-btn-primary:hover {
-    background: #E04D30;
+    background: linear-gradient(135deg, #FF7A4D 0%, #FF5A30 45%, #E23916 100%);
+    border-color: #E23916;
     transform: translateY(-1.5px);
-    box-shadow: 0 6px 20px rgba(255, 90, 61, 0.2);
+    box-shadow: 0 6px 22px rgba(255, 75, 36, 0.48);
     color: #FFFFFF;
   }
 
   .banner-btn-secondary {
-    background: transparent;
-    color: #FF5A3D;
-    border: 1.5px solid #FF5A3D;
+    background: rgba(255, 255, 255, 0.05);
+    color: #FFFFFF;
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
     font-family: var(--sans);
     font-size: 13.5px;
     font-weight: 750;
@@ -157,17 +165,20 @@
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(4px);
   }
 
   .banner-btn-secondary:hover {
-    background: rgba(255, 90, 61, 0.1);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #FFFFFF;
     transform: translateY(-1.5px);
-    color: #FF5A3D;
+    color: #FFFFFF;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
 
   @media (max-width: 900px) {

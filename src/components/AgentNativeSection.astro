@@ -1,475 +1,666 @@
 ---
 // src/components/AgentNativeSection.astro
-const workflowSteps = [
-  {
-    code: '200 OK',
-    type: 'allowed',
-    title: 'Standard Product Actions',
-    endpoint: 'GET /v1/videos · POST /v1/uploads',
-    desc: 'Agents run read & standard write requests freely within scope without human intervention.'
-  },
-  {
-    code: '202 ACCEPTED',
-    type: 'approval',
-    title: 'Human-Gated Destructive Actions',
-    endpoint: 'DELETE /v1/videos · POST /v1/functions',
-    desc: 'Returns 202 Pending Approval. Executed only after a human resubmits with an X-Approval-Id digest.'
-  },
-  {
-    code: '403 FORBIDDEN',
-    type: 'denied',
-    title: 'Human-Only Prohibited Operations',
-    endpoint: 'POST /v1/keys · DELETE /v1/org',
-    desc: 'Agent keys are structurally prevented from holding admin, managing credentials, or accessing billing.'
-  }
-];
-
-const governancePillars = [
-  {
-    num: '01',
-    title: 'Capability Map (/v1/whoami)',
-    desc: 'Agents inspect per-action capability states (allowed | approval | denied) before execution so they never fail by trial and error.'
-  },
-  {
-    num: '02',
-    title: 'Approval Digest Gating',
-    desc: 'Destructive calls return 202 without running. Approvals bind to key, action, resource, and body hash to prevent payload tampering.'
-  },
-  {
-    num: '03',
-    title: 'Tamper-Evident Audit Chain',
-    desc: 'Every mutation logs prev_hash/entry_hash integrity signatures in an immutable cryptographic audit chain (/v1/audit/verify).'
-  },
-  {
-    num: '04',
-    title: 'Emergency Project Kill-Switch',
-    desc: 'Platform operators can instantly revoke all active AI agent keys for a project with one fail-closed call (/v1/admin/disable-agents).'
-  }
-];
 ---
 
-<section class="band alt agent-native-sec" id="agent-native">
-  <div class="wrap">
-    {/* SECTION HEADER */}
-    <div class="agent-header-wrap">
-      <span class="eyebrow">
-        <span class="eyebrow-dot"></span>
-        AGENT-NATIVE INFRASTRUCTURE
-      </span>
-      <h2 class="agent-h2 reveal-up ">
-        AI agents with human-in-the-loop guardrails.
-      <p class="agent-lead-desc reveal-up" style="font-family: 'Inter', sans-serif;">
-        Agents are API-first citizens with built-in governance. They discover their own capabilities via <code class="agent-inline-code">/v1/whoami</code>, run standard actions freely, but route destructive operations through human approval &mdash; backed by a tamper-evident audit trail and a project kill-switch.
-      </p>
-
-      <div class="agent-chips-strip">
-        <span class="agent-chip">whoami map</span>
-        <span class="agent-chip-dot">•</span>
-        <span class="agent-chip">202 approval-gated</span>
-        <span class="agent-chip-dot">•</span>
-        <span class="agent-chip">hash-chain audit</span>
-        <span class="agent-chip-dot">•</span>
-        <span class="agent-chip">kill-switch</span>
-      </div>
-    </div>
-
-    {/* WORKFLOW DIAGRAM */}
-    <div class="agent-diagram-card">
-      <div class="diagram-top-bar">
-        <div class="agent-node-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="node-icon"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="16" y1="16" x2="16.01" y2="16"/></svg>
-          <span>AI AGENT / MCP CLIENT</span>
+<section class="agent-native-sec" id="agent-native">
+  <div class="agent-native-container">
+    {/* 2-COLUMN GRID (LEFT: OLLANODE CONTENT & CAPABILITY POINTS | RIGHT: INTERACTIVE SIGN-OFF CARD) */}
+    <div class="agent-two-col-layout">
+      
+      {/* LEFT COLUMN: TITLE, DESCRIPTION & BULLET POINTS FROM OLLANODE.COM */}
+      <div class="agent-left-col">
+        <div class="agent-eyebrow-pill">
+          <span class="eyebrow-status-dot"></span>
+          <span>AGENT-NATIVE INFRASTRUCTURE</span>
         </div>
-        <span class="diagram-arrow">─── API Request ───►</span>
-        <div class="control-node-badge">
-          <span class="control-dot"></span>
-          <span>OLLANODE CONTROL PLANE</span>
-        </div>
-      </div>
 
-      {/* 3-BRANCH EXECUTION PATHS */}
-      <div class="branches-grid">
-        {workflowSteps.map((step) => (
-          <div class={`branch-card branch-${step.type}`}>
-            <div class="branch-header">
-              <span class={`status-badge badge-${step.type}`}>{step.code}</span>
-              <span class="endpoint-code">{step.endpoint}</span>
+        <h2 class="agent-section-title">
+          AI agents with <span class="text-orange-gradient">human-in-the-loop guardrails.</span>
+        </h2>
+
+        <p class="agent-section-desc">
+          Agents are API-first citizens with built-in governance. They discover their own capabilities via <code class="agent-code-tag">/v1/whoami</code>, run standard actions freely, but route destructive operations through human approval &mdash; backed by a tamper-evident audit trail and a project kill-switch.
+        </p>
+
+        {/* 3 FEATURE CHECK ITEMS (CORRESPONDING TO OLLANODE.COM'S 3 BRANCHES) */}
+        <div class="agent-features-list">
+          <!-- Item 1: 200 OK Standard Product Actions -->
+          <div class="agent-feature-item">
+            <div class="feature-icon-circle circle-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feat-svg">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
             </div>
-            <h3 class="branch-title">{step.title}</h3>
-            <p class="branch-desc">{step.desc}</p>
+            <div class="feature-text-block">
+              <h4 class="feature-item-title">Standard Product Actions <span class="badge-code-sub">200 OK</span></h4>
+              <p class="feature-item-desc">Agents run read &amp; standard write requests freely within scope (<code class="agent-inline-code">GET /v1/videos</code>, <code class="agent-inline-code">POST /v1/uploads</code>) without human intervention.</p>
+            </div>
           </div>
-        ))}
+
+          <!-- Item 2: 202 ACCEPTED Human-Gated Destructive Actions -->
+          <div class="agent-feature-item">
+            <div class="feature-icon-circle circle-orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feat-svg">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </div>
+            <div class="feature-text-block">
+              <h4 class="feature-item-title">Human-Gated Destructive Actions <span class="badge-code-sub">202 ACCEPTED</span></h4>
+              <p class="feature-item-desc">Destructive mutations (<code class="agent-inline-code">DELETE /v1/videos</code>, <code class="agent-inline-code">POST /v1/functions</code>) return 202 Pending Approval and require human sign-off with an <code class="agent-inline-code">X-Approval-Id</code> digest.</p>
+            </div>
+          </div>
+
+          <!-- Item 3: Tamper-Evident Audit & Kill-Switch -->
+          <div class="agent-feature-item">
+            <div class="feature-icon-circle circle-gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feat-svg">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div class="feature-text-block">
+              <h4 class="feature-item-title">Tamper-Evident Audit Chain &amp; Kill-Switch</h4>
+              <p class="feature-item-desc">Every mutation logs <code class="agent-inline-code">prev_hash/entry_hash</code> integrity in an immutable chain (<code class="agent-inline-code">/v1/audit/verify</code>), with instant project-wide revocation (<code class="agent-inline-code">/v1/admin/disable-agents</code>).</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* BOTTOM DIAGRAM FOOTER */}
-      <div class="diagram-bottom-bar">
-        <div class="audit-status-item">
-          <span class="audit-icon">🛡️</span>
-          <span><b>Cryptographic Audit:</b> Every action signed with <code class="agent-inline-code">prev_hash / entry_hash</code> verification</span>
-        </div>
-        <div class="kill-status-item">
-          <span class="kill-indicator"></span>
-          <span><b>Kill-Switch:</b> Instant revocation via <code class="agent-inline-code">/v1/admin/disable-agents</code></span>
+      {/* RIGHT COLUMN: INTERACTIVE SIGN-OFF APPROVAL CARD */}
+      <div class="agent-right-col">
+        <div class="signoff-card" id="signoff-card-demo">
+          
+          {/* CARD TOP STATUS HEADER */}
+          <div class="signoff-card-header">
+            <div class="signoff-status-left">
+              <span class="signoff-pulsing-dot" id="signoff-status-dot"></span>
+              <span class="signoff-status-lbl" id="signoff-status-lbl">Awaiting Human Sign-Off</span>
+            </div>
+            <div class="signoff-channel-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="slack-mini-icon">
+                <path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/>
+                <path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                <path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/>
+                <path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/>
+              </svg>
+              <span>Slack #infra-ops</span>
+            </div>
+          </div>
+
+          {/* CARD INNER REQUEST BOX */}
+          <div class="signoff-request-box" id="signoff-request-box">
+            <span class="request-box-label">REQUESTED ACTION · 202 ACCEPTED</span>
+            <h3 class="request-box-title" id="request-box-title">
+              DELETE /v1/videos/vid_8f92a1bc &amp; Purge Edge CDN Cache?
+            </h3>
+            <p class="request-box-sub" id="request-box-sub">
+              Triggered by <strong>Transcoding AI Agent</strong> (<code class="sub-code">mcp_video_optimizer</code>). Requires human authorization digest (<code class="sub-code">X-Approval-Id</code>) before executing destructive mutation.
+            </p>
+            <div class="request-box-meta">
+              <span>Target: <code>api.ollanode.com/v1/videos</code></span>
+              <span class="meta-dot">·</span>
+              <span>Risk Tier: <strong class="tier-badge">High (Destructive Delete)</strong></span>
+            </div>
+          </div>
+
+          {/* CARD ACTION BUTTONS */}
+          <div class="signoff-actions-row" id="signoff-actions-row">
+            <button type="button" class="btn-signoff-approve" id="btn-signoff-approve">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-action-icon">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Approve &amp; Execute (202)</span>
+            </button>
+            <button type="button" class="btn-signoff-reject" id="btn-signoff-reject">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-action-icon">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+              <span>Reject Action</span>
+            </button>
+          </div>
+
+          {/* DYNAMIC RESULT FEEDBACK STATE */}
+          <div class="signoff-result-state" id="signoff-result-state" style="display: none;">
+            <div class="result-message" id="result-message"></div>
+            <button type="button" class="btn-signoff-reset" id="btn-signoff-reset">Test Another Decision ↺</button>
+          </div>
         </div>
       </div>
-    </div>
-
-    {/* 4 GOVERNANCE PILLARS GRID */}
-    <div class="pillars-grid">
-      {governancePillars.map((pillar) => (
-        <article class="pillar-card">
-          <div class="pillar-top">
-            <span class="pillar-num">{pillar.num}</span>
-          </div>
-          <h4 class="pillar-title">{pillar.title}</h4>
-          <p class="pillar-desc">{pillar.desc}</p>
-        </article>
-      ))}
     </div>
   </div>
 </section>
 
 <style>
+  /* ================= AGENT NATIVE SECTION (EXACT SCREENSHOT LAYOUT WITH OLLANODE CONTENT) ================= */
   .agent-native-sec {
     position: relative;
     width: 100%;
-    background: linear-gradient(180deg, #FFF5F2 0%, #FFF9F7 100%);
+    background: #FFFFFF;
     padding: 85px 0 95px;
-    border-top: 1px solid rgba(255, 90, 61, 0.15);
-    border-bottom: 1px solid rgba(255, 90, 61, 0.15);
+    border-top: 1px solid #E2E8F0;
+    border-bottom: 1px solid #E2E8F0;
     z-index: 2;
   }
 
-  .agent-header-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 920px;
-    margin: 0 auto 52px;
-    gap: 18px;
+  .agent-native-container {
+    width: 100%;
+    max-width: var(--maxw, 1280px);
+    margin: 0 auto;
+    padding: 0 var(--gutter, clamp(20px, 4vw, 40px));
   }
 
-  .agent-h2 {
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(2rem, 3vw, 2.6rem);
-    font-weight: 620;
-    line-height: 1.05;
-    letter-spacing: -0.04em;
-    color: #1A1D23;
-    margin: 0;
-  }
-
-  .agent-lead-desc {
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(1rem, 1.2vw, 1.15rem);
-    font-weight: 400;
-    color: #475569;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .agent-inline-code {
-    font-family: var(--mono);
-    font-size: 0.9em;
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    padding: 2px 7px;
-    border-radius: 5px;
-    color: #FF5A3D;
-  }
-
-  .agent-chips-strip {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 500;
-    color: #1A1D23;
-    padding-top: 6px;
-  }
-
-  .agent-chip {
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    padding: 4px 12px;
-    border-radius: 20px;
-  }
-
-  .agent-chip-dot {
-    color: #FF5A3D;
-    font-weight: bold;
-  }
-
-  /* WORKFLOW DIAGRAM CARD */
-  .agent-diagram-card {
-    background: #FFFFFF;
-    border: 1px solid #1A1D23;
-    border-radius: 16px;
-    padding: 28px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    margin-bottom: 48px;
-    box-shadow: 0 2px 10px rgba(26, 29, 35, 0.04);
-  }
-
-  .diagram-top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #E2E8F0;
-  }
-
-  .agent-node-badge,
-  .control-node-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 8px;
-    letter-spacing: 0.04em;
-  }
-
-  .agent-node-badge {
-    background: #F1F5F9;
-    border: 1px solid #CBD5E1;
-    color: #1A1D23;
-  }
-
-  .control-node-badge {
-    background: #FFF0EB;
-    border: 1px solid #FF5A3D;
-    color: #1A1D23;
-  }
-
-  .node-icon {
-    width: 16px;
-    height: 16px;
-    color: #FF5A3D;
-  }
-
-  .control-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #FF5A3D;
-    box-shadow: 0 0 0 3px rgba(255, 90, 61, 0.2);
-  }
-
-  .diagram-arrow {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: #667085;
-    letter-spacing: 0.05em;
-  }
-
-  /* 3-BRANCH GRID */
-  .branches-grid {
+  .agent-two-col-layout {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1.05fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  /* LEFT COLUMN */
+  .agent-left-col {
+    display: flex;
+    flex-direction: column;
     gap: 20px;
   }
 
-  .branch-card {
+  .agent-eyebrow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    font-family: var(--sans, sans-serif);
+    font-size: 11.5px;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+
+  .eyebrow-status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #FF5A3D;
+    box-shadow: 0 0 0 2.5px rgba(255, 90, 61, 0.25);
+  }
+
+  .agent-section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(2.1rem, 3.2vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    color: #0F172A;
+    margin: 0;
+  }
+
+  .text-orange-gradient {
+    background: linear-gradient(135deg, #FFA07A 0%, #FF6A3D 30%, #FF4B24 55%, #D43210 80%, #9C1B05 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+  }
+
+  .agent-section-desc {
+    font-family: var(--sans, 'Inter', sans-serif);
+    font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+    font-weight: 400;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 0 6px 0;
+  }
+
+  .agent-code-tag {
+    font-family: var(--mono, monospace);
+    font-size: 0.9em;
+    background: #F1F5F9;
+    border: 1px solid #CBD5E1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #0F172A;
+  }
+
+  .agent-inline-code {
+    font-family: var(--mono, monospace);
+    font-size: 0.88em;
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 20px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #0F172A;
+  }
+
+  .badge-code-sub {
+    font-family: var(--mono, monospace);
+    font-size: 11px;
+    font-weight: 700;
+    background: #F1F5F9;
+    border: 1px solid #CBD5E1;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #475569;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* 3 FEATURE BULLETS */
+  .agent-features-list {
     display: flex;
     flex-direction: column;
+    gap: 18px;
+    padding-top: 6px;
+  }
+
+  .agent-feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .feature-icon-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .feat-svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .circle-green {
+    background: #DCFCE7;
+    color: #16A34A;
+  }
+
+  .circle-orange {
+    background: #FFF0EB;
+    color: #FF5A3D;
+  }
+
+  .circle-gold {
+    background: #FEF3C7;
+    color: #D97706;
+  }
+
+  .feature-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .feature-item-title {
+    font-family: var(--sans, sans-serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0;
+    line-height: 1.35;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .feature-item-desc {
+    font-family: var(--sans, sans-serif);
+    font-size: 13.5px;
+    color: #64748B;
+    margin: 0;
+    line-height: 1.48;
+  }
+
+  /* RIGHT COLUMN: INTERACTIVE SIGNOFF CARD */
+  .agent-right-col {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .signoff-card {
+    width: 100%;
+    max-width: 540px;
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 20px;
+    box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.1), 0 4px 14px rgba(15, 23, 42, 0.05);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    transition: all 0.25s ease;
+  }
+
+  .signoff-card:hover {
+    box-shadow: 0 22px 48px -8px rgba(15, 23, 42, 0.14);
+    border-color: #94A3B8;
+  }
+
+  .signoff-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    transition: transform 0.25s ease, border-color 0.25s ease;
+    flex-wrap: wrap;
   }
 
-  .branch-card:hover {
-    transform: translateY(-2px);
+  .signoff-status-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .branch-allowed:hover {
-    border-color: #16a34a;
+  .signoff-pulsing-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #FF5A3D;
+    box-shadow: 0 0 0 3px rgba(255, 90, 61, 0.25);
+    animation: pulse-ring 2s infinite;
   }
 
-  .branch-approval:hover {
-    border-color: #FF5A3D;
+  .signoff-status-lbl {
+    font-family: var(--sans, sans-serif);
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0F172A;
   }
 
-  .branch-denied:hover {
-    border-color: #dc2626;
+  .signoff-channel-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-family: var(--mono, monospace);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #475569;
   }
 
-  .branch-header {
+  .slack-mini-icon {
+    width: 13px;
+    height: 13px;
+    color: #64748B;
+  }
+
+  /* INNER REQUEST BOX */
+  .signoff-request-box {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .status-badge {
-    align-self: start;
-    font-family: var(--mono);
+  .request-box-label {
+    font-family: var(--mono, monospace);
     font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.04em;
+    font-weight: 750;
+    color: #64748B;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
-  .badge-allowed {
+  .request-box-title {
+    font-family: var(--sans, sans-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .request-box-sub {
+    font-family: var(--sans, sans-serif);
+    font-size: 13px;
+    color: #64748B;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .sub-code {
+    font-family: var(--mono, monospace);
+    font-size: 0.9em;
+    background: #EDF2F7;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #1E293B;
+  }
+
+  .request-box-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 6px;
+    font-family: var(--mono, monospace);
+    font-size: 11.5px;
+    color: #475569;
+    flex-wrap: wrap;
+  }
+
+  .request-box-meta code {
+    color: #0F172A;
+    font-weight: 600;
+  }
+
+  .meta-dot {
+    color: #94A3B8;
+  }
+
+  .tier-badge {
+    color: #DC2626;
+    font-weight: 700;
+  }
+
+  /* ACTION BUTTONS */
+  .signoff-actions-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 12px;
+  }
+
+  .btn-signoff-approve {
+    background: linear-gradient(135deg, #FF7A4D 0%, #FF5A3D 45%, #D43210 100%);
+    color: #FFFFFF;
+    border: 1px solid #D43210;
+    font-family: var(--sans, sans-serif);
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 12px 18px;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(255, 90, 61, 0.28);
+    transition: all 0.2s ease;
+  }
+
+  .btn-signoff-approve:hover {
+    background: linear-gradient(135deg, #FF8E66 0%, #FF6E52 45%, #E23D1F 100%);
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 20px rgba(255, 90, 61, 0.42);
+  }
+
+  .btn-signoff-reject {
+    background: #FFF;
+    color: #DC2626;
+    border: 1.5px solid #FCA5A5;
+    font-family: var(--sans, sans-serif);
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 12px 18px;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-signoff-reject:hover {
+    background: #FEF2F2;
+    border-color: #EF4444;
+    transform: translateY(-1.5px);
+  }
+
+  .btn-action-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* RESULT STATE */
+  .signoff-result-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .result-message {
+    font-family: var(--sans, sans-serif);
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 12px 20px;
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  .result-approved {
     background: #DCFCE7;
     color: #15803D;
     border: 1px solid #86EFAC;
   }
 
-  .badge-approval {
-    background: #FFF0EB;
-    color: #C2410C;
-    border: 1px solid #FFBDAD;
-  }
-
-  .badge-denied {
+  .result-rejected {
     background: #FEE2E2;
     color: #B91C1C;
     border: 1px solid #FCA5A5;
   }
 
-  .endpoint-code {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: #667085;
+  .btn-signoff-reset {
+    background: transparent;
+    border: none;
+    color: #64748B;
+    font-family: var(--sans, sans-serif);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
   }
 
-  .branch-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 650;
-    color: #1A1D23;
-    margin: 0;
-  }
-
-  .branch-desc {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.88rem;
-    color: #667085;
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  .diagram-bottom-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #E2E8F0;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    color: #475569;
-  }
-
-  .audit-status-item,
-  .kill-status-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .kill-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #dc2626;
-  }
-
-  /* 4 GOVERNANCE PILLARS */
-  .pillars-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-  }
-
-  .pillar-card {
-    background: #FFFFFF;
-    border: 1px solid #1A1D23;
-    border-radius: 12px;
-    padding: 20px 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: transform 0.25s ease, border-color 0.25s ease;
-  }
-
-  .pillar-card:hover {
-    border-color: #FF5A3D;
-    transform: translateY(-2px);
-  }
-
-  .pillar-num {
-    font-family: var(--mono);
-    font-size: 1.1rem;
-    font-weight: 700;
+  .btn-signoff-reset:hover {
     color: #FF5A3D;
   }
 
-  .pillar-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    font-weight: 650;
-    color: #1A1D23;
-    margin: 0;
-  }
-
-  .pillar-desc {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.88rem;
-    color: #667085;
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  /* RESPONSIVE RULES */
+  /* RESPONSIVE LAYOUT */
   @media (max-width: 990px) {
-    .branches-grid {
+    .agent-two-col-layout {
       grid-template-columns: 1fr;
-      gap: 16px;
+      gap: 40px;
     }
 
-    .pillars-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+    .signoff-card {
+      max-width: 100%;
     }
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 580px) {
     .agent-native-sec {
       padding: 55px 0 65px;
     }
 
-    .agent-diagram-card {
+    .signoff-card {
       padding: 20px 16px;
     }
 
-    .pillars-grid {
+    .signoff-actions-row {
       grid-template-columns: 1fr;
-      gap: 12px;
     }
 
-    .diagram-top-bar {
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .diagram-arrow {
-      transform: rotate(90deg);
+    .btn-signoff-approve,
+    .btn-signoff-reject {
+      width: 100%;
     }
   }
 </style>
+
+<script is:inline>
+  (function () {
+    function initSignoffDemo() {
+      var btnApprove = document.getElementById('btn-signoff-approve');
+      var btnReject = document.getElementById('btn-signoff-reject');
+      var actionsRow = document.getElementById('signoff-actions-row');
+      var resultState = document.getElementById('signoff-result-state');
+      var resultMsg = document.getElementById('result-message');
+      var btnReset = document.getElementById('btn-signoff-reset');
+      var statusDot = document.getElementById('signoff-status-dot');
+      var statusLbl = document.getElementById('signoff-status-lbl');
+
+      if (!btnApprove || !btnReject || !actionsRow || !resultState || !resultMsg || !btnReset) return;
+
+      btnApprove.addEventListener('click', function () {
+        actionsRow.style.display = 'none';
+        resultState.style.display = 'flex';
+        resultMsg.className = 'result-message result-approved';
+        resultMsg.innerHTML = '✓ Action Approved &amp; Executed (200 OK) · Logged in Hash-Chain';
+        if (statusDot) {
+          statusDot.style.background = '#16A34A';
+          statusDot.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.25)';
+        }
+        if (statusLbl) {
+          statusLbl.textContent = 'Executed by Operator (200 OK)';
+        }
+      });
+
+      btnReject.addEventListener('click', function () {
+        actionsRow.style.display = 'none';
+        resultState.style.display = 'flex';
+        resultMsg.className = 'result-message result-rejected';
+        resultMsg.innerHTML = '✕ Action Rejected (403 Forbidden) · Execution Blocked';
+        if (statusDot) {
+          statusDot.style.background = '#DC2626';
+          statusDot.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.25)';
+        }
+        if (statusLbl) {
+          statusLbl.textContent = 'Blocked by Operator (403 Forbidden)';
+        }
+      });
+
+      btnReset.addEventListener('click', function () {
+        resultState.style.display = 'none';
+        actionsRow.style.display = 'grid';
+        if (statusDot) {
+          statusDot.style.background = '#FF5A3D';
+          statusDot.style.boxShadow = '0 0 0 3px rgba(255, 90, 61, 0.25)';
+        }
+        if (statusLbl) {
+          statusLbl.textContent = 'Awaiting Human Sign-Off';
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSignoffDemo);
+    } else {
+      initSignoffDemo();
+    }
+  })();
+</script>

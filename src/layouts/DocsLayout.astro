@@ -292,16 +292,62 @@ const groups = [
   /* MAIN CONTENT */
   .docs-main-content {
     min-width: 0;
+    max-width: 100%;
+  }
+
+  .docs-main-content pre,
+  .docs-main-content code-block,
+  .docs-main-content table {
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   @media (max-width: 960px) {
     .docs-redesign-shell {
       grid-template-columns: 1fr;
-      gap: 32px;
+      gap: 28px;
+      padding: 24px 20px 60px;
     }
+
     .docs-sidebar {
       position: static;
       max-height: none;
+      padding-right: 0;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .docs-sidebar-group {
+      margin-bottom: 12px;
+    }
+
+    .docs-group-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+    }
+
+    .docs-sidebar-help-card {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .docs-redesign-shell {
+      padding: 18px 14px 48px;
+      gap: 20px;
+    }
+
+    .docs-group-list {
+      grid-template-columns: 1fr;
+    }
+
+    .docs-nav-link {
+      padding: 7px 10px;
+      font-size: 13px;
     }
   }
 </style>
