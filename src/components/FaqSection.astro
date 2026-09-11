@@ -59,10 +59,13 @@ const faqs: FaqItem[] = [
     
     <!-- SECTION HEADER -->
     <div class="faq-header">
-      <div class="faq-badge-pill">
+      <div class="faq-badge-pill reveal-up">
         <span>FREQUENTLY ASKED QUESTIONS</span>
       </div>
-      <p class="faq-subtitle">
+      <h2 class="faq-h2 reveal-up">
+        Got questions? <span class="text-orange">We've got answers.</span>
+      </h2>
+      <p class="faq-subtitle reveal-up">
         Clear answers on platform boundaries, licensing, pricing, and infrastructure architecture — straight from the official source.
       </p>
 
@@ -175,6 +178,17 @@ const faqs: FaqItem[] = [
     border-radius: 6px;
     box-shadow: 0 4px 16px rgba(255, 90, 61, 0.32);
     margin-bottom: 20px;
+  }
+
+  .faq-h2 {
+    font-family: var(--sans, 'Inter', sans-serif);
+    font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: #0F172A;
+    margin: 0 auto 14px;
+    max-width: 720px;
   }
 
   .faq-subtitle {
