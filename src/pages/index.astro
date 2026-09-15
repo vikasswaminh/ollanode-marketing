@@ -575,9 +575,16 @@ const platformCapabilities = [
 
         function getVisibleCount() {
           var w = window.innerWidth;
-          if (w <= 680) return 1;
-          if (w <= 1100) return 2;
+          if (w <= 390) return 1;
+          if (w <= 768) return 2;
           return 3;
+        }
+
+        function getStep() {
+          var w = window.innerWidth;
+          if (w <= 390) return 1;
+          if (w <= 768) return 2;
+          return 1;
         }
 
         function updateCarousel() {
@@ -589,7 +596,8 @@ const platformCapabilities = [
 
           if (cards.length > 0) {
             var cardWidth = cards[0].offsetWidth;
-            var gap = 20;
+            var w = window.innerWidth;
+            var gap = w <= 390 ? 10 : (w <= 768 ? 14 : 16);
             var moveDistance = (cardWidth + gap) * currentIndex;
             track.style.transform = 'translateX(-' + moveDistance + 'px)';
           }
@@ -600,15 +608,13 @@ const platformCapabilities = [
 
         prevBtn.addEventListener('click', function (e) {
           e.preventDefault();
-          var step = getVisibleCount() === 1 ? 1 : 2;
-          currentIndex -= step;
+          currentIndex -= getStep();
           updateCarousel();
         });
 
         nextBtn.addEventListener('click', function (e) {
           e.preventDefault();
-          var step = getVisibleCount() === 1 ? 1 : 2;
-          currentIndex += step;
+          currentIndex += getStep();
           updateCarousel();
         });
 
@@ -625,8 +631,8 @@ const platformCapabilities = [
         }, { passive: true });
 
         viewport.addEventListener('touchend', function () {
-          if (Math.abs(touchDiffX) > 40) {
-            var step = getVisibleCount() === 1 ? 1 : 2;
+          if (Math.abs(touchDiffX) > 30) {
+            var step = getStep();
             if (touchDiffX < 0) {
               currentIndex += step;
             } else {

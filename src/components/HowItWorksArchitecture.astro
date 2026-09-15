@@ -909,74 +909,204 @@
 /* Responsive */
 @media (max-width: 900px) {
   .arch-top-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 14px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
   .arch-actions {
-    width: 100%;
     display: flex;
-    gap: 10px;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .how-it-works-sec {
+    padding: 30px 0 38px;
+  }
+
+  .how-header {
+    margin-bottom: 14px;
+  }
+
+  .how-title {
+    font-size: clamp(1.6rem, 5vw, 2.1rem);
+    margin-bottom: 6px;
+  }
+
+  .how-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .arch-board {
+    padding: 12px 10px;
+    border-radius: 14px;
+  }
+
+  .arch-pipeline-wrap {
+    padding-bottom: 8px;
+  }
+
+  .arch-pipeline-grid {
+    min-width: 720px;
+    gap: 6px;
+  }
+
+  .arch-stage-card {
+    width: 124px;
+    padding: 10px 8px;
+    border-radius: 12px;
+  }
+
+  .stage-header {
+    margin-bottom: 6px;
+  }
+
+  .stage-step-num {
+    font-size: 0.65rem;
+  }
+
+  .stage-tag {
+    font-size: 0.52rem;
+    padding: 1.5px 4px;
+  }
+
+  .stage-icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+  }
+
+  .stage-icon-box svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .stage-title {
+    font-size: 0.80rem;
+    line-height: 1.2;
+    margin: 0 0 2px 0;
+  }
+
+  .stage-sub {
+    font-size: 0.62rem;
+    margin-bottom: 4px;
+  }
+
+  .micro-badge {
+    font-size: 0.52rem;
+    padding: 1px 4px;
+  }
+
+  .stage-specs-list {
+    gap: 2.5px;
+  }
+
+  .spec-item {
+    font-size: 0.54rem;
+    padding: 1.5px 4px;
+  }
+
+  .arch-connector {
+    width: 20px;
+  }
+
+  .connector-label {
+    font-size: 0.50rem;
+  }
+
+  .arch-terminal-strip {
+    margin-top: 10px;
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .term-title {
+    font-size: 0.58rem;
+  }
+
+  .terminal-body {
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .how-it-works-sec {
+    padding: 22px 0 28px;
+  }
+
+  .how-header {
+    margin-bottom: 10px;
+  }
+
+  .how-title {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+
+  .how-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .arch-board {
+    padding: 10px 8px;
+    border-radius: 12px;
+  }
+
+  .arch-top-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .arch-status-pill {
+    font-size: 0.58rem;
+    padding: 4px 8px;
   }
 
   .sim-btn,
   .arch-link-btn {
-    flex: 1;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 640px) {
-  .how-it-works-sec {
-    padding: 44px 0 52px;
-  }
-
-  .how-header {
-    margin-bottom: 24px;
-  }
-
-  .how-title {
-    font-size: clamp(1.8rem, 6.5vw, 2.3rem);
-  }
-
-  .how-subtitle {
-    font-size: 0.95rem;
-  }
-
-  .arch-board {
-    padding: 16px 12px;
-    border-radius: 16px;
-  }
-
-  .arch-top-bar {
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .arch-status-pill {
-    width: 100%;
-    justify-content: space-between;
-    font-size: 0.62rem;
+    font-size: 0.74rem;
     padding: 5px 10px;
   }
 
-  .status-ver {
-    display: none;
+  .arch-pipeline-grid {
+    min-width: 640px;
+    gap: 4px;
   }
 
-  .arch-terminal-strip {
-    margin-top: 14px;
-    padding: 8px 10px;
-    gap: 8px;
+  .arch-stage-card {
+    width: 112px;
+    padding: 8px 6px;
   }
 
-  .terminal-header {
-    padding-right: 8px;
+  .stage-icon-box {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    margin-bottom: 4px;
   }
 
-  .terminal-body {
-    font-size: 0.65rem;
+  .stage-icon-box svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .stage-title {
+    font-size: 0.75rem;
+  }
+
+  .stage-sub {
+    font-size: 0.58rem;
+  }
+
+  .arch-connector {
+    width: 16px;
   }
 }
 </style>

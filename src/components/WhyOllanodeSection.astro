@@ -53,11 +53,20 @@ const valuePillars = [
           </p>
 
           <div class="why-trust-pills">
-            <span class="why-pill">Self-Hosted Platform</span>
+            <span class="why-pill">
+              <span class="pill-full">Self-Hosted Platform</span>
+              <span class="pill-short">Self-Hosted</span>
+            </span>
             <span class="why-pill-dot">•</span>
-            <span class="why-pill">Apache-2.0 Licensed</span>
+            <span class="why-pill">
+              <span class="pill-full">Apache-2.0 Licensed</span>
+              <span class="pill-short">Apache-2.0</span>
+            </span>
             <span class="why-pill-dot">•</span>
-            <span class="why-pill">API & Agent Native</span>
+            <span class="why-pill">
+              <span class="pill-full">API &amp; Agent Native</span>
+              <span class="pill-short">API Native</span>
+            </span>
           </div>
 
           <div class="why-scroll-indicator" aria-hidden="true">
@@ -189,7 +198,8 @@ const valuePillars = [
   .why-trust-pills {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    white-space: nowrap;
     gap: 8px;
     font-family: var(--mono);
     font-size: 11.5px;
@@ -197,19 +207,31 @@ const valuePillars = [
     color: #1A1D23;
     letter-spacing: 0.02em;
     padding-top: 4px;
+    width: 100%;
+    max-width: 100%;
   }
 
   .why-pill {
     background: #FFFFFF;
     border: 1px solid #CBD5E1;
     padding: 4px 11px;
-    border-radius: 20px;
+    border-radius: 999px;
     color: #1A1D23;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pill-full {
+    display: inline;
+  }
+  .pill-short {
+    display: none;
   }
 
   .why-pill-dot {
     color: #FF5A3D;
     font-weight: bold;
+    flex-shrink: 0;
   }
 
   .why-scroll-indicator {
@@ -338,21 +360,61 @@ const valuePillars = [
 
   @media (max-width: 640px) {
     .why-ollanode-section {
-      padding: 55px 0 65px;
+      padding: 44px 0 54px;
     }
 
     .why-point-card {
       padding: 16px 18px;
       border-radius: 10px;
     }
+  }
 
+  @media (max-width: 480px) {
     .why-trust-pills {
-      gap: 6px;
+      gap: 4px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      justify-content: flex-start;
+      overflow-x: visible;
+    }
+
+    .pill-full {
+      display: none;
+    }
+
+    .pill-short {
+      display: inline;
     }
 
     .why-pill {
-      font-size: 10.5px;
-      padding: 3px 9px;
+      font-size: 10px;
+      padding: 3px 8px;
+    }
+
+    .why-pill-dot {
+      font-size: 8px;
+    }
+  }
+
+  @media (max-width: 375px) {
+    .why-trust-pills {
+      gap: 3px;
+    }
+
+    .why-pill {
+      font-size: 9px;
+      padding: 2.5px 6px;
+    }
+  }
+
+  @media (max-width: 320px) {
+    .why-trust-pills {
+      gap: 2px;
+    }
+
+    .why-pill {
+      font-size: 8px;
+      padding: 2px 5px;
     }
   }
 </style>
