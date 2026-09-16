@@ -17,121 +17,928 @@ interface Props {
 const { article } = Astro.props;
 const { Content, headings } = await article.render();
 
-// Extract H2 headings for the "ON THIS PAGE" sticky left sidebar
-const tocHeadings = headings.filter((h) => h.depth === 2 && h.slug !== 'table-of-contents');
+// Extract H2 & H3 headings for the "ON THIS PAGE" sticky left sidebar
+const tocHeadings = headings.filter(
+  (h) => (h.depth === 2 || h.depth === 3) && h.slug !== 'table-of-contents'
+);
 
 // Fetch related articles for the "RELATED READING" sticky right sidebar
 const allArticles = await getCollection('blog');
 const otherArticles = allArticles.filter((a) => a.id !== article.id);
-const relatedArticles = (otherArticles.length > 0 ? otherArticles : allArticles).slice(0, 5);
+// Prioritize articles in same category
+const sameCategory = otherArticles.filter(
+  (a) => a.data.category === article.data.category
+);
+const differentCategory = otherArticles.filter(
+  (a) => a.data.category !== article.data.category
+);
+const relatedArticles = [...sameCategory, ...differentCategory].slice(0, 5);
+
+// Key takeaways from frontmatter if available or derived
+const keyTakeaways = (article.data as any).keyTakeaways || [
+  `Self-hosted video infrastructure gives you total control over ingestion, transcoding, storage, and edge delivery.`,
+  `Combines adaptive HLS packaging, private-origin proxying, and WhisperX transcription in an event-driven Rust pipeline.`,
+  `Permissively licensed under Apache-2.0 with native AI-agent governance and tamper-evident audit logging.`,
+];
 ---
 
 <Site
-  title={`${article.data.title} — Ollanode Blog`}
+  title={`${article.data.title} · OllaNode Blog`}
   description={article.data.excerpt}
 >
-  <article class="post-detail-sec">
-    <!-- POST HERO HEADER -->
-    <header class="post-hero">
-      <div class="wrap">
-        <a href="/blog" class="back-link">← Back to Blog</a>
+  <div class="article-page-wrap">
+    <div class="container-wide">
+      
+      <!-- 3-COLUMN ARTICLE LAYOUT (EXACT REPLICATION OF BLOGS.OLLANODE.COM) -->
+      <div class="article-3col-layout">
 
-        <div class="post-hero-body">
-          <div class="post-meta">
-            <span class="cat-pill">{article.data.category}</span>
-            <span class="meta-dot">•</span>
-            <span>{article.data.publishedDate}</span>
-            <span class="meta-dot">•</span>
-            <span>{article.data.readingTime}</span>
+        <!-- 1. LEFT SIDEBAR: STICKY "ON THIS PAGE" TABLE OF CONTENTS -->
+        <aside class="sidebar-col sidebar-toc">
+          <div class="sticky-sidebar">
+            <span class="badge-pill founder-badge-purple">ON THIS PAGE</span>
+            <nav class="toc-card-box" aria-label="Table of contents">
+              {tocHeadings.length > 0 ? (
+                <ul class="toc-list">
+                  {tocHeadings.map((h) => (
+                    <li class={`toc-item depth-${h.depth}`}>
+                      <a href={`#${h.slug}`} class="toc-link" title={h.text}>
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul class="toc-list">
+                  <li class="toc-item depth-2">
+                    <a href="#overview" class="toc-link">Overview</a>
+                  </li>
+                  <li class="toc-item depth-2">
+                    <a href="#architecture" class="toc-link">Architecture</a>
+                  </li>
+                </ul>
+              )}
+            </nav>
+            <a href="/blog" class="view-all-btn-purple">← Back to Blog Home</a>
           </div>
+        </aside>
 
-          <h1 class="post-title">{article.data.title}</h1>
+        <!-- 2. MIDDLE COLUMN: MAIN ARTICLE CONTENT -->
+        <main class="article-middle-col">
+          
+          <!-- Breadcrumb Navigation -->
+          <nav class="article-breadcrumb" aria-label="Breadcrumb">
+            <a href="/" class="crumb-link">Home</a>
+            <span class="crumb-sep">›</span>
+            <a href="/blog" class="crumb-link">Blog</a>
+            <span class="crumb-sep">›</span>
+            <span class="crumb-current">{article.data.title}</span>
+          </nav>
 
-          <p class="post-excerpt-lead">{article.data.excerpt}</p>
-
-          <div class="post-author-box">
-            <div class="author-avatar">{article.data.author.avatar || '⚡'}</div>
-            <div class="author-info">
-              <span class="author-name">{article.data.author.name}</span>
-              <span class="author-role">{article.data.author.role}</span>
+          <!-- Article Header -->
+          <header class="article-header">
+            <div class="article-meta-top">
+              <span class="category-pill-orange">{article.data.category}</span>
+              <span class="meta-dot">•</span>
+              <span class="meta-item">{article.data.publishedDate}</span>
+              <span class="meta-dot">•</span>
+              <span class="meta-item">{article.data.readingTime}</span>
             </div>
-          </div>
-        </div>
-      </div>
-    </header>
 
-    {article.data.image && (
-      <div class="post-hero-banner-wrap">
-        <div class="wrap">
-          <img src={article.data.image} alt={article.data.title} class="post-hero-banner-img" />
-        </div>
-      </div>
-    )}
+            <h1 class="article-main-title">{article.data.title}</h1>
 
-    <!-- COMPLETE 3-COLUMN POST DETAIL LAYOUT GRID -->
-    <div class="post-body-container">
-      <div class="wrap post-detail-max-wrap">
-        <div class="post-detail-grid">
+            <p class="article-lead-desc">{article.data.excerpt}</p>
 
-          <!-- 1. LEFT SIDEBAR: STICKY "ON THIS PAGE" TABLE OF CONTENTS -->
-          <aside class="post-sidebar-left">
-            <div class="toc-card">
-              <div class="toc-badge">ON THIS PAGE</div>
-              <nav class="toc-nav">
-                {tocHeadings.length > 0 ? (
-                  <ul>
-                    {tocHeadings.map((h) => (
-                      <li>
-                        <a href={`#${h.slug}`} class="toc-link">
-                          {h.text}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p class="toc-empty">Overview &amp; details</p>
-                )}
-              </nav>
+            <div class="article-author-bar">
+              <div class="author-avatar">{article.data.author?.avatar || '⚡'}</div>
+              <div class="author-info">
+                <span class="author-name">{article.data.author?.name || 'OllaNode Team'}</span>
+                <span class="author-role">{article.data.author?.role || 'Core Engineering'}</span>
+              </div>
             </div>
-          </aside>
+          </header>
 
-          <!-- 2. CENTER COLUMN: ARTICLE BODY CONTENT -->
-          <main class="post-content-main prose">
+          <!-- Featured Hero Image (if available) -->
+          {article.data.image && (
+            <div class="article-hero-banner">
+              <img src={article.data.image} alt={article.data.title} />
+            </div>
+          )}
+
+          <!-- Key Takeaways Callout Box -->
+          {keyTakeaways && keyTakeaways.length > 0 && (
+            <div class="key-takeaways-box">
+              <div class="takeaways-header">
+                <svg class="takeaways-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <h3 class="takeaways-title">Key Takeaways</h3>
+              </div>
+              <ul class="takeaways-list">
+                {keyTakeaways.map((item: string) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <!-- Main Article Prose -->
+          <div class="article-prose-content prose">
             <Content />
+          </div>
 
-            {article.data.tags && article.data.tags.length > 0 && (
-              <div class="post-tags-footer">
-                <span class="tags-label">Tags:</span>
+          <!-- Tags Footer -->
+          {article.data.tags && article.data.tags.length > 0 && (
+            <div class="article-tags-wrap">
+              <span class="tags-label">Tags:</span>
+              <div class="tags-list">
                 {article.data.tags.map((tag) => (
                   <span class="tag-chip">#{tag}</span>
                 ))}
               </div>
-            )}
-          </main>
+            </div>
+          )}
 
-          <!-- 3. RIGHT SIDEBAR: STICKY "RELATED READING" CARDS -->
-          <aside class="post-sidebar-right">
-            <div class="related-sidebar-card">
-              <div class="related-badge">RELATED READING</div>
-              <div class="related-sidebar-list">
-                {relatedArticles.map((art) => (
-                  <article class="related-mini-card">
-                    <span class="related-mini-cat">{art.data.category}</span>
-                    <h4 class="related-mini-title">
-                      <a href={`/blog/${art.slug || art.id}`}>{art.data.title}</a>
-                    </h4>
-                    <div class="related-mini-footer">
-                      <span class="related-mini-time">{art.data.readingTime}</span>
-                      <a href={`/blog/${art.slug || art.id}`} class="related-mini-arrow">Read →</a>
-                    </div>
-                  </article>
-                ))}
+          <!-- Bottom CTA Banner Card -->
+          <div class="article-bottom-cta">
+            <div class="bottom-cta-inner">
+              <span class="cta-badge">GET STARTED</span>
+              <h3 class="cta-title">Run your own VOD transcoding, adaptive HLS, edge CDN, and AI-governed media storage</h3>
+              <p class="cta-desc">Deploy Apache-2.0 open source video infrastructure on your own cloud hardware in minutes.</p>
+              <div class="cta-btn-wrap">
+                <a href="https://ollanode.com" class="btn-cta-orange">Explore OllaNode ↗</a>
               </div>
             </div>
-          </aside>
+          </div>
 
-        </div>
+        </main>
+
+        <!-- 3. RIGHT SIDEBAR: STICKY "RELATED READING" CARDS -->
+        <aside class="sidebar-col sidebar-related">
+          <div class="sticky-sidebar">
+            <span class="badge-pill orange-badge">RELATED READING</span>
+            <div class="related-cards-stack">
+              {relatedArticles.map((art) => (
+                <a href={`/blog/${art.slug || art.id}`} class="related-card-item">
+                  <span class="related-card-category">{art.data.category} ↗</span>
+                  <h4 class="related-card-title">{art.data.title}</h4>
+                  <p class="related-card-desc">{art.data.excerpt}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </aside>
+
       </div>
     </div>
-  </article>
+  </div>
 </Site>
+
+<!-- CLIENT SCRIPT FOR TOC ACTIVE STATE TRACKING -->
+<script is:inline>
+  (function () {
+    function initTocTracker() {
+      var links = document.querySelectorAll('.toc-link');
+      if (!links.length) return;
+
+      var headings = [];
+      links.forEach(function (link) {
+        var href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          var el = document.getElementById(href.substring(1));
+          if (el) {
+            headings.push({ el: el, link: link });
+          }
+        }
+      });
+
+      function onScroll() {
+        var scrollPos = window.scrollY + 140;
+        var active = null;
+
+        for (var i = 0; i < headings.length; i++) {
+          if (headings[i].el.offsetTop <= scrollPos) {
+            active = headings[i];
+          } else {
+            break;
+          }
+        }
+
+        links.forEach(function (l) {
+          l.classList.remove('active');
+        });
+
+        if (active) {
+          active.link.classList.add('active');
+        } else if (links.length > 0) {
+          links[0].classList.add('active');
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTocTracker);
+    } else {
+      initTocTracker();
+    }
+
+    document.addEventListener('astro:page-load', initTocTracker);
+  })();
+</script>
+
+<style>
+  /* ==========================================================================
+     EXACT 3-COLUMN BLOG POST PAGE STYLES (REPLICATING BLOGS.OLLANODE.COM)
+     ========================================================================== */
+
+  .article-page-wrap {
+    width: 100%;
+    background-color: #FFFFFF;
+    color: #0F172A;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 2.25rem 0 5rem;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container-wide {
+    width: 100%;
+    max-width: 86rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
+  }
+
+  /* 3-COLUMN GRID LAYOUT */
+  .article-3col-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 240px;
+    gap: 2.25rem;
+    width: 100%;
+    position: relative;
+    align-items: start;
+  }
+
+  /* SIDEBAR COMMON STYLES */
+  .sidebar-col {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 86px !important;
+    align-self: start !important;
+    z-index: 25 !important;
+    width: 100% !important;
+  }
+
+  .sticky-sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+  }
+
+  /* BADGE PILLS */
+  .badge-pill {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    width: max-content;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .founder-badge-purple {
+    background: #7C3AED;
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+  }
+
+  .orange-badge {
+    background: #FF6600;
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(255, 102, 0, 0.25);
+  }
+
+  /* LEFT SIDEBAR: TABLE OF CONTENTS */
+  .toc-card-box {
+    background: #FAFAFA;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 0.85rem 0.75rem;
+    box-sizing: border-box;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .toc-item {
+    line-height: 1.35;
+  }
+
+  .toc-item.depth-3 {
+    padding-left: 0.85rem;
+    font-size: 0.76rem;
+  }
+
+  .toc-link {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #475569;
+    text-decoration: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .toc-link:hover {
+    color: #7C3AED;
+    background: #F3E8FF;
+    border-left-color: #7C3AED;
+  }
+
+  .toc-link.active {
+    color: #7C3AED;
+    font-weight: 700;
+    background: #F3E8FF;
+    border-left-color: #7C3AED;
+  }
+
+  .view-all-btn-purple {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #7C3AED;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    padding: 0.25rem 0;
+  }
+
+  .view-all-btn-purple:hover {
+    color: #6D28D9;
+    text-decoration: underline;
+    transform: translateX(-2px);
+  }
+
+  /* MIDDLE COLUMN */
+  .article-middle-col {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* BREADCRUMB */
+  .article-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748B;
+    margin-bottom: 1.25rem;
+  }
+
+  .crumb-link {
+    color: #64748B;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .crumb-link:hover {
+    color: #FF6600;
+    text-decoration: underline;
+  }
+
+  .crumb-sep {
+    color: #94A3B8;
+    font-size: 0.9rem;
+  }
+
+  .crumb-current {
+    color: #0F172A;
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 480px;
+  }
+
+  /* ARTICLE HEADER */
+  .article-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 1.75rem;
+  }
+
+  .article-meta-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: #64748B;
+    font-weight: 500;
+    margin-bottom: 0.85rem;
+  }
+
+  .category-pill-orange {
+    display: inline-block;
+    background: #FF6600;
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .meta-dot {
+    color: #CBD5E1;
+  }
+
+  .article-main-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.22;
+    letter-spacing: -0.025em;
+    margin: 0 0 1rem;
+  }
+
+  .article-lead-desc {
+    font-size: 1.08rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+  }
+
+  .article-author-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .author-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #FFEDE0;
+    color: #FF6600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border: 1.5px solid #FFD8BE;
+    flex-shrink: 0;
+  }
+
+  .author-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .author-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0F172A;
+  }
+
+  .author-role {
+    font-size: 0.78rem;
+    color: #64748B;
+  }
+
+  .article-hero-banner {
+    margin-bottom: 2rem;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #E2E8F0;
+  }
+
+  .article-hero-banner img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* KEY TAKEAWAYS BOX */
+  .key-takeaways-box {
+    background: #FFFDF7;
+    border: 2px solid #FF9800;
+    border-radius: 14px;
+    padding: 1.35rem 1.6rem;
+    margin: 1.75rem 0 2.25rem;
+    box-shadow: 0 4px 16px rgba(255, 152, 0, 0.08);
+  }
+
+  .takeaways-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+    color: #E65100;
+  }
+
+  .takeaways-title {
+    font-size: 1.12rem;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .takeaways-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .takeaways-list li {
+    font-size: 0.92rem;
+    color: #334155;
+    line-height: 1.55;
+  }
+
+  /* ARTICLE PROSE CONTENT STYLING */
+  .article-prose-content {
+    font-size: 1.04rem;
+    line-height: 1.72;
+    color: #1E293B;
+  }
+
+  .article-prose-content h2 {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 2.5rem 0 1rem;
+    line-height: 1.28;
+    letter-spacing: -0.02em;
+    padding-top: 1rem;
+    scroll-margin-top: 96px;
+  }
+
+  .article-prose-content h3 {
+    font-size: 1.32rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 2rem 0 0.85rem;
+    line-height: 1.32;
+    letter-spacing: -0.015em;
+    scroll-margin-top: 96px;
+  }
+
+  .article-prose-content h4 {
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 1.5rem 0 0.65rem;
+  }
+
+  .article-prose-content p {
+    margin: 0 0 1.35rem;
+  }
+
+  .article-prose-content a {
+    color: #FF6600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+    transition: color 0.15s ease;
+  }
+
+  .article-prose-content a:hover {
+    color: #E65100;
+  }
+
+  .article-prose-content ul,
+  .article-prose-content ol {
+    margin: 0 0 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .article-prose-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.65;
+  }
+
+  .article-prose-content pre {
+    background: #0B0F19 !important;
+    color: #F8FAFC !important;
+    padding: 1.15rem 1.4rem !important;
+    border-radius: 12px !important;
+    overflow-x: auto !important;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+    font-size: 0.88rem !important;
+    line-height: 1.6 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    margin: 1.5rem 0 1.75rem !important;
+  }
+
+  .article-prose-content code {
+    background: #F1F5F9;
+    color: #0F172A;
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    font-size: 0.88em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    border: 1px solid #E2E8F0;
+  }
+
+  .article-prose-content pre code {
+    background: transparent !important;
+    color: inherit !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  .article-prose-content blockquote {
+    border-left: 4px solid #FF6600;
+    background: #FFF7ED;
+    padding: 1rem 1.35rem;
+    margin: 1.5rem 0;
+    border-radius: 0 10px 10px 0;
+    color: #431407;
+    font-style: italic;
+  }
+
+  .article-prose-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.75rem 0;
+    font-size: 0.92rem;
+  }
+
+  .article-prose-content th,
+  .article-prose-content td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #E2E8F0;
+    text-align: left;
+  }
+
+  .article-prose-content th {
+    background: #F8FAFC;
+    font-weight: 700;
+    color: #0F172A;
+  }
+
+  /* TAGS FOOTER */
+  .article-tags-wrap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+    border-top: 1px solid #E2E8F0;
+  }
+
+  .tags-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #64748B;
+  }
+
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .tag-chip {
+    display: inline-block;
+    background: #F1F5F9;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    border: 1px solid #E2E8F0;
+  }
+
+  /* BOTTOM CTA BANNER CARD */
+  .article-bottom-cta {
+    margin-top: 2.5rem;
+    background: linear-gradient(135deg, #0F172A 0%, #080C14 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 2.25rem 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+  }
+
+  .bottom-cta-inner {
+    max-width: 680px;
+  }
+
+  .cta-badge {
+    display: inline-block;
+    background: #FF6600;
+    color: #FFFFFF;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 0.22rem 0.65rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .cta-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.3;
+    margin: 0 0 0.65rem;
+    letter-spacing: -0.015em;
+  }
+
+  .cta-desc {
+    font-size: 0.92rem;
+    color: #94A3B8;
+    line-height: 1.5;
+    margin: 0 0 1.35rem;
+  }
+
+  .btn-cta-orange {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, #FF6600, #E65100);
+    color: #FFFFFF !important;
+    font-size: 0.92rem;
+    font-weight: 700;
+    padding: 0.75rem 1.6rem;
+    border-radius: 10px;
+    border: 1px solid #FDE047;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(255, 102, 0, 0.35);
+  }
+
+  .btn-cta-orange:hover {
+    background: #E65100;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 102, 0, 0.45);
+  }
+
+  /* RIGHT SIDEBAR: RELATED READING */
+  .related-cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .related-card-item {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 0.85rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .related-card-item:hover {
+    border-color: #FF6600;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -2px rgba(255, 102, 0, 0.2);
+  }
+
+  .related-card-category {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #FF6600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.35rem;
+  }
+
+  .related-card-title {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.32;
+    margin: 0 0 0.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.15s ease;
+  }
+
+  .related-card-item:hover .related-card-title {
+    color: #FF6600;
+  }
+
+  .related-card-desc {
+    font-size: 0.74rem;
+    color: #64748B;
+    line-height: 1.4;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ==========================================================================
+     RESPONSIVE BREAKPOINTS
+     ========================================================================== */
+
+  /* LAPTOP / SMALL DESKTOP (901px to 1180px) */
+  @media (min-width: 901px) and (max-width: 1180px) {
+    .article-3col-layout {
+      grid-template-columns: 190px minmax(0, 1fr) 200px;
+      gap: 1.35rem;
+    }
+    .article-main-title {
+      font-size: 1.85rem;
+    }
+  }
+
+  /* TABLET (768px to 900px) */
+  @media (min-width: 768px) and (max-width: 900px) {
+    .article-3col-layout {
+      grid-template-columns: 150px minmax(0, 1fr) 160px;
+      gap: 0.95rem;
+    }
+    .article-main-title {
+      font-size: 1.6rem;
+    }
+    .founder-badge-purple,
+    .orange-badge {
+      font-size: 0.62rem;
+      padding: 0.22rem 0.5rem;
+    }
+    .toc-link {
+      font-size: 0.74rem;
+      padding: 0.25rem 0.35rem;
+    }
+    .related-card-title {
+      font-size: 0.78rem;
+    }
+    .related-card-desc {
+      font-size: 0.7rem;
+    }
+  }
+
+  /* MOBILE (<= 767px) */
+  @media (max-width: 767px) {
+    .article-page-wrap {
+      padding: 1.25rem 0 3.5rem;
+    }
+    .article-3col-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .sidebar-toc {
+      display: none !important; /* Hide left TOC on mobile to focus on content */
+    }
+    .sidebar-related {
+      position: static !important;
+      margin-top: 1.5rem;
+    }
+    .article-main-title {
+      font-size: 1.55rem;
+      line-height: 1.28;
+    }
+    .article-lead-desc {
+      font-size: 0.94rem;
+    }
+    .key-takeaways-box {
+      padding: 1rem 1.15rem;
+    }
+    .article-bottom-cta {
+      padding: 1.5rem 1.25rem;
+    }
+    .cta-title {
+      font-size: 1.15rem;
+    }
+  }
+</style>

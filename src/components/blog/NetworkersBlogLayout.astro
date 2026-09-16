@@ -12,10 +12,16 @@ const gridArticles = mainFeatured
   ? articles.filter((a) => a.id !== mainFeatured.id)
   : articles;
 
-// Unique categories dynamically derived from existing articles
+// Exact categories matching blogs.ollanode.com homepage
 const allCategories = [
   'All',
-  ...Array.from(new Set(articles.map((a) => a.data.category).filter(Boolean))),
+  'Video Infrastructure & Developer Platforms',
+  'Video & CDN',
+  'Product & Changelog',
+  'Guides',
+  'Comparisons',
+  'AI & agents',
+  'Engineering',
 ];
 
 // Archive category groups
@@ -271,6 +277,21 @@ const archiveList = Array.from(archiveGroups.entries());
       var subcards = document.querySelectorAll('.subcard-item');
       var noPosts = document.getElementById('no-category-posts');
 
+      function matchesCategory(articleCat, targetCat) {
+        if (!targetCat || targetCat === 'all') return true;
+        var a = (articleCat || '').toLowerCase().trim();
+        var t = targetCat.toLowerCase().trim();
+        if (a.includes(t) || t.includes(a)) return true;
+        if (t.includes('video') && a.includes('video')) return true;
+        if (t.includes('cdn') && (a.includes('cdn') || a.includes('video'))) return true;
+        if (t.includes('guide') && (a.includes('guide') || a.includes('tutorial'))) return true;
+        if (t.includes('comparison') && (a.includes('comparison') || a.includes('vs'))) return true;
+        if (t.includes('ai') && (a.includes('ai') || a.includes('agent'))) return true;
+        if (t.includes('engineering') && (a.includes('engineering') || a.includes('rust') || a.includes('infra'))) return true;
+        if (t.includes('product') && (a.includes('product') || a.includes('changelog') || a.includes('release'))) return true;
+        return false;
+      }
+
       function filterCategory(cat) {
         var cleanCat = (cat || 'all').toLowerCase().trim();
         var visibleCount = 0;
@@ -286,8 +307,8 @@ const archiveList = Array.from(archiveGroups.entries());
 
         // Filter featured card
         if (featuredCard) {
-          var featCat = (featuredCard.getAttribute('data-category') || '').toLowerCase().trim();
-          if (cleanCat === 'all' || featCat.includes(cleanCat) || cleanCat.includes(featCat)) {
+          var featCat = featuredCard.getAttribute('data-category') || '';
+          if (matchesCategory(featCat, cleanCat)) {
             featuredCard.style.display = '';
             visibleCount++;
           } else {
@@ -297,8 +318,8 @@ const archiveList = Array.from(archiveGroups.entries());
 
         // Filter subcards
         subcards.forEach(function (card) {
-          var itemCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
-          if (cleanCat === 'all' || itemCat.includes(cleanCat) || cleanCat.includes(itemCat)) {
+          var itemCat = card.getAttribute('data-category') || '';
+          if (matchesCategory(itemCat, cleanCat)) {
             card.style.display = '';
             visibleCount++;
           } else {
@@ -342,15 +363,17 @@ const archiveList = Array.from(archiveGroups.entries());
 
 <style>
   /* ==========================================================================
-     BLOG PAGE STYLES WITH SKY BLUE GRADIENT CATEGORY STRIP
+     BLOG PAGE STYLES WITH DARKENED AND BROADENED SKY BLUE CATEGORY STRIP
      ========================================================================== */
 
   .blog-page-wrapper {
     width: 100%;
     background-color: var(--bg, #FFFFFF);
-    color: var(--text, #1E293B);
-    font-family: var(--font, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    color: var(--text, #0F172A);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .container-wide {
@@ -361,17 +384,17 @@ const archiveList = Array.from(archiveGroups.entries());
     box-sizing: border-box;
   }
 
-  /* 1. STICKY CATEGORY CHIPS STRIP (SKY BLUE DARK AND LIGHT GRADIENT) */
+  /* 1. STICKY CATEGORY CHIPS STRIP (DARKENED, BROADENED SKY BLUE TO DEEP CYAN GRADIENT) */
   .category-strip {
     width: 100%;
-    background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 30%, #BAE6FD 60%, #60A5FA 85%, #2563EB 100%);
-    border-top: 1px solid rgba(59, 130, 246, 0.25);
-    border-bottom: 1.5px solid rgba(37, 99, 235, 0.35);
-    padding: 0.65rem 0;
+    background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 20%, #7DD3FC 50%, #38BDF8 78%, #0284C7 100%);
+    border-top: 1.5px solid rgba(2, 132, 199, 0.35);
+    border-bottom: 2px solid rgba(3, 105, 161, 0.45);
+    padding: 0.85rem 0; /* Broader strip */
     position: sticky;
     top: 62px;
     z-index: 40;
-    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.16), 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 24px rgba(2, 132, 199, 0.22), 0 2px 6px rgba(0, 0, 0, 0.06);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     display: flex;
@@ -385,7 +408,7 @@ const archiveList = Array.from(archiveGroups.entries());
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 0.65rem;
     margin: 0 auto;
     padding: 0;
     text-align: center;
@@ -394,36 +417,36 @@ const archiveList = Array.from(archiveGroups.entries());
   .category-chip {
     display: inline-flex;
     align-items: center;
-    font-size: 0.815rem;
+    font-size: 0.82rem;
     font-weight: 700;
     line-height: 1.35;
     color: #0F172A;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1.5px solid rgba(255, 255, 255, 0.95);
-    padding: 0.32rem 0.95rem;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1.5px solid rgba(255, 255, 255, 0.98);
+    padding: 0.36rem 0.95rem;
     border-radius: 9999px;
     transition: all 0.18s ease;
     text-decoration: none;
     box-sizing: border-box;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
     font-family: inherit;
   }
 
   .category-chip:hover {
-    color: #0284C7;
-    border-color: #38BDF8;
+    color: #0369A1;
+    border-color: #0284C7;
     background: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
   }
 
   .category-chip.active {
     color: #FFFFFF !important;
     background: linear-gradient(135deg, #FF5722, #FF4500) !important;
     border: 1.5px solid #FF5500 !important;
-    box-shadow: 0 3px 12px rgba(255, 69, 0, 0.4) !important;
+    box-shadow: 0 3px 12px rgba(255, 69, 0, 0.45) !important;
     font-weight: 800;
   }
 
