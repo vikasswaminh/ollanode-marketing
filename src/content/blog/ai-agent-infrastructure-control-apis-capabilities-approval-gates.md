@@ -479,13 +479,16 @@ Autonomous infrastructure agents operate under an adversarial threat model. Belo
 
 When agent operations fail or stall, follow this diagnostic runbook to isolate root causes:
 
-| Error / Symptom | Root Cause | Immediate Diagnostic Action | Remediation Step |
-| :--- | :--- | :--- | :--- |
-| `HTTP 202 Accepted Infinite Loop` | Escalation alert failed to notify human approvers or approval queue is stalled. | Query `GET /v1/approvals?status=pending` to check queue depth. Inspect NATS consumer lag on `agent_governance`. | Verify notification webhook connectivity and ensure on-call engineers are monitoring approval channels. |
-| `409 Conflict: APPROVAL_DIGEST_MISMATCH` | The payload, query parameters, or URI path altered between approval registration and replay. | Compare live request SHA-256 digest with stored digest in database via `GET /v1/approvals/{id}`. | Ensure client canonicalizes JSON payload (RFC 8785) before replay. Submit fresh approval request if mutation arguments changed. |
-| `410 Gone on Replay` | Approval ID already consumed or TTL expired (default 3600s). | Check `consumed_at` timestamp in `agent_approvals` table. | Issue fresh mutation request from agent runtime; implement jittered polling to prevent premature token expiration. |
-| `503 Service Unavailable` | Emergency kill switch engaged cluster-wide. | Query `GET /v1/admin/agent-status` using human administrative credentials. | Audit active incident logs. Once verified safe, disengage kill switch via `POST /v1/admin/enable-agents`. |
-| `403 Forbidden: STRUCTURAL_DENIAL` | Agent attempted to call a Tier 3 prohibited route (IAM, billing, or self-approval). | Inspect agent role definition in `agent-policies.yaml`. | Re-route administrative tasks to human consoles. Agents are permanently barred from administrative self-governance. |
+![Troubleshooting Reference: Production Operational Runbook](/images/blog/ai-agent-troubleshooting-runbook.png)
+
+| Observed Status | Error String | Probable Root Cause | Diagnostic Step | Remediation Action |
+| :--- | :--- | :--- | :--- | :--- |
+| `409 Conflict` | `APPROVAL_DIGEST_MISMATCH` | Agent modified payload bytes or headers between approval and execution. | Compare approved digest with live SHA-256 calculation. | Ensure deterministic JSON serialization (RFC 8785). Do not reorder keys. |
+| `410 Gone` | `APPROVAL_TOKEN_CONSUMED` | Approval ID was already executed by another worker. | Query `agent_approvals` table for `consumed_at` timestamp. | Fetch a fresh approval ID. Approval IDs are strict single-use mutexes. |
+| `408 Timeout` | `APPROVAL_EXPIRED` | Human operator did not review the request before the TTL expired. | Inspect `expires_at` column in database. | Resubmit the action. Adjust `default_ttl_seconds` in `agent-policies.yaml`. |
+| `503 Unavailable` | `AGENT_SYSTEM_SUSPENDED` | Operator kill switch is engaged. | Query `GET /v1/admin/status`. | Clear active incident. Issue `POST /v1/admin/enable-agents`. |
+| `429 Too Many` | `RATE_LIMIT_EXCEEDED` | Agent caught in an unconstrained retry loop. | Inspect `/var/log/ollanode/access.log` for high-frequency retries. | Implement exponential backoff in agent loop. Adjust burst rate limits. |
+| `500 Error` | `HASH_CHAIN_LINK_BROKEN` | An audit log entry was manually altered or corrupted. | Run `GET /v1/audit/verify` to identify broken block index. | Isolate corrupted block ID. Restore partition from verified replica. |
 
 ---
 
