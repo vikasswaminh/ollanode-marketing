@@ -7,17 +7,17 @@ author: 'The OllaNode Team'
 tags: ['Engineering', 'Rust', 'NATS-JetStream', 'HLS', 'Transcoding', 'VOD', 'Distributed-Systems']
 ---
 
-There is a version of every video platform's origin story that goes like this: someone wires FFmpeg behind an API endpoint, the endpoint transcodes a video synchronously, everyone claps, and the demo ships. Then real files show up — a ninety-minute lecture recording, a vertical phone clip, a four-hour Twitch VOD, a corrupted upload with a malformed moov atom — and the wrapper falls over, one request at a time, until someone gets paged because the API process ran out of memory holding open concurrent encodes.
+There is a version of every video platform's origin story that goes like this: someone wires FFmpeg behind an API endpoint, the endpoint transcodes a video synchronously, everyone claps, and the demo ships. Then real files show up — a ninety-minute lecture recording, a vertical phone clip, a four-hour Twitch VOD, a corrupted upload with a malformed moov atom — and the wrapper falls over, one request at a time, until someone gets paged (see [video processing monitoring](/blog/video-processing-monitoring-how-to-detect-stuck-failed-and-delayed-transcoding-job)) because the API process ran out of memory holding open concurrent encodes.
 
 That is roughly how we ended up rebuilding our transcoding pipeline three times before calling it production-grade. This post is about the third version — the one we actually run. It covers why we moved the pipeline onto Rust, why we picked NATS JetStream as the backbone instead of Kafka or SQS, how the job lifecycle is modeled, and the failure modes that shaped nearly every design decision.
 
-This is not a theoretical architecture. It is the pipeline behind OllaNode's VOD processing, explained the way we'd walk a new infrastructure engineer through it.
+This is not a theoretical architecture. It is the pipeline behind [OllaNode](https://ollanode.com/#platform-capabilities)'s [VOD processing and self-hosted video APIs](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles), explained the way we'd walk a new infrastructure engineer through it.
 
 ---
 
 ## Quick Answer: What Does a Production HLS Pipeline Actually Need?
 
-A production-grade HLS transcoding pipeline needs four things a script wrapping FFmpeg doesn't give you by default:
+A production-grade [dynamic HLS transcoding](/blog/how-to-generate-dynamic-hls-resolution-ladders) pipeline needs four things a script wrapping FFmpeg doesn't give you by default:
 1. Asynchronous job orchestration
 2. Durable at-least-once delivery with idempotent workers
 3. Backpressure-aware scaling
@@ -248,13 +248,3 @@ Rust gave us a control plane we could reason about at the systems level. NATS Je
 If you're building video infrastructure and want to see this architecture running inside a working, self-hosted platform rather than just a blog post, it powers OllaNode, our open-source, Apache-2.0 video infrastructure platform. Read the VOD pipeline documentation or explore the broader platform architecture to see how transcoding fits alongside storage, CDN, and delivery.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Dynamic HLS Resolution Ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders)
-- [Video Processing Monitoring](/blog/video-processing-monitoring-how-to-detect-stuck-failed-and-delayed-transcoding-job)
-- [Self-Hosted Video API Architecture](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles)
-- [OllaNode Platform Overview](https://ollanode.com/#platform-capabilities)
-

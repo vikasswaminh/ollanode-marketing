@@ -8,7 +8,7 @@ author: 'The OllaNode Team'
 tags: ['Video & CDN', 'Video Infrastructure', 'VOD', 'Self-Hosted', 'SaaS', 'CDN', 'Transcoding', 'Comparison', 'Cost Optimization', 'Apache-2.0']
 ---
 
-Most video infrastructure comparisons start with a pricing page and end with a verdict. "SaaS is expensive, self-host is cheap." Or the reverse: "Self-hosting is a rabbit hole, just use the API." Both are wrong, and both are dangerous, because they hand you a conclusion before you have looked at your own numbers.
+Most [open-source video infrastructure](/blog/best-open-source-video-infrastructure-in-2026-top-options-for-startups-and-midmarket-teams) comparisons start with a [pricing](https://ollanode.com/pricing) page and end with a verdict. "SaaS is expensive, self-host is cheap." Or the reverse: "Self-hosting is a rabbit hole, just use the API." Both are wrong, and both are dangerous, because they hand you a conclusion before you have looked at your own numbers.
 
 This guide takes the opposite approach.
 
@@ -43,7 +43,7 @@ The short version: SaaS is the right default for prototypes and low volume. Self
   </div>
   <ul class="key-takeaways-list">
     <li><strong>The decision is a crossover, not a verdict.</strong> SaaS is the right default for prototypes and low volume; self-hosting wins as volume, control needs, or residency requirements grow. The crossover is measurable, not vibes.</li>
-    <li><strong>Cost is the most misunderstood dimension.</strong> SaaS pricing looks simple (per minute, per GB) but compounds across encode, delivery, storage, and features. Self-hosting has a fixed floor and a variable ceiling you control.</li>
+    <li><strong>Cost is the most misunderstood dimension.</strong> SaaS pricing looks simple (per minute, per GB) but compounds across encode, delivery, storage, and [self-hosted video platform features](/blog/self-hosted-video-platform-benefits-usecases-features). Self-hosting has a fixed floor and a variable ceiling you control.</li>
     <li><strong>Control is the dimension that quietly decides everything else.</strong> If you cannot set the ladder, the codec tier, the retention policy, or the playback token TTL, you are building your product on someone else's defaults.</li>
     <li><strong>Security is a risk-model choice, not a checkbox.</strong> SaaS offloads ops but concentrates data; self-hosting keeps data local but makes you the security owner. Match the model to your threat model and compliance reality.</li>
     <li><strong>Scalability means two different things.</strong> Delivery scalability (elastic egress) and processing scalability (encode throughput) are separate problems, and self-hosting and SaaS handle them differently.</li>
@@ -431,13 +431,3 @@ If you are evaluating the ownership-first side, run a real catalog through a sel
 Explore the full platform and documentation at OllaNode Docs or view OllaNode Features Overview.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Why We Built an Open-Source Mux Alternative in Rust](/blog/why-we-built-open-source-mux-alternative-in-rust)
-- [Self-Hosted Video Platform Benefits & Use Cases](/blog/self-hosted-video-platform-benefits-usecases-features)
-- [Best Open Source Video Infrastructure](/blog/best-open-source-video-infrastructure-in-2026-top-options-for-startups-and-midmarket-teams)
-- [OllaNode Pricing Comparison](https://ollanode.com/pricing)
-

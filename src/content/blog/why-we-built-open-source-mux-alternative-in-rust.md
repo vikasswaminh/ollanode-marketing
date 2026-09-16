@@ -20,7 +20,7 @@ Managed video platforms such as Mux make video infrastructure dramatically easie
 
 But convenience and ownership are different things.
 
-When your catalog grows, you are not only paying for the bytes behind your video product. You are paying according to a pricing abstraction chosen by the provider: minutes uploaded or encoded, minutes stored, minutes delivered, resolution tiers, quality tiers, and sometimes additional services. Mux itself explains that its Video pricing is divided into input, storage, and delivery, with video charged by minute.
+When your catalog grows, you are not only paying for the bytes behind your video product. You are paying according to a [pricing](https://ollanode.com/pricing) abstraction chosen by the provider: minutes uploaded or encoded, minutes stored, minutes delivered, resolution tiers, quality tiers, and sometimes additional services. Mux itself explains that its Video pricing is divided into input, storage, and delivery, with video charged by minute.
 
 We built **OllaNode** because we wanted another option: a video infrastructure platform that developers can run themselves, inspect, modify, and operate without a mandatory per-minute SaaS billing layer.
 
@@ -32,7 +32,7 @@ This is not an article arguing that Mux is bad. It is a practical comparison of 
 
 ## Quick Answer: Is Mux the Same as a Self-Hosted Video Platform?
 
-**No.** Mux is a managed video infrastructure service, while a self-hosted Mux alternative gives you control over the software and the infrastructure that runs it.
+**No.** Mux is a managed video infrastructure service, while a [self-hosted video platform vs SaaS](/blog/self-hosted-video-platform-vs-saas-cost-control-security-and-stability) Mux alternative gives you control over the software and the infrastructure that runs it.
 
 Mux is designed to remove operational work: you use its APIs and it handles the underlying video infrastructure for you. OllaNode takes the opposite approach. It is designed as self-hosted, API-first video infrastructure that you can run on hardware or cloud infrastructure you control.
 
@@ -176,7 +176,7 @@ A video platform has several characteristics that make systems-level engineering
 
 Rust gives OllaNode memory safety without requiring a garbage collector, strong compile-time guarantees, efficient concurrency primitives, and a mature ecosystem for building high-performance network services.
 
-OllaNode is structured as a Rust workspace rather than one giant application. The architecture separates domain logic from infrastructure adapters, which makes it easier to reason about the system and replace individual integrations.
+OllaNode is structured as a [Rust and NATS transcoding pipeline](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats) rather than one giant application. The architecture separates domain logic from infrastructure adapters, which makes it easier to reason about the system and replace individual integrations.
 
 The point is not that Rust automatically makes a video platform fast. The underlying media workloads still do the heavy lifting for encoding. The point is that the control plane coordinating those workloads should be predictable, efficient, and maintainable.
 
@@ -229,7 +229,7 @@ $$\text{Upload} \longrightarrow \text{Validate} \longrightarrow \text{Metadata} 
 
 That design matters for cost as well as reliability. A synchronous request that waits for video processing is difficult to scale. A queue-based workflow lets API services hand long-running jobs to workers and allows the system to process work independently. Learn more in our VOD Pipeline Documentation.
 
-OllaNode's architecture uses an event bus by default for event-driven job orchestration, with a workflow engine available as an optional alternative. The video pipeline can produce adaptive HLS renditions, thumbnails, transcripts, and delivery assets without forcing the API request to remain open.
+OllaNode's architecture uses an event bus by default for event-driven job orchestration, with a workflow engine available as an optional alternative. The [first open-source video pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)](/blog/setting-up-first-open-source-video-pipeline-ollanode) can produce adaptive HLS renditions, thumbnails, transcripts, and delivery assets without forcing the API request to remain open.
 
 The important comparison point is that OllaNode is not simply "an encoder in a Docker container." A standalone encoder is a powerful media processing tool. A video platform needs the systems around it: job orchestration, authentication, storage, playback security, CDN delivery, webhooks, monitoring, and APIs.
 
@@ -439,13 +439,3 @@ That is the question OllaNode was built to answer.
 *Pricing Source Note: Current Mux pricing references in this article are based on Mux's official pricing documentation and public product pages accessed in August 2026. Pricing can change; verify current rates directly with Mux before using figures for procurement or financial planning.*
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Self-Hosted Video Platform vs SaaS](/blog/self-hosted-video-platform-vs-saas-cost-control-security-and-stability)
-- [Setting Up Your First Open-Source Video Pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)
-- [Building a Production-Grade HLS Pipeline with Rust](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats)
-- [OllaNode Pricing & Calculator](https://ollanode.com/pricing)
-

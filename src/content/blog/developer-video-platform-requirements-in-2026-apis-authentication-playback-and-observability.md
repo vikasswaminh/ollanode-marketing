@@ -10,7 +10,7 @@ tags: ['Video Infrastructure', 'Developer Platforms', 'Video API', 'Authenticati
 
 ## Executive Summary: The 2026 Video Platform Mandate
 
-By 2026, video is no longer a peripheral marketing asset or an embedded iframe widget. It is core application surface area: interactive product workflows, vertical SaaS documentation, automated compliance audits, AI agent multimodal consumption, customer support forensics, and paid learning environments. When video becomes infrastructure, the architectural requirements change completely. Engineering teams can no longer tolerate opaque, per-minute metered SaaS pricing that penalizes catalog growth, nor can they risk home-brewed, brittle scripts running ffmpeg inside ad-hoc containers dumping raw files into unshielded S3 buckets.
+By 2026, video is no longer a peripheral marketing asset or an embedded iframe widget. It is core application surface area: interactive product workflows, vertical SaaS documentation, automated compliance audits, [AI agent security model](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails) multimodal consumption, customer support forensics, and paid learning environments. When video becomes infrastructure, the architectural requirements change completely. Engineering teams can no longer tolerate opaque, per-minute metered SaaS pricing that penalizes catalog growth, nor can they risk home-brewed, brittle scripts running ffmpeg inside ad-hoc containers dumping raw files into unshielded S3 buckets.
 
 A modern developer video platform in 2026 must fulfill four non-negotiable architectural contracts:
 
@@ -45,7 +45,7 @@ Modern engineering teams encounter a severe architectural breaking point when in
 
 ### 1. The Managed SaaS Margin Trap
 
-Early-stage prototypes frequently launch with commercial developer video APIs (such as Mux or Cloudflare Stream). The initial developer velocity is undeniable: an engineer makes one API call, receives an upload URL, drops an SDK player into the frontend, and ships.
+Early-stage prototypes frequently launch with commercial developer [self-hosted video API](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles)s (such as Mux or Cloudflare Stream). The initial developer velocity is undeniable: an engineer makes one API call, receives an upload URL, drops an SDK player into the frontend, and ships.
 
 However, as application usage scales, commercial SaaS billing models turn punitive. Charging $0.04 to $0.075 per minute for encoding, combined with $0.005 to $0.01 per minute for storage and $0.08 to $0.15 per GB for bandwidth egress, creates an unsustainable cost curve. A platform hosting 50,000 video assets with 500,000 monthly active viewers quickly incurs $15,000 to $40,000 in monthly vendor invoices. For organizations where video is a functional product feature (such as EdTech, video messaging, workflow audits) rather than high-margin entertainment streaming, this vendor tax destroys product unit economics.
 
@@ -114,7 +114,7 @@ To understand 2026 requirements, we must trace the structural shifts across four
 
 ---
 
-## System Architecture: Three-Plane Architectural Separation
+## [system architecture](https://ollanode.com/#how-it-works): Three-Plane Architectural Separation
 
 A production-grade 2026 developer video platform must maintain strict operational decoupling across three independent functional planes: the Control Plane, the Data/Delivery Plane, and the Observability Plane.
 
@@ -527,13 +527,3 @@ Own your pipeline. Own your data. Own your economics. Treat video as the core pl
 Explore the full platform architecture and technical capabilities at OllaNode Features Overview.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Best Open Source Video Infrastructure](/blog/best-open-source-video-infrastructure-in-2026-top-options-for-startups-and-midmarket-teams)
-- [Self-Hosted Video API Lifecycle](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles)
-- [AI Agent Security Model](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails)
-- [OllaNode Platform Architecture](https://ollanode.com/#how-it-works)
-

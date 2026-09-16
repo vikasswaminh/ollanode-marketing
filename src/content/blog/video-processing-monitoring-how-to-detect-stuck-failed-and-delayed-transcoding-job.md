@@ -12,7 +12,7 @@ A comprehensive engineering guide to designing telemetry, heartbeats, dynamic ti
 
 ---
 
-## Quick Answer: How to Monitor Video Transcoding Pipelines
+## Quick Answer: How to Monitor Video [Rust and NATS transcoding pipeline](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats)s
 
 | Question | Quick Answer |
 | :--- | :--- |
@@ -39,7 +39,7 @@ Solving this requires active, stage-aware pipeline telemetry:
 - **Poison-Pill Quarantines:** Cap retries at 2 attempts, fingerprint crash signatures, and route toxic files directly to a Dead-Letter Queue (DLQ) to prevent cluster-wide cascading worker failures.
 - **Automated Self-Healing:** Enforce a strict termination hierarchy (`SIGTERM` $\to$ `SIGKILL` $\to$ scratch disk purge $\to$ lock release) to recover wedged workers autonomously.
 
-Built on Ollanode’s open, self-hosted architecture, this observability model eliminates the guesswork of black-box cloud encoders, giving engineering teams total transparency into every frame, queue, and worker across the video pipeline.
+Built on Ollanode’s open, self-hosted [system architecture](https://ollanode.com/#how-it-works), this observability model eliminates the guesswork of black-box cloud encoders, giving engineering teams total transparency into every frame, queue, and worker across the video pipeline.
 
 ---
 
@@ -85,7 +85,7 @@ This operational challenge is what this guide addresses. Building on Ollanode �
 ### 3. Delayed Job
 - **Primary Symptoms:** The job is healthy and actively executing with positive frame progression (`fps > 0`), but elapsed total processing time exceeds the expected SLA target; or the job spends an excessive duration waiting in the queue before being claimed by a worker.
 - **Typical Root Causes:** Head-of-line (HoL) queue blocking caused by massive, unthrottled 4K/60fps uploads; worker pool compute starvation; local scratch disk I/O write throttling; or host CPU thermal throttling under continuous AVX workloads.
-- **Remediation Action:** Scale the worker pool horizontally; dynamically route heavy jobs to dedicated high-memory, high-core worker queues; prioritize interactive workloads; and throttle low-priority bulk catalog ingests. For multi-tenant fairness scheduling, consult our Multi-Tenant Self-Hosted Video Platform guide.
+- **Remediation Action:** Scale the worker pool horizontally; dynamically route heavy jobs to dedicated high-memory, high-core worker queues; prioritize interactive workloads; and throttle low-priority bulk catalog ingests. For [multi-tenant video platform isolation](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing) fairness scheduling, consult our Multi-Tenant Self-Hosted Video Platform guide.
 
 ---
 
@@ -483,13 +483,3 @@ As video formats evolve toward higher computational complexity—transitioning f
 4. **Never Enforce Uniform Timeouts on Non-Uniform Content:** A 30-second 720p mobile clip and a 2-hour 4K 60fps HDR documentary feature cannot share the same 15-minute timeout. Dynamically budget job deadlines at ingest using source duration, native resolution, and codec complexity factors.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Best Open Source Video Infrastructure](/blog/best-open-source-video-infrastructure-in-2026-top-options-for-startups-and-midmarket-teams)
-- [Multi-Tenant Self-Hosted Video Platform](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing)
-- [CDN Performance Monitoring](/blog/cdn-performance-monitoring-how-ttraclatency-cachehits-and-edge-errors)
-- [OllaNode VOD Architecture](https://ollanode.com/#how-it-works)
-

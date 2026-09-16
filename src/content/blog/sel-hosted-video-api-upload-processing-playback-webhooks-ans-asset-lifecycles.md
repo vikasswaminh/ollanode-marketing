@@ -192,7 +192,7 @@ Creating first is not ceremony. It gives you a stable ID for retries, a place to
 | **Multipart** | Large files | Begin, presign parts, complete and start pipeline |
 | **TUS resumable** | Browser and flaky networks | tusd at `/files/` with `videoId` and one-time `uploadToken` |
 | **`source_url`** | Migrations and remote masters | Platform fetches; no separate upload step |
-For a deeper implementation walkthrough, see our guide on How to Generate Dynamic HLS Resolution Ladders.
+For a deeper implementation walkthrough, see our guide on How to Generate [dynamic HLS resolution ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders) Resolution Ladders.
 The design rule for direct uploads is simple. Bytes never pass through the API. The API orchestrates. Object storage receives the PUT.
 
 - **Presigned PUT pattern:** Mint a short-lived upload URL, PUT the whole file to that URL, then finalize with upload-complete and the observed size. Finalization is what starts the pipeline. If you skip finalize, you have an object in storage and a video record that never becomes ready. This path is ideal when the client is trusted enough to complete a single PUT and the file is not huge. It is also easy to reason about in backend-to-backend transfers.
@@ -278,7 +278,7 @@ curl -X POST https://api.ollanode.com/v1/webhooks \
 Store the signing secret immediately. It is shown once. List endpoints should not re-expose it. Patch should let you rotate URL, event set, or active state. Delivery history should be queryable newest first with status and response codes.
 
 Webhook URLs should be SSRF-vetted. An open webhook create endpoint that can hit internal metadata services is an incident.
-For a broader architecture view, see our guide to Multi-Tenant Self-Hosted Video Platform.
+For a broader architecture view, see our guide to [multi-tenant video platform isolation](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing) Self-Hosted Video Platform.
 
 ### Event vocabulary
 Mux-compatible naming helps migrations and mental models.
@@ -378,7 +378,7 @@ Use scoped keys. Prefer `videos:read`, `videos:write`, `videos:delete`, `webhook
 
 Upload tokens for TUS should be one-time and tenant-bound. `source_url` and webhook URLs need SSRF controls. Webhook signatures are mandatory before trust. Signed playback should be the default for private content. Direct bucket exposure should be architecturally impossible for normal playback.
 
-Encrypted HLS keys must travel through the same gated path as segments. Soft-delete and purge support data minimization. When AI agents hold write scopes, destructive actions should be approval-gated and audited.
+Encrypted HLS keys must travel through the same gated path as segments. Soft-delete and purge support data minimization. When [AI agent security model](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails)s hold write scopes, destructive actions should be approval-gated and audited.
 
 Ollanode's broader platform adds WAF controls and origin guards around the gateway. Even if you only adopt the video API slice first, keep defense in depth around authentication, egress, and playback.
 
@@ -512,13 +512,3 @@ If you keep those contracts explicit, your product code stays boring in the best
 Ollanode is one working implementation of that bar—an Apache-2.0, API-first, VOD-only stack where the lifecycle is visible, the webhooks are verifiable, and the playback path does not accidentally become a public bucket. Use it as a reference architecture, or as the control plane you actually run.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Best Open Source Video Infrastructure](/blog/best-open-source-video-infrastructure-in-2026-top-options-for-startups-and-midmarket-teams)
-- [How to Generate Dynamic HLS Resolution Ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders)
-- [Multi-Tenant Self-Hosted Video Platform](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing)
-- [OllaNode Platform Features](https://ollanode.com/#platform-capabilities)
-

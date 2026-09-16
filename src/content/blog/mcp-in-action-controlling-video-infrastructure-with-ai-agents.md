@@ -18,13 +18,13 @@ But understanding the request is only half the job. The agent needs a reliable w
 
 That's where Model Context Protocol (MCP) becomes interesting.
 
-MCP is an open protocol for connecting AI applications to the tools, resources, and prompts provided by external systems. Instead of teaching an agent a different custom integration for every service, an MCP server gives the AI application a standardized interface for discovering and using those capabilities. The current MCP specification, released July 28, 2026, also introduces a more stateless protocol core, cacheable list results, header-based routing, authorization hardening, and a formal extensions framework.
+MCP is an open protocol for connecting AI applications to the tools, resources, and prompts provided by external systems. Instead of teaching an agent a different custom integration for every service, an MCP server gives the AI application a standardized interface for discovering and using those capabilities. The current MCP specification, released July 28, 2026, also introduces a more stateless protocol core, cacheable list results, header-based routing, authorization hardening (guided by our [AI agent security model](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails)), and a formal extensions framework.
 
 For video infrastructure, the potential is much more practical than "chat with your server."
 
 An agent could inspect a failed transcode, check an asset's available renditions, look at delivery information, identify a storage-heavy project, retrieve video metadata, or — when explicitly authorized — trigger a processing operation.
 
-OllaNode is particularly suited to this model because its control plane is already API-first. Its project-scoped REST API exposes video ingestion, processing, playback, CDN, storage, DNS, edge functions, webhooks, and governance capabilities, with MCP available for agents.
+OllaNode is particularly suited to this model because its control plane is already API-first (fulfilling modern [developer video platform requirements](/blog/developer-video-platform-requirements-in-2026-apis-authentication-playback-and-observability)). Its project-scoped REST API exposes video ingestion, processing, playback, and [self-hosted video API lifecycles](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles), CDN, storage, DNS, edge functions, webhooks, and governance capabilities, with MCP available for agents.
 
 This guide shows how to think about that architecture and how to build it safely.
 
@@ -81,7 +81,7 @@ At a practical level, think of MCP as a standardized language for an AI applicat
 - What happened when I called it?
 - What context or resources are available to help me reason about the task?
 
-The current MCP ecosystem includes servers, clients, tools, resources, prompts, authorization, transports, and other protocol capabilities. The official SDK documentation describes MCP as a way for AI applications to connect to systems where their data and tools live.
+The current MCP ecosystem includes servers, clients, tools, resources, prompts, authorization, transports, and other protocol capabilities. The official SDK [OllaNode documentation](https://ollanode.com/docs) describes MCP as a way for AI applications to connect to systems where their data and tools live.
 
 For a video platform, that changes the integration model. With MCP, the agent-facing layer can expose meaningful capabilities such as `list_videos`, `get_video`, `get_processing_status`, `get_video_manifest`, `get_project_usage`, `retry_processing`, and `create_video`.
 
@@ -472,13 +472,3 @@ The important part isn't giving an AI agent as much control as possible; it's gi
 With OllaNode's API-first video platform, MCP can sit alongside the existing REST control plane, giving AI agents a structured way to interact with video, processing, playback, CDN, storage, and governance capabilities while keeping the underlying infrastructure under your control.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [AI Agent Security Model: Least Privilege & Scopes](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails)
-- [Self-Hosted Video API Lifecycle](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles)
-- [Developer Video Platform Requirements](/blog/developer-video-platform-requirements-in-2026-apis-authentication-playback-and-observability)
-- [OllaNode Architecture & Docs](https://ollanode.com/docs)
-

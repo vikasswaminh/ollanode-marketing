@@ -428,9 +428,9 @@ Yes. Ollanode is deliberately VOD-only — adaptive HLS, signed playback, S3-com
 ## References
 
 - OllaNode Docs — platform documentation
-- Setting Up Your First Open-Source Video Pipeline — the VOD pipeline walkthrough
-- Dynamic HLS Resolution Ladders — ladder configuration
-- Self-Hosted Video Platform vs SaaS — architecture and deployment guide
+- Setting Up Your [first open-source video pipeline with OllaNode](/blog/setting-up-first-open-source-video-pipeline-ollanode) — the VOD pipeline walkthrough
+- [dynamic HLS resolution ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders) Resolution Ladders — ladder configuration
+- Self-Hosted Video Platform [self-hosted video platform vs SaaS](/blog/self-hosted-video-platform-vs-saas-cost-control-security-and-stability) — architecture and deployment guide
 
 ---
 
@@ -447,13 +447,3 @@ The decision is not permanent. Start VOD-only for your catalog, and add live onl
 Explore the full platform and documentation at OllaNode Docs or view OllaNode Features Overview.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Setting Up Your First Open-Source Video Pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)
-- [Dynamic HLS Resolution Ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders)
-- [Self-Hosted Video Platform vs SaaS](/blog/self-hosted-video-platform-vs-saas-cost-control-security-and-stability)
-- [OllaNode Features Overview](https://ollanode.com/#platform-capabilities)
-

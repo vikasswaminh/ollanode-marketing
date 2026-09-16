@@ -8,11 +8,11 @@ author: 'The OllaNode Team'
 tags: ['Guides', 'Video Pipeline', 'Open Source', 'HLS', 'Transcoding', 'Self-Hosted', 'CDN', 'Storage', 'NATS JetStream', 'Adaptive Bitrate']
 ---
 
-Most video infrastructure guides start with an API key and end with a playback URL. What happens in between — encoding, storage, orchestration, delivery, security — is usually hidden behind a managed provider's dashboard, and most developers never actually see it.
+Most [open source video infrastructure](/blog/open-source-video-infrastructure-explained-control-plane-pipeline-cdn-and0storage) guides start with an API key and end with a playback URL. What happens in between — encoding, storage, orchestration, delivery, security — is usually hidden behind a managed provider's dashboard, and most developers never actually see it.
 
 This guide takes the opposite approach.
 
-We are going to walk through exactly what it takes to stand up a self-hosted, open-source video pipeline from scratch: installing the software, wiring up storage and job orchestration, uploading your first asset, configuring transcoding, generating adaptive HLS renditions, connecting a CDN, securing playback, and moving it toward a production-ready deployment.
+We are going to walk through exactly what it takes to stand up a self-hosted, open-source video pipeline from scratch: installing the software, wiring up storage and job orchestration, uploading your first asset, configuring transcoding, generating adaptive [dynamic HLS resolution ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders) renditions, connecting a CDN, securing playback, and moving it toward a production-ready deployment.
 
 By the end, you will have a working video-on-demand pipeline running on infrastructure you own, built on OllaNode, a self-hosted, API-first video platform written in Rust and released under Apache-2.0.
 
@@ -207,7 +207,7 @@ Once accepted, poll the asset status endpoint or wait for the webhook in Step 10
 
 ---
 
-## Step 6: Configure the Transcoding Pipeline
+## Step 6: Configure the [transcoding pipeline with Rust and NATS](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats)
 
 Once an asset is accepted, it moves into the transcode stage. This is where you decide which renditions get generated — resolution ladder, bitrate targets, and codec settings.
 
@@ -484,16 +484,6 @@ Once that pipeline is running with OllaNode, every stage is something you can in
 
 The next step is yours: run it against a real catalog, watch how the queue, storage, and delivery layers behave under your workload, and tune from there rather than guessing in advance.
 
-Explore the full platform and documentation at ollanode.com.
+Explore the full platform and [documentation](https://ollanode.com/docs) at ollanode.com.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [How to Generate Dynamic HLS Resolution Ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders)
-- [Open Source Video Infrastructure Explained](/blog/open-source-video-infrastructure-explained-control-plane-pipeline-cdn-and0storage)
-- [Building a Production-Grade HLS Pipeline with Rust and NATS](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats)
-- [OllaNode Quickstart & Docs](https://ollanode.com/docs)
-

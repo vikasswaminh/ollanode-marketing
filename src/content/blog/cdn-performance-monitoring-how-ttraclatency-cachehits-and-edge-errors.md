@@ -10,7 +10,7 @@ tags: ['CDN', 'Video Delivery', 'Observability', 'Performance', 'Latency', 'Cach
 
 ## CDN Performance Monitoring: The Observability Blind Spot at the Edge
 
-A content delivery network is often treated as a binary utility: it is either routing traffic or it is completely offline. In production video streaming and high-concurrency API environments, binary health checks fail to capture the true operational state of your delivery layer. A CDN can report an aggregate 99.99% uptime while silently degrading viewer Quality of Experience (QoE). A 200ms latency creep on adaptive bitrate manifests triggers player stalls, an unmonitored origin shield collapse converts thousands of cached hits into an origin-saturating thundering herd, and intermittent 502 Bad Gateway responses at specific regional Points of Presence (POPs) go unnoticed because global averages mask regional anomalies.
+A content delivery network is often treated as a binary utility: it is either routing traffic or it is completely offline. In production video streaming and high-concurrency API environments, binary health checks fail to capture the true operational state of your delivery layer. A CDN can report an aggregate 99.99% uptime while silently degrading viewer Quality of Experience (QoE). A 200ms latency creep on [dynamic HLS resolution ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders) manifests triggers player stalls, an unmonitored origin shield collapse converts thousands of cached hits into an origin-saturating thundering herd, and intermittent 502 Bad Gateway responses at specific regional Points of Presence (POPs) go unnoticed because global averages mask regional anomalies.
 
 Effective CDN performance monitoring requires measuring telemetry across three critical axes:
 
@@ -33,7 +33,7 @@ This technical guide demonstrates how to build, configure, and operate an end-to
     <li><strong>Isolate Upstream Latency from Edge Latency:</strong> Always log <code>$upstream_response_time</code>, <code>$upstream_connect_time</code>, and <code>$request_time</code> independently in your reverse proxy access logs. Without this distinction, you cannot determine whether a slow request was caused by a sluggish client connection or an overloaded origin.</li>
     <li><strong>Cache-Control Headers Dictate Telemetry Patterns:</strong> Video manifests (<code>.m3u8</code>) and media segments (<code>.m4s</code>) require distinct cache invalidation rules. Manifests must leverage short TTLs with stale-while-revalidate, whereas media segments must be cached immutably with long TTLs.</li>
     <li><strong>Monitor the 499 Status Code:</strong> Nginx and OpenResty record an HTTP status of 499 when a client closes the connection before the server can complete the response. A surge in 499s is the earliest indicator that viewers are abandoning playback due to slow edge responses.</li>
-    <li><strong>Trace Context Must Traverse the Edge:</strong> Propagate W3C traceparent headers through your edge pull zones into upstream transcode and storage layers. Distributed tracing allows operators to correlate a specific video player stall with an upstream S3 disk bottleneck.</li>
+    <li><strong>Trace Context Must Traverse the Edge:</strong> Propagate W3C traceparent headers through your edge [CDN pull zone configuration](https://ollanode.com/docs/cdn)s into upstream transcode and storage layers. Distributed tracing allows operators to correlate a specific video player stall with an upstream S3 disk bottleneck.</li>
     <li><strong>Ollanode Provides Unfettered Observability:</strong> Unlike black-box commercial CDNs that charge extra for real-time log streaming and aggregate metrics, a self-hosted platform like Ollanode exposes raw edge metrics, sub-second Prometheus scrapers, and line-level OpenResty access events by default.</li>
   </ul>
 </div>
@@ -458,7 +458,7 @@ Organizations operating at scale must evaluate the operational control of self-h
 | **Log Ingestion & Egress Costs** | Zero additional cost; run on your own hardware or VPC | Punitive per-million log line fees or high-rate enterprise add-on contracts |
 | **Custom Lua / Edge Hook Telemetry** | Native arbitrary Lua execution with in-memory histogram tracking | Restricted sandboxed workers with execution time and CPU limits |
 | **Origin Shield Observability** | Complete visibility into shield CPU, NVMe IOPS, and consolidation ratio | Shielding mechanics are completely opaque |
-| **Data Sovereignty & Compliance** | 100% data residency; zero client IP or PII leakage to third parties | Client metadata traverses multi-tenant global third-party infrastructure |
+| **Data Sovereignty & Compliance** | 100% data residency; zero client IP or PII leakage to third parties | Client metadata traverses [multi-tenant infrastructure](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing) global third-party infrastructure |
 | **Dynamic HLS Cache Optimization** | Built-in source-aware HLS caching rules tuned for adaptive streaming | Generic HTTP caching; requires manual maintenance of complex rule engines |
 
 For engineering teams where video streaming and API delivery represent core operational competencies, the unfettered transparency of Ollanode transforms troubleshooting from guessing into an exact, instrumented engineering discipline.
@@ -529,7 +529,7 @@ In a Multi-CDN topology, a client-side routing broker or DNS steering service (s
 
 Modern web and video architectures cannot operate reliably with black-box delivery networks. Treating the edge as an unmonitored utility invites undetected latency degradation, silent cache invalidation failures, and unbudgeted origin bandwidth expenses.
 
-For the API side of the video lifecycle, see our guide to the self-hosted video API covering upload, processing, playback, webhooks, and asset lifecycle management.
+For the API side of the video lifecycle, see our guide to the self-hosted [self-hosted video API](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles) covering upload, processing, playback, webhooks, and asset lifecycle management.
 
 By instrumenting high-precision JSON access logging, computing real-time metrics via native in-memory Lua exporters, enforcing thundering-herd protections, and correlating edge latency percentiles with client-side player QoE telemetry, you transform edge delivery into an observable, predictable system.
 
@@ -540,13 +540,3 @@ By instrumenting high-precision JSON access logging, computing real-time metrics
 - **Deploy OllaNode Video Infrastructure for Total Visibility:** Explore Ollanode to implement an open-source, self-hosted video and edge platform that delivers full data sovereignty, zero per-minute billing, and complete, line-level delivery observability.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Open Source Video Infrastructure Explained](/blog/open-source-video-infrastructure-explained-control-plane-pipeline-cdn-and0storage)
-- [Self-Hosted Streaming: Why VOD-Only Can Be Better](/blog/self-hosted-streaming-platform-why-VOD-only-can-be-better-than-live-streaming)
-- [Video Processing Monitoring](/blog/video-processing-monitoring-how-to-detect-stuck-failed-and-delayed-transcoding-job)
-- [Edge CDN Documentation](https://ollanode.com/docs/cdn)
-

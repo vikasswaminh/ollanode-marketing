@@ -42,7 +42,7 @@ Open source video infrastructure is the ownership model for teams that outgrew b
     <li><strong>CDN is not optional at scale:</strong> Private playback origins plus pull-zone caching, hotlink signing, and purge are what keep private content private and public traffic cheap.</li>
     <li><strong>Source-aware ladders beat fixed ladders:</strong> Cap renditions at native resolution; do not invent 4K from a 720p upload.</li>
     <li><strong>Open source only helps if licensing and ops are production-shaped:</strong> Apache-2.0, clear VOD boundaries, and observable workers matter more than a demo encode.</li>
-    <li><strong>Ollanode is a concrete reference architecture:</strong> Rust/Axum control plane, NATS JetStream workers, SeaweedFS/S3 storage, OpenResty pull zones, signed HLS playback, and agent-aware governance — without live/RTMP scope creep.</li>
+    <li><strong>Ollanode is a concrete reference architecture:</strong> [Rust and NATS transcoding workers](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats)/Axum control plane, NATS JetStream workers, SeaweedFS/S3 storage, OpenResty pull zones, signed HLS playback, and agent-aware governance — without live/RTMP scope creep.</li>
   </ul>
 </div>
 
@@ -261,7 +261,7 @@ Persist outputs, notify downstream systems, open playback.
 - Webhook names are stable enough to automate against (`video.asset.ready`, `video.asset.errored`, thumbnail/track events).
 - Ladder policy is evidence-based, not “always 360p–4K for every file.”
 
-For rung theory and verification, use the dedicated ladder guide: How to Generate Dynamic HLS Resolution Ladders. This article stays at the infrastructure layer: the pipeline must expose policy knobs and prove them in manifests, not hide encoding as magic.
+For rung theory and verification, use the dedicated ladder guide: How to Generate [dynamic HLS resolution ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders) Resolution Ladders. This article stays at the infrastructure layer: the pipeline must expose policy knobs and prove them in manifests, not hide encoding as magic.
 
 ---
 
@@ -742,7 +742,7 @@ Choose unified when the integration tax of encoder + bucket + CDN + token servic
 - CDN docs
 - Webhooks docs
 - How to Generate Dynamic HLS Resolution Ladders
-- Apple HLS documentation / HTTP Live Streaming overview
+- Apple HLS [OllaNode documentation](https://ollanode.com/docs) / HTTP Live Streaming overview
 - CMAF / ISO BMFF packaging references for fMP4 segment design
 
 ---
@@ -765,13 +765,3 @@ Ollanode is one concrete implementation of that model: Apache-2.0 oriented, VOD-
 Own the seams between the layers, and video stops being a surprise vendor relationship. It becomes backend capability — which is what it should have been from the start.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Building a Production-Grade HLS Transcoding Pipeline](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats)
-- [CDN Performance Monitoring](/blog/cdn-performance-monitoring-how-ttraclatency-cachehits-and-edge-errors)
-- [Self-Hosted Video Platform Benefits & Features](/blog/self-hosted-video-platform-benefits-usecases-features)
-- [OllaNode Documentation](https://ollanode.com/docs)
-

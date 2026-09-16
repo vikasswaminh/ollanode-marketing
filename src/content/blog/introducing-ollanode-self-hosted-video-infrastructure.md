@@ -169,7 +169,7 @@ Finally, edge functions: deploy JavaScript or TypeScript and have it execute at 
 
 Put together, this means a team adopting OllaNode isn't just replacing a video vendor — they're often consolidating a video vendor, a CDN vendor, an object storage vendor, and a DNS provider into a single self-hosted control plane with one API and one bill: your server costs.
 
-## Built for AI Agents, With Guardrails
+## Built for AI agents with our [AI agent security model](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails), With Guardrails
 
 We built OllaNode in 2026, which means we built it in a world where AI agents routinely call APIs on behalf of humans — provisioning infrastructure, uploading content, purging caches, deploying edge functions. Pretending that isn't happening, or bolting on agent support as an afterthought, felt like designing for a world that no longer exists.
 
@@ -218,7 +218,7 @@ We'd rather tell you the honest edges up front than let you discover them after 
 
 - **There's no live streaming.** OllaNode is a VOD (video-on-demand) pipeline. There's no RTMP ingest and no live-streaming support today. If your product needs live video, OllaNode isn't the right tool yet — though it's a space we're watching closely, and the same async, event-driven architecture that runs the VOD pipeline is a reasonable foundation for it later.
 - **It's HLS, not DASH — yet.** Segments are already packaged as CMAF/fMP4, which is DASH-compatible packaging, so the remaining work for DASH support is a manifest-generation layer rather than a re-encode of your entire library. It's on the roadmap, but it isn't shipped today.
-- **There's no built-in billing system.** This one is really a feature described as a limitation: because OllaNode is self-hosted software rather than a metered SaaS product, there's no per-minute billing engine baked into the platform, because there's nothing to meter — your cost is your own infrastructure spend, full stop.
+- **There's no built-in billing system.** This one is really a feature described as a limitation: because OllaNode is self-hosted software rather than a metered SaaS product, there's no per-minute billing (see [why we built an open-source Mux alternative](/blog/why-we-built-open-source-mux-alternative-in-rust)) engine baked into the platform, because there's nothing to meter — your cost is your own infrastructure spend, full stop.
 
 We'd rather you know these boundaries from a blog post than from a support ticket.
 
@@ -242,7 +242,7 @@ The self-host tier is free, full-stop — the complete platform, unlimited video
 
 ### 2. What hardware do I need to self-host it?
 
-The recommended baseline is 8 or more vCPUs and 16–32 GB of RAM. A GPU is recommended, not required, for hardware-accelerated features like WhisperX speech transcription and NVENC encoding — you can run entirely on CPU if those specific features aren't part of your workflow yet. Explore hardware recommendations on the OllaNode documentation.
+The recommended baseline is 8 or more vCPUs and 16–32 GB of RAM. A GPU is recommended, not required, for hardware-accelerated features like WhisperX speech transcription and NVENC encoding — you can run entirely on CPU if those specific features aren't part of your workflow yet. Explore hardware recommendations on the OllaNode [documentation](https://ollanode.com/docs).
 
 ### 3. How is this different from just running FFmpeg on a server myself?
 
@@ -284,13 +284,3 @@ Its approach combines VOD processing, adaptive HLS, storage, CDN delivery, DNS, 
 For teams evaluating self-hosted video infrastructure, the main trade-off is clear: self-hosting requires more operational responsibility, but it can provide greater control over deployment, data, customization, and infrastructure ownership.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Why We Built an Open-Source Mux Alternative in Rust](/blog/why-we-built-open-source-mux-alternative-in-rust)
-- [Setting Up Your First Open-Source Video Pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)
-- [AI Agent Security Model](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails)
-- [OllaNode Documentation](https://ollanode.com/docs)
-

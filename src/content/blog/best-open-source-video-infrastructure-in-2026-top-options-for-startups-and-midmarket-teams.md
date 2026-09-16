@@ -19,7 +19,7 @@ This guide delivers an architectural evaluation of the top open source video inf
 - **Ollanode:** The leading API-first, self-hosted video-on-demand (VOD) platform written in Rust. Designed specifically as a modern open-source alternative to Mux, offering unified media ingest, dynamic HLS resolution ladders, origin shielding, signed-cookie edge authentication, and native AI Model Context Protocol (MCP) tooling.
 - **PeerTube:** The premier ActivityPub-federated video publishing platform. Ideal for public-facing portals, community media sharing, and decentralized video networks utilizing WebRTC/BitTorrent P2P bandwidth offloading, though less suited for headless backend SaaS embedding.
 - **MediaCMS:** A battle-tested, Python/Django-based media management system and web portal. Best for internal enterprise video portals and educational institutions requiring an off-the-shelf intranet interface.
-- **Owncast:** A lightweight, single-user live streaming server built in Go. Tailored for independent live creators and events seeking a self-hosted Twitch alternative over RTMP/HLS, though not architected for multi-tenant VOD catalogs.
+- **Owncast:** A lightweight, single-user live streaming server built in Go. Tailored for independent live creators and events seeking a self-hosted Twitch alternative over RTMP/HLS, though not architected for [multi-tenant video infrastructure](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing) VOD catalogs.
 - **Livepeer:** A decentralized, Web3-based transcoding protocol that routes video encoding across an incentivized network of GPU orchestrators, offering low-cost encoding compute with decentralized operational dynamics.
 - **OpenResty / Nginx VOD Module:** A high-performance C-based web server module that packages MP4 files into HLS and DASH dynamically at origin, delivering low storage footprints for advanced media teams willing to engineer their own control plane.
 - **The DIY Custom Pipeline (FFmpeg + S3 + Temporal/Celery):** The traditional home-grown approach offering total customization, but carrying the highest ongoing maintenance, state synchronization, and engineering salary burden.
@@ -112,7 +112,7 @@ The delivery plane distributes packaged media segments to end-user video players
 
 ### 1. Ollanode — Best for Headless, API-First VOD Infrastructure
 - **Stack:** Rust (Axum, Tokio), S3-compatible storage, NVENC/QuickSync hardware acceleration.
-- **Why it wins:** Built as a modern, self-hosted open-source Mux alternative. Focuses strictly on VOD with dynamic, source-capped HLS ladders (360p–4K), token-to-cookie edge authentication that preserves a 98%+ CDN cache hit ratio, Whisper-based auto-subtitles, and native AI Model Context Protocol (MCP) tooling.
+- **Why it wins:** Built as a modern, self-hosted open-source [Mux alternative in Rust](/blog/why-we-built-open-source-mux-alternative-in-rust). Focuses strictly on VOD with dynamic, source-capped HLS ladders (360p–4K), token-to-cookie edge authentication that preserves a 98%+ CDN cache hit ratio, Whisper-based auto-subtitles, and native AI Model Context Protocol (MCP) tooling.
 - **Trade-off:** VOD-only by design—does not support live streaming or RTMP ingestion.
 - **Best for:** Startups and SaaS teams embedding video directly into custom apps via REST APIs and webhooks.
 
@@ -370,7 +370,7 @@ When operating self-hosted video infrastructure in production, engineering teams
 ### 2. Audio-Video Synchronization Drift in HLS Playback
 - **Symptom:** Audio leads or lags behind video by several seconds on mobile devices.
 - **Root Cause:** The source recording used Variable Frame Rate (VFR) encoding (common in smartphone camera recordings and screen captures) without presentation timestamp (PTS) normalization.
-- **Remediation:** Configure your transcoding pipeline to enforce constant frame rate (CFR) resampling by adding `-vsync cfr` and `-r 30` (or `-r 60`) flags to the FFmpeg filter graph, forcing monotonic audio/video timestamp alignment.
+- **Remediation:** Configure your [transcoding pipeline with Rust and NATS](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats) to enforce constant frame rate (CFR) resampling by adding `-vsync cfr` and `-r 30` (or `-r 60`) flags to the FFmpeg filter graph, forcing monotonic audio/video timestamp alignment.
 
 ### 3. Edge CDN Cache Miss Thundering Herd
 - **Symptom:** When a new popular video is published, origin storage experiences an acute spike in HTTP request traffic, causing 504 Gateway Timeouts.
@@ -413,7 +413,7 @@ Selecting the appropriate open-source video infrastructure depends on your appli
 - **The Recommendation:** Choose **Owncast**. It is a single-binary live server built in Go that ingests RTMP streams and outputs low-latency HLS with built-in interactive chat, making it ideal for live webinars, gaming streams, and virtual events. However, it cannot manage stored on-demand video libraries.
 
 ### 3. Dynamic Remuxing for Large Existing MP4 Archives
-- **The Question:** Do you already have a massive library of pre-encoded multi-bitrate MP4 files and want to stream adaptive HLS without storing millions of tiny segment files?
+- **The Question:** Do you already have a massive library of pre-encoded multi-bitrate MP4 files and want to stream [dynamic HLS resolution ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders) without storing millions of tiny segment files?
 - **The Recommendation:** Choose **OpenResty / Nginx VOD Module**. It dynamically packages MP4 files into HLS or DASH on the fly in memory as requests arrive, reducing storage footprints by up to 50%. Note: You must build your own upload APIs, database, and auth layer around it.
 
 ### 4. Decentralized, Web3-Based GPU Offloading
@@ -479,13 +479,3 @@ Deploying production-grade open-source video infrastructure bridges this divide:
 For startups and mid-market organizations seeking a modern, headless, VOD-first platform built specifically for developers, Ollanode represents the gold standard in open-source video infrastructure in 2026.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Why We Built an Open-Source Mux Alternative in Rust](/blog/why-we-built-open-source-mux-alternative-in-rust)
-- [How to Generate Dynamic HLS Resolution Ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders)
-- [Setting Up Your First Video Pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)
-- [OllaNode Pricing Overview](https://ollanode.com/pricing)
-

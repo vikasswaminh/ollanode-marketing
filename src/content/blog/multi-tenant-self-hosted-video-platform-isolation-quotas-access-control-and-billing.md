@@ -70,7 +70,7 @@ The architectural patterns governing multi-tenant video systems have shifted dra
   - While isolation was absolute, operational overhead was catastrophic: updating encoding profiles, patching security vulnerabilities, and scaling hardware required managing hundreds of independent instances. Infrastructure utilization hovered below 15%, resulting in massive hardware waste.
 
 - **Era 2: Centralized Cloud SaaS Monopoly (2017–2021)**
-  - Platforms migrated to managed developer video APIs like Mux, Vimeo Enterprise, or AWS Elemental.
+  - Platforms migrated to managed developer [self-hosted video API](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles)s like Mux, Vimeo Enterprise, or AWS Elemental.
   - Cloud vendors solved the multi-tenancy challenge by creating multi-org management consoles and abstracting infrastructure behind unified APIs.
   - However, this convenience introduced a severe economic penalty: commercial SaaS vendors charge exorbitant markups—often $0.05 to $0.08 per encoded minute, $0.005 to $0.01 per stored minute, and $0.08 to $0.15 per GB of egress. As platforms scaled to thousands of tenants, video infrastructure bills expanded exponentially, consuming 40% to 60% of total gross margins.
 
@@ -80,7 +80,7 @@ The architectural patterns governing multi-tenant video systems have shifted dra
 
 - **Era 4: Sovereign, Unified Multi-Tenant Platforms (2025–2026+)**
   - The modern paradigm centers on deploying unified, open-source video infrastructure engines—exemplified by Ollanode—directly within private clouds, sovereign VPCs, or bare-metal data centers.
-  - By implementing an API-first Rust control plane, native multi-tenant worker scheduling (Deficit Weighted Round Robin), automated S3 storage sandboxing, dynamic edge authentication, and built-in usage metering, modern platforms achieve the operational simplicity of commercial SaaS while cutting infrastructure costs by 70% to 85% and maintaining absolute data sovereignty.
+  - By implementing an API-first Rust [open-source video control plane](/blog/open-source-video-infrastructure-explained-control-plane-pipeline-cdn-and0storage), native multi-tenant worker scheduling (Deficit Weighted Round Robin), automated S3 storage sandboxing, dynamic edge authentication, and built-in usage metering, modern platforms achieve the operational simplicity of commercial SaaS while cutting infrastructure costs by 70% to 85% and maintaining absolute data sovereignty.
 
 ---
 
@@ -401,7 +401,7 @@ Under the Flat FIFO queue, Tenant B and Tenant C experience catastrophic SLA fai
 | :--- | :--- | :--- | :--- |
 | **License & Control** | **Apache-2.0 (100% Sovereign)** | Proprietary Closed SaaS | Proprietary Cloud Lock-in |
 | **Hosting Deployment** | **Anywhere: Bare-Metal, VPC, K8s** | Vendor Cloud Only | AWS Only |
-| **Pricing Model** | **Predictable Hardware / Server Cost** | Per-minute encoding & storage fees | Metered AWS service charges |
+| **[OllaNode pricing](https://ollanode.com/pricing) Model** | **Predictable Hardware / Server Cost** | Per-minute encoding & storage fees | Metered AWS service charges |
 | **Per-Minute Transcode Fee** | **$0.00 (Zero markup)** | $0.045 – $0.075 / minute | $0.015 – $0.030 / minute |
 | **Per-GB Egress Markup** | **$0.00 (Standard bandwidth cost)** | $0.08 – $0.12 / GB markup | $0.085 / GB (CloudFront standard) |
 | **Multi-Tenant Scheduling** | **Native DWRR Fair-Share Queues** | Handled internally by vendor | Must be hand-coded across SQS queues |
@@ -493,13 +493,3 @@ By deploying Ollanode as your multi-tenant video foundation, your engineering te
 Explore the complete platform capabilities and multi-tenant tooling at OllaNode Platform Features.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Open Source Video Infrastructure Explained](/blog/open-source-video-infrastructure-explained-control-plane-pipeline-cdn-and0storage)
-- [Developer Video Platform Requirements](/blog/developer-video-platform-requirements-in-2026-apis-authentication-playback-and-observability)
-- [Self-Hosted Video API Architecture](/blog/sel-hosted-video-api-upload-processing-playback-webhooks-ans-asset-lifecycles)
-- [OllaNode Platform Pricing](https://ollanode.com/pricing)
-

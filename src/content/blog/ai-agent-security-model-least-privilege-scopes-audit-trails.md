@@ -11,7 +11,7 @@ tags: ['AI & Security', 'AIAgentSecurity', 'LeastPrivilege', 'MCPSecurity', 'AIA
 
 ## Executive Summary
 
-Autonomous artificial intelligence agents represent an unprecedented paradigm shift in software architecture and operational access control. Unlike deterministic scripts, compiled cron jobs, or human-driven administrative consoles, Large Language Model (LLM)-powered agents make runtime execution decisions based on non-deterministic probabilistic reasoning, dynamic context windows, and external tool feedback. When infrastructure teams connect autonomous agents directly to production environments—such as automated video transcoding clusters, content delivery network (CDN) caching layers, object storage zones, authoritative DNS servers, and edge compute runtimes—traditional authentication and access control models fail completely.
+Autonomous artificial intelligence agents represent an unprecedented paradigm shift in software architecture and operational access control. Unlike deterministic scripts, compiled cron jobs, or human-driven administrative consoles, Large Language Model (LLM)-powered agents make runtime execution decisions based on non-deterministic probabilistic reasoning, dynamic context windows, and external tool feedback (aligned with modern developer video platform requirements). When infrastructure teams connect autonomous agents directly to production environments—such as automated video transcoding clusters, content delivery network (CDN) caching layers, object storage zones, authoritative DNS servers, and edge compute runtimes—traditional authentication and access control models fail completely.
 
 Granting an agent a static, broad-scoped API bearer token creates an immediate systemic hazard. A single prompt injection vulnerability, hallucinated parameter payload, or context window poisoning incident can trigger irreversible mass data deletions, unauthorized storage exposure, or cascading service outages across global edge networks.
 
@@ -21,7 +21,7 @@ Securing autonomous infrastructure automation requires a purpose-built AI Agent 
 2. **Dynamic Scopes and Self-Inspecting Capability Maps**: Agents cannot safely discover their permissions through trial-and-error HTTP error codes. Systems must provide a dedicated discovery endpoint (such as `/v1/whoami`) that returns an immutable, machine-readable declaration of permissible actions, rate limits, and approval requirements before execution begins.
 3. **Cryptographically Verifiable, Tamper-Evident Audit Trails**: Traditional append-only text logs are insufficient for regulatory compliance and post-incident forensics. Every agent-driven API call, tool invocation, human approval signature, and execution outcome must be serialized into a cryptographically linked hash-chain ledger, mathematically guaranteeing non-repudiation.
 
-**Ollanode Platform Context**: Ollanode is an ownership-first, self-hosted media and edge infrastructure platform engineered specifically for autonomous agent operations and high-throughput developer workflows. Ollanode implements a native three-tier capability model (`allowed`, `approval`, `denied`), fine-grained scopes (such as `videos:write`, `zones:purge`, and `functions:delete`), cryptographic approval digest gating bound to request body hashes, an immutable hash-chain audit ledger, and an emergency global agent kill switch (`/v1/admin/disable-agents`), with full Model Context Protocol (MCP) and API documentation integration.
+**Ollanode Platform Context**: Ollanode is an ownership-first, self-hosted media and edge infrastructure platform engineered specifically for autonomous agent operations and high-throughput developer workflows (detailed in [Developer Video Platform Requirements](/blog/developer-video-platform-requirements-in-2026-apis-authentication-playback-and-observability)). Ollanode implements a native three-tier capability model (`allowed`, `approval`, `denied`), fine-grained scopes (such as `videos:write`, `zones:purge`, and `functions:delete`), cryptographic approval digest gating bound to request body hashes, an immutable hash-chain audit ledger, and an emergency global agent kill switch (`/v1/admin/disable-agents`), with full [Model Context Protocol (MCP)](/blog/mcp-in-action-controlling-video-infrastructure-with-ai-agents) and [API documentation](https://ollanode.com/docs) integration.
 
 ---
 
@@ -96,7 +96,7 @@ Because autonomous agents operate at machine speed across thousands of operation
 An Agent-Native Zero Trust Security Gateway sits between the agent runtime (local, MCP, or cloud) and backend infrastructure, governing execution across six modular layers:
 
 - **Layer 1: Ingress & Protocol Mediation**: Terminates mTLS/HTTPS and runs incoming REST or MCP tool calls through a Web Application Firewall (WAF) to block protocol-level exploits.
-- **Layer 2: Identity & Session Authentication**: Validates ephemeral agent tokens, enforces tenant isolation, and checks the in-memory Global Kill Switch—immediately dropping agent traffic if tripped.
+- **Layer 2: Identity & Session Authentication**: Validates ephemeral agent tokens, enforces [multi-tenant isolation](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing), and checks the in-memory Global Kill Switch—immediately dropping agent traffic if tripped.
 - **Layer 3: Capability & Policy Engine**: Enforces the three-tier matrix: passes `allowed` calls, blocks `denied` endpoints, and routes sensitive mutations to Layer 4 (`approval`).
 - **Layer 4: Cryptographic Approval Gateway (HITL)**: Canonicalizes payloads (RFC 8785), computes a SHA-256 digest, and pauses execution with an HTTP 202 Accepted ticket until a human supervisor cryptographically signs that exact digest.
 - **Layer 5: Execution, Egress & Sandboxing**: Dispatches authorized requests over private networks while enforcing SSRF filtering on outbound fetches (blocking internal metadata and private IPs).
@@ -450,13 +450,3 @@ Relying on traditional service account tokens or trusting natural language instr
 By enforcing these boundaries at the infrastructure layer, engineering teams can unlock the full transformative efficiency of autonomous AI agents while maintaining uncompromising security, mathematical auditability, and total operational control over their infrastructure.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Model Context Protocol (MCP) in Action](/blog/mcp-in-action-controlling-video-infrastructure-with-ai-agents)
-- [Multi-Tenant Self-Hosted Video Platform](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing)
-- [Developer Video Platform Requirements](/blog/developer-video-platform-requirements-in-2026-apis-authentication-playback-and-observability)
-- [OllaNode API & Security Docs](https://ollanode.com/docs)
-

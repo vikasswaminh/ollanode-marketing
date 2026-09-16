@@ -657,7 +657,7 @@ Not necessarily. Many production platforms are VOD-only. Live/RTMP ingest, low-l
 Ollanode is an Apache-2.0, self-hosted, API-first stack that unifies VOD processing (adaptive HLS, thumbnails, transcripts), S3-compatible storage, CDN pull zones, DNS, and edge functions under one control plane — with signed playback and ownership-first deployment. It is a concrete reference for the architecture this guide describes, especially for teams that want VOD without building the glue layer from scratch.
 
 ### 8 How do I choose between self-hosted and managed video SaaS?
-Choose managed when speed-to-demo and near-zero ops dominate, and volume/compliance pressure is low. Choose self-hosted when residency, private delivery, catalog-scale economics, or custom policy dominate — and you can operate (or buy support for) API, workers, storage, and edge. Run a 12-month TCO model with your real upload mix before deciding, and evaluate Ollanode self-hosted vs managed tiers.
+Choose managed when speed-to-demo and near-zero ops dominate, and volume/compliance pressure is low. Choose self-hosted when residency, private delivery, catalog-scale economics, or custom policy dominate — and you can operate (or buy support for) API, workers, storage, and edge. Run a 12-month TCO model with your real upload mix before deciding, and evaluate Ollanode self-hosted vs managed tiers on [OllaNode Pricing](https://ollanode.com/pricing).
 
 ---
 
@@ -669,7 +669,7 @@ Choose managed when speed-to-demo and near-zero ops dominate, and volume/complia
 - Processing & AI docs
 - Playback docs
 - Webhooks docs
-- Related reading on Ollanode Blog: dynamic HLS ladders, first open-source pipeline setup, and ownership-focused architecture posts (avoid treating those as substitutes for this category guide)
+- Related reading on Ollanode Blog: [dynamic HLS resolution ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders) ladders, [first open-source video pipeline setup](/blog/setting-up-first-open-source-video-pipeline-ollanode) setup, and ownership-focused architecture posts (avoid treating those as substitutes for this category guide)
 
 ---
 
@@ -685,13 +685,3 @@ Ownership is the feature. Everything else is implementation detail you can final
 > If video is part of your product’s core path — not a side embed — treat media infrastructure like any other critical backend: APIs, isolation, observability, and cost you can explain. A self-hosted video platform is how you do that without rebuilding the entire media industry in your repo.
 
 ---
-
-## Related Engineering & Architecture Guides
-
-For deeper technical implementations, explore these related platform resources:
-
-- [Why We Built an Open-Source Mux Alternative in Rust](/blog/why-we-built-open-source-mux-alternative-in-rust)
-- [Dynamic HLS Resolution Ladders](/blog/how-to-generate-dynamic-hls-resolution-ladders)
-- [Setting Up Your First Video Pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)
-- [OllaNode Pricing & Plans](https://ollanode.com/pricing)
-
