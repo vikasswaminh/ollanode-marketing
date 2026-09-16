@@ -256,16 +256,6 @@ const edgeCards = [
         }
       }
 
-      // Reset all flipped cards back to front face
-      function resetAllCardsToFront() {
-        cardWrappers.forEach(function (wrapper) {
-          var inner = wrapper.querySelector('.flip-card-inner');
-          if (inner && inner.classList.contains('is-flipped')) {
-            inner.classList.remove('is-flipped');
-          }
-        });
-      }
-
       // 1. CLICK ANYWHERE ON CARD TO FLIP (Front <-> Back)
       cardWrappers.forEach(function (cardWrapper) {
         cardWrapper.addEventListener('click', function (e) {
@@ -275,7 +265,7 @@ const edgeCards = [
         });
       });
 
-      // 2. LEFT HEADINGS CLICK HANDLER
+      // 2. LEFT HEADINGS CLICK HANDLER (SCROLL + FLIP)
       navButtons.forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.preventDefault();
@@ -303,15 +293,35 @@ const edgeCards = [
         });
       });
 
-      // 3. AUTOMATICALLY FLIP BACK TO FRONT ON SCROLL
-      var isScrollingTimer;
-      window.addEventListener('scroll', function () {
-        clearTimeout(isScrollingTimer);
-        isScrollingTimer = setTimeout(function () {
-          resetAllCardsToFront();
-          navButtons.forEach(function (b) { b.classList.remove('is-active'); });
-        }, 180);
-      }, { passive: true });
+      // 3. SCROLL OBSERVER: Highlight matching nav button as user scrolls right-side cards
+      if ('IntersectionObserver' in window) {
+        var cardObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var cardId = entry.target.getAttribute('data-card-id');
+                if (cardId) {
+                  navButtons.forEach(function (btn) {
+                    if (btn.getAttribute('data-target-id') === cardId) {
+                      btn.classList.add('is-active');
+                    } else {
+                      btn.classList.remove('is-active');
+                    }
+                  });
+                }
+              }
+            });
+          },
+          {
+            rootMargin: '-20% 0px -20% 0px',
+            threshold: 0.3
+          }
+        );
+
+        cardWrappers.forEach(function (card) {
+          cardObserver.observe(card);
+        });
+      }
     }
 
     if (document.readyState === 'loading') {
@@ -351,10 +361,11 @@ const edgeCards = [
 
   /* LEFT STICKY COLUMN */
   .delivery-left-sticky {
+    position: -webkit-sticky;
     position: sticky;
-    top: 110px;
+    top: 100px;
     align-self: start;
-    height: auto;
+    height: fit-content;
   }
 
   .delivery-sticky-content {
