@@ -31,7 +31,7 @@ const archiveList = Array.from(archiveGroups.entries());
 ---
 
 <div class="blog-page-wrapper">
-  <!-- 1. STICKY CATEGORY CHIPS STRIP -->
+  <!-- 1. STICKY CATEGORY CHIPS STRIP (WITH SKY BLUE DARK & LIGHT GRADIENT) -->
   <nav class="category-strip" aria-label="Blog Categories">
     <div class="container-wide">
       <div class="category-strip-inner">
@@ -342,7 +342,7 @@ const archiveList = Array.from(archiveGroups.entries());
 
 <style>
   /* ==========================================================================
-     EXACT REPLICA STYLES FROM BLOGS.OLLANODE.COM HOMEPAGE
+     BLOG PAGE STYLES WITH SKY BLUE GRADIENT CATEGORY STRIP
      ========================================================================== */
 
   .blog-page-wrapper {
@@ -361,17 +361,17 @@ const archiveList = Array.from(archiveGroups.entries());
     box-sizing: border-box;
   }
 
-  /* 1. STICKY CATEGORY CHIPS STRIP */
+  /* 1. STICKY CATEGORY CHIPS STRIP (SKY BLUE DARK AND LIGHT GRADIENT) */
   .category-strip {
     width: 100%;
-    background: #F8FAFC;
-    border-top: 1px solid #E2E8F0;
-    border-bottom: 1px solid #E2E8F0;
-    padding: 0.5rem 0;
+    background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 30%, #BAE6FD 60%, #60A5FA 85%, #2563EB 100%);
+    border-top: 1px solid rgba(59, 130, 246, 0.25);
+    border-bottom: 1.5px solid rgba(37, 99, 235, 0.35);
+    padding: 0.65rem 0;
     position: sticky;
     top: 62px;
     z-index: 40;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.16), 0 1px 3px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     display: flex;
@@ -385,7 +385,7 @@ const archiveList = Array.from(archiveGroups.entries());
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0.55rem;
+    gap: 0.6rem;
     margin: 0 auto;
     padding: 0;
     text-align: center;
@@ -395,36 +395,36 @@ const archiveList = Array.from(archiveGroups.entries());
     display: inline-flex;
     align-items: center;
     font-size: 0.815rem;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.35;
-    color: #1E293B;
-    background: #FFFFFF;
-    border: 1px solid #D4E5F5;
-    padding: 0.3rem 0.9rem;
+    color: #0F172A;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    padding: 0.32rem 0.95rem;
     border-radius: 9999px;
-    transition: all 0.16s ease;
+    transition: all 0.18s ease;
     text-decoration: none;
     box-sizing: border-box;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 0 1px 2px rgba(14, 165, 233, 0.04);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
     font-family: inherit;
   }
 
   .category-chip:hover {
     color: #0284C7;
     border-color: #38BDF8;
-    background: #E0F2FE;
+    background: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
   }
 
   .category-chip.active {
     color: #FFFFFF !important;
-    background: linear-gradient(135deg, #FF5722, #FF4500);
-    border: 1px solid #FF5500;
-    box-shadow: 0 2px 10px rgba(255, 69, 0, 0.35);
-    font-weight: 700;
+    background: linear-gradient(135deg, #FF5722, #FF4500) !important;
+    border: 1.5px solid #FF5500 !important;
+    box-shadow: 0 3px 12px rgba(255, 69, 0, 0.4) !important;
+    font-weight: 800;
   }
 
   /* 2. BLOG LAYOUT 3-COLUMN GRID */
@@ -1260,7 +1260,7 @@ const archiveList = Array.from(archiveGroups.entries());
   /* HORIZONTAL SCROLL FOR CATEGORY STRIP ON TABLET & MOBILE (<= 1024px) */
   @media (max-width: 1024px) {
     .category-strip {
-      padding: 0.4rem 0;
+      padding: 0.45rem 0;
       overflow: hidden;
     }
 
