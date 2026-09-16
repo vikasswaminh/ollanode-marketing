@@ -3,7 +3,6 @@ import {
   getAllBlogArticles,
   getFeaturedBlogArticle,
   getLeftSidebarArticles,
-  OLLANODE_BLOG_CATEGORIES,
 } from '../../data/blogArticles';
 
 const articles = await getAllBlogArticles();
@@ -12,340 +11,1506 @@ const leftSidebarArticles = await getLeftSidebarArticles();
 const gridArticles = mainFeatured
   ? articles.filter((a) => a.id !== mainFeatured.id)
   : articles;
+
+// Unique categories dynamically derived from existing articles + standard chips
+const allCategories = [
+  'All',
+  ...Array.from(new Set(articles.map((a) => a.data.category).filter(Boolean))),
+];
+
+// Archive category groups
+const archiveGroups = new Map<string, typeof articles>();
+articles.forEach((art) => {
+  const cat = art.data.category || 'Engineering';
+  if (!archiveGroups.has(cat)) {
+    archiveGroups.set(cat, []);
+  }
+  archiveGroups.get(cat)!.push(art);
+});
+const archiveList = Array.from(archiveGroups.entries());
 ---
 
 <div class="blog-page-wrapper">
-  
-  <!-- CATEGORY STRIP BELOW HEADER WITH RIGHT-ALIGNED SEARCH BAR -->
-  <div class="blog-category-strip">
-    <div class="net-blog-container">
+  <!-- 1. STICKY CATEGORY CHIPS STRIP -->
+  <nav class="category-strip" aria-label="Blog Categories">
+    <div class="container-wide">
       <div class="category-strip-inner">
-        <!-- LEFT: CATEGORIES NAVIGATION -->
-        <div class="cat-strip-links" role="tablist" aria-label="Blog categories">
-          {OLLANODE_BLOG_CATEGORIES.map((cat, idx) => (
-            <button
-              class={`cat-strip-btn ${idx === 0 ? 'active' : ''}`}
-              data-category={cat}
-              role="tab"
-              aria-selected={idx === 0 ? 'true' : 'false'}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        <!-- RIGHT: SEARCH BAR -->
-        <div class="blog-search-wrap">
-          <svg class="blog-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input
-            type="text"
-            id="blog-search-input"
-            class="blog-search-input"
-            placeholder="Search articles..."
-            aria-label="Search articles"
-          />
-        </div>
+        {allCategories.map((cat, idx) => (
+          <button
+            type="button"
+            class={`category-chip ${idx === 0 ? 'active' : ''}`}
+            data-cat={cat.toLowerCase()}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- MAIN 3-COLUMN BLOG SECTION -->
-  <section class="net-blog-section">
-    <div class="net-blog-container">
-      <div class="net-blog-grid">
+  <!-- 2. MAIN 3-COLUMN BLOG LAYOUT SECTION -->
+  <section id="articles" class="blog-layout-section">
+    <div class="container-wide">
+      <div class="nh-layout-grid">
 
-        <!-- LEFT COLUMN: FEATURED INSIGHTS (STICKY BOX) -->
-        <aside class="net-col-left">
-          <div class="featured-box-card">
-            <div class="pill-badge pill-orange">FEATURED</div>
-            
-            {leftSidebarArticles.length > 0 ? (
-              <ul class="net-link-list">
-                {leftSidebarArticles.map((item) => (
-                  <li>
-                    <a href={`/blog/${item.slug || item.id}`} class="net-link">{item.data.title}</a>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <ul class="net-link-list">
-                <li><span class="net-link-placeholder">No featured articles yet</span></li>
-              </ul>
-            )}
-            
-            <a href="/docs" class="view-all-link">Explore Docs →</a>
+        <!-- LEFT STICKY SIDEBAR: Featured Recent Blogs (Purple Badge) -->
+        <aside class="sidebar-col sidebar-left">
+          <div class="sticky-sidebar">
+            <span class="badge-pill founder-badge-purple">FEATURED</span>
+            <ul class="article-links-list">
+              {leftSidebarArticles.map((item) => (
+                <li>
+                  <a
+                    href={`/blog/${item.slug || item.id}`}
+                    class="link-item"
+                    title={item.data.title}
+                  >
+                    {item.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a href="#archive" class="view-all-btn-purple">View All →</a>
           </div>
         </aside>
 
-        <!-- CENTER COLUMN: MAIN CONTENT & LATEST ARTICLES -->
-        <main class="net-col-center">
-          <!-- CENTER HEADER -->
-          <div class="center-header">
-            <h1 class="center-h1">Ollanode Engineering &amp; Insights</h1>
-            <p class="center-sub">Technical deep dives, architecture patterns &amp; self-hosted infrastructure updates</p>
+        <!-- CENTER COLUMN: Middle Scrolling Blog Feed -->
+        <main class="feed-col">
+          <!-- Section Title Header inside Middle Feed Column -->
+          <div class="feed-header-wrap">
+            <h1 class="feed-section-title">OllaNode Infrastructure &amp; Engineering Blog</h1>
+            <p class="feed-section-subtitle">
+              Expert articles on video delivery, edge compute, AI infrastructure &amp; cloud storage
+            </p>
           </div>
 
-          <!-- LATEST ARTICLES BADGE STRIP -->
-          <div class="section-label-strip">
-            <span class="pill-badge pill-orange-filled">🔥 LATEST ARTICLES</span>
-            <span class="strip-text" id="article-count-label">Showing {articles.length} article{articles.length === 1 ? '' : 's'}</span>
+          <!-- Sub-header bar -->
+          <div class="newest-header-bar">
+            <span class="badge-pill newest-badge">
+              <svg class="flame-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 23c-4.97 0-9-3.58-9-8 0-4.19 3.01-7.26 5.88-10.12.55-.55 1.12-1.09 1.67-1.65.34-.35.88-.23 1.05.21.68 1.76 1.95 3.39 3.2 4.41 1.72 1.41 3.2 2.65 3.2 5.15 0 .68-.09 1.34-.26 1.97-.1.35.21.68.56.59 1.54-.38 2.7-1.46 3.23-2.86.09-.23.4-.29.56-.1 1.25 1.52 1.91 3.27 1.91 5.4 0 4.42-4.03 8-9 8zm-1.87-4.47c1.78.68 3.51.15 4.31-.61.47-.45.74-1.07.78-1.72.03-.59-.19-1.2-.56-1.74-.53-.78-1.42-1.57-2.34-2.39-.77.85-1.54 1.83-1.89 2.92-.37 1.14-.23 2.5.7 3.54z"/>
+              </svg>
+              NEWEST ARTICLES
+            </span>
+            <span class="newest-subtitle-text">Latest from our experts</span>
           </div>
 
-          <!-- HERO FEATURED ARTICLE CARD (Automatic from Content Collection) -->
-          {mainFeatured ? (
-            <div
-              class="hero-article-card blog-item-card"
-              data-href={`/blog/${mainFeatured.slug || mainFeatured.id}`}
-              data-category={mainFeatured.data.category}
-              data-title={mainFeatured.data.title.toLowerCase()}
-              data-excerpt={mainFeatured.data.excerpt.toLowerCase()}
-              data-tags={(mainFeatured.data.tags || []).join(' ').toLowerCase()}
+          <!-- Featured Main Hero Card -->
+          {mainFeatured && (
+            <a
+              id="featured"
+              href={`/blog/${mainFeatured.slug || mainFeatured.id}`}
+              class="featured-main-card featured-main-card-no-img"
+              data-category={(mainFeatured.data.category || '').toLowerCase()}
+              aria-label={`Read featured post: ${mainFeatured.data.title}`}
             >
-              {mainFeatured.data.image && (
-                <div class="hero-card-img-wrap">
-                  <img
-                    src={mainFeatured.data.image}
-                    alt={mainFeatured.data.title}
-                    class="hero-card-img"
-                    loading="lazy"
-                  />
+              <div class="featured-content-wrapper">
+                <div class="featured-top-tag">
+                  <span class="pill-tag-new">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 23c-4.97 0-9-3.58-9-8 0-4.19 3.01-7.26 5.88-10.12.55-.55 1.12-1.09 1.67-1.65.34-.35.88-.23 1.05.21.68 1.76 1.95 3.39 3.2 4.41 1.72 1.41 3.2 2.65 3.2 5.15 0 .68-.09 1.34-.26 1.97-.1.35.21.68.56.59 1.54-.38 2.7-1.46 3.23-2.86.09-.23.4-.29.56-.1 1.25 1.52 1.91 3.27 1.91 5.4 0 4.42-4.03 8-9 8z"/>
+                    </svg>
+                    FEATURED
+                  </span>
                 </div>
-              )}
-              <div class="hero-card-body">
-                <span class="hero-new-tag">🔥 FEATURED</span>
-                <span class="pill-badge pill-category">{mainFeatured.data.category}</span>
-                <h2 class="hero-card-title">
-                  <a href={`/blog/${mainFeatured.slug || mainFeatured.id}`}>{mainFeatured.data.title}</a>
-                </h2>
-                <p class="hero-card-excerpt">{mainFeatured.data.excerpt}</p>
-                <div class="hero-card-meta">
-                  <span>{mainFeatured.data.publishedDate}</span>
-                  <span class="meta-sep">•</span>
-                  <span>{mainFeatured.data.readingTime}</span>
-                  <span class="meta-sep">•</span>
-                  <a href={`/blog/${mainFeatured.slug || mainFeatured.id}`} class="read-article-link">Read article →</a>
+                <div class="featured-category-badge">{mainFeatured.data.category}</div>
+                <h3 class="featured-title">
+                  <span>{mainFeatured.data.title}</span>
+                </h3>
+                <p class="featured-desc">{mainFeatured.data.excerpt}</p>
+                <div class="featured-footer-meta">
+                  <span class="read-time">{mainFeatured.data.readingTime}</span>
+                  <span class="meta-dot">•</span>
+                  <span class="read-article-link">Read article →</span>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div class="hero-article-card hero-placeholder-card">
-              <div class="hero-card-body">
-                <span class="hero-new-tag">WAITING FOR CONTENT</span>
-                <span class="pill-badge pill-category">Engineering</span>
-                <h2 class="hero-card-title">No Featured Article Yet</h2>
-                <p class="hero-card-excerpt">Add your first markdown article with featured: true in src/content/blog/ to display it here automatically.</p>
-              </div>
-            </div>
+            </a>
           )}
 
-          <!-- NEWEST ARTICLES 3-COLUMN GRID (Automatic from Content Collection) -->
-          <div class="newest-grid" id="blog-grid-cards">
+          <!-- All Other Blog Cards Grid (Amber/Orange Borders) -->
+          <div class="subcards-grid" id="subcards-grid">
             {gridArticles.map((art) => (
-              <article
-                class="grid-card blog-item-card"
-                data-href={`/blog/${art.slug || art.id}`}
-                data-category={art.data.category}
-                data-title={art.data.title.toLowerCase()}
-                data-excerpt={art.data.excerpt.toLowerCase()}
-                data-tags={(art.data.tags || []).join(' ').toLowerCase()}
+              <div
+                class="subcard-item"
+                data-category={(art.data.category || '').toLowerCase()}
               >
-                <span class="pill-badge pill-category-sm">{art.data.category}</span>
-                <h3 class="grid-card-title">
-                  <a href={`/blog/${art.slug || art.id}`}>{art.data.title}</a>
-                </h3>
-                <p class="grid-card-excerpt">{art.data.excerpt}</p>
-                <div class="grid-card-footer">
-                  <span class="grid-card-readtime">{art.data.readingTime}</span>
-                  <a href={`/blog/${art.slug || art.id}`} class="read-more-sm">Read →</a>
+                <span class="subcard-tag">{art.data.category}</span>
+                <h4 class="subcard-title">
+                  <a href={`/blog/${art.slug || art.id}`}>
+                    <span class="subcard-title-desktop">{art.data.title}</span>
+                    <span class="subcard-title-mobile">{art.data.title}</span>
+                  </a>
+                </h4>
+                <p class="subcard-desc">
+                  <span class="subcard-desc-desktop">{art.data.excerpt}</span>
+                  <span class="subcard-desc-mobile">{art.data.excerpt}</span>
+                </p>
+                <div class="subcard-meta-footer">
+                  <span class="subcard-read-time">{art.data.readingTime}</span>
+                  <a href={`/blog/${art.slug || art.id}`} class="subcard-read-link">
+                    <span class="subcard-read-text-desktop">Read article →</span>
+                    <span class="subcard-read-text-mobile">Read →</span>
+                  </a>
                 </div>
-              </article>
+              </div>
             ))}
           </div>
 
-          <!-- EMPTY CATEGORY / SEARCH FILTER STATE -->
-          <div id="blog-empty-state" class="blog-empty-card" style="display: none;">
-            <div class="empty-icon">🔍</div>
-            <h3 class="empty-h3">No matching articles found</h3>
-            <p class="empty-p">Try adjusting your search query or selecting a different category filter.</p>
-            <button id="reset-filters-btn" class="reset-btn">Clear Search &amp; Show All</button>
+          <!-- Fallback when no posts in category -->
+          <div id="no-category-posts" style="display: none; padding: 2.5rem 0; text-align: center; color: var(--muted, #64748b);">
+            <p style="font-size: 1.05rem; font-weight: 600;">No articles found for this category.</p>
           </div>
-
         </main>
 
-        <!-- RIGHT COLUMN: RESTRUCTURED STICKY SIDEBAR -->
-        <aside class="net-col-right">
-          <!-- A. QUICK JUMP LINKS -->
-          <div class="right-sidebar-block">
-            <div class="pill-badge pill-purple">QUICK JUMP</div>
-            <ul class="bullet-list-cols">
-              <li><a href="/#platform-capabilities" class="bullet-link-item">Video</a></li>
-              <li><a href="/docs/cdn" class="bullet-link-item">CDN &amp; Delivery</a></li>
-              <li><a href="/#agent-native" class="bullet-link-item">AI &amp; Agents</a></li>
-              <li><a href="/docs/edge-functions" class="bullet-link-item">Edge</a></li>
-              <li><a href="/#how-it-works" class="bullet-link-item">Engineering</a></li>
-              <li><a href="/docs" class="bullet-link-item">Security</a></li>
-              <li><a href="/#delivery-edge" class="bullet-link-item">Performance</a></li>
-              <li><a href="/#start" class="bullet-link-item">Updates</a></li>
-            </ul>
-          </div>
+        <!-- RIGHT STICKY SIDEBAR: Quick Jump Links, Pricing & Contact -->
+        <aside class="sidebar-col sidebar-right">
+          <div class="sticky-sidebar">
+            <!-- 1. Quick Jump Links (White Capsules, 2 per row) -->
+            <div class="sidebar-block">
+              <span class="badge-pill orange-badge">QUICK JUMP LINKS</span>
+              <div class="quick-jump-capsules-grid">
+                <a href="#featured" class="quick-jump-capsule-white">Featured</a>
+                {allCategories.map((c) => (
+                  <button
+                    type="button"
+                    class="quick-jump-capsule-white quick-jump-filter-btn"
+                    data-cat={c.toLowerCase()}
+                  >
+                    {c}
+                  </button>
+                ))}
+                <a href="#pricing-tab" class="quick-jump-capsule-white">Pricing</a>
+                <a href="#archive" class="quick-jump-capsule-white">Archive</a>
+              </div>
+            </div>
 
-          <!-- B. PRICING SECTION -->
-          <div class="right-sidebar-block">
-            <div class="pill-badge pill-purple">PRICING</div>
-            <ul class="capsule-grid">
-              <li><a href="/pricing" class="capsule-link">Self-Host: Free</a></li>
-              <li><a href="/pricing" class="capsule-link">Managed: Custom</a></li>
-              <li><a href="/pricing" class="capsule-link">No Per-Min Fees</a></li>
-              <li><a href="/pricing" class="capsule-link">Apache-2.0 OSS</a></li>
-              <li><a href="/pricing" class="capsule-link">Unlimited Videos</a></li>
-              <li><a href="/pricing" class="capsule-link">View Tiers →</a></li>
-            </ul>
-          </div>
+            <!-- 2. Platform Pricing Section (Short Bullets) -->
+            <div id="pricing-tab" class="sidebar-block">
+              <span class="badge-pill orange-badge">PLATFORM PRICING</span>
+              <ul class="simple-pricing-bullets">
+                <li>
+                  <span class="pricing-bullet-title">Self-Hosted ($0)</span> — Unlimited VOD, WhisperX Transcripts, Edge CDN &amp; S3 Storage.
+                </li>
+                <li>
+                  <span class="pricing-bullet-title">Enterprise (Custom)</span> — Dedicated Edge Nodes, 99.99% SLA &amp; 24/7 Support.
+                </li>
+              </ul>
+            </div>
 
-
-          <!-- C. CONTACT SECTION -->
-          <div class="right-sidebar-block contact-card">
-            <div class="pill-badge pill-purple">CONTACT</div>
-            <a href="mailto:hello@ollanode.com" class="btn-contact-eng">Contact Engineering</a>
+            <!-- 3. Contact Engineering Button -->
+            <div class="sidebar-contact-block">
+              <a href="mailto:hello@ollanode.com" class="sidebar-contact-btn-orange">
+                Contact Engineering ↗
+              </a>
+            </div>
           </div>
         </aside>
 
-
       </div>
+
+      <!-- 3. COMPLETE BLOG ARCHIVE SECTION -->
+      <div id="archive" class="archive-section">
+        <h2 class="archive-title">Complete Blog Archive</h2>
+        <p class="archive-subtitle">Browse all engineering articles, tutorials, and release updates by category.</p>
+        <div class="archive-grid">
+          {archiveList.map(([catName, catArticles]) => (
+            <div class="archive-group">
+              <h3 class="group-title">
+                <span>{catName}</span>
+                <span class="group-count">({catArticles.length})</span>
+              </h3>
+              <ul class="archive-list">
+                {catArticles.map((art) => (
+                  <li>
+                    <a href={`/blog/${art.slug || art.id}`}>
+                      {art.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- 4. CONTRIBUTE / CONTACT CTA BANNER -->
+      <div class="contribute-banner">
+        <div class="contribute-banner-left">
+          <div class="contribute-icon-wrap" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <div class="contribute-text-wrap">
+            <h3 class="contribute-title">Have an idea or want to contribute?</h3>
+            <p class="contribute-desc">We'd love to hear from you. Join our community of builders.</p>
+          </div>
+        </div>
+        <div class="contribute-banner-right">
+          <a href="mailto:hello@ollanode.com" class="btn-contact-eng">
+            <span>Contact Engineering</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+
     </div>
   </section>
 </div>
 
-<!-- CLIENT-SIDE COMBINED CATEGORY STRIP & SEARCH FILTERING SCRIPT -->
-<script>
-  // Astro bundles this script as a module and automatically defers it until the DOM is ready.
-  // It is immune to CDN script-loader optimizers and caching lifecycle bugs.
-  
-  const catBtns = document.querySelectorAll('.cat-strip-btn');
-  const itemCards = document.querySelectorAll('.blog-item-card');
-  const emptyState = document.getElementById('blog-empty-state');
-  const resetBtn = document.getElementById('reset-filters-btn');
-  const searchInput = document.getElementById('blog-search-input');
-  const countLabel = document.getElementById('article-count-label');
+<!-- CLIENT SCRIPT FOR INSTANT CATEGORY FILTERING & SMOOTH NAVIGATION -->
+<script is:inline>
+  (function () {
+    function initBlogFilters() {
+      var chips = document.querySelectorAll('.category-chip');
+      var quickJumpBtns = document.querySelectorAll('.quick-jump-filter-btn');
+      var featuredCard = document.getElementById('featured');
+      var subcards = document.querySelectorAll('.subcard-item');
+      var noPosts = document.getElementById('no-category-posts');
 
-  if (catBtns.length > 0 && itemCards.length > 0) {
-    let currentCategory = 'All';
-    let searchQuery = '';
+      function filterCategory(cat) {
+        var cleanCat = (cat || 'all').toLowerCase().trim();
+        var visibleCount = 0;
 
-    function normalizeCat(str) {
-      if (!str) return '';
-      let s = str.toLowerCase()
-        .replace(/&amp;/g, 'and')
-        .replace(/&/g, 'and')
-        .replace(/[^a-z0-9]/g, '')
-        .trim();
-      if (s.endsWith('s') && s.length > 3) {
-        s = s.slice(0, -1);
-      }
-      return s;
-    }
-
-    function isCategoryMatch(cardCat, selectedCategory) {
-      if (!selectedCategory || selectedCategory.toLowerCase().trim() === 'all') return true;
-      const normSel = normalizeCat(selectedCategory);
-      const normCard = normalizeCat(cardCat);
-      if (!normSel || !normCard) return false;
-      return normCard === normSel || normCard.includes(normSel) || normSel.includes(normCard);
-    }
-
-    function filterArticles() {
-      let visibleCount = 0;
-      const query = searchQuery.trim().toLowerCase();
-
-      itemCards.forEach(card => {
-        const cat = card.getAttribute('data-category') || '';
-        const title = card.getAttribute('data-title') || '';
-        const excerpt = card.getAttribute('data-excerpt') || '';
-        const tags = card.getAttribute('data-tags') || '';
-
-        const matchesCategory = isCategoryMatch(cat, currentCategory);
-        const matchesSearch = !query ||
-          title.toLowerCase().includes(query) ||
-          excerpt.toLowerCase().includes(query) ||
-          cat.toLowerCase().includes(query) ||
-          tags.toLowerCase().includes(query);
-
-        if (matchesCategory && matchesSearch) {
-          card.style.display = '';
-          visibleCount++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-
-      if (countLabel) {
-        countLabel.textContent = 'Showing ' + visibleCount + ' article' + (visibleCount === 1 ? '' : 's');
-      }
-
-      if (emptyState) {
-        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
-      }
-    }
-
-    // Bind card clicks
-    itemCards.forEach(card => {
-      card.style.cursor = 'pointer';
-      card.addEventListener('click', (e) => {
-        const href = card.getAttribute('data-href');
-        if (href && !e.target.closest('a')) {
-          window.location.href = href;
-        }
-      });
-    });
-
-    // Bind category buttons
-    catBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        catBtns.forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-selected', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-        currentCategory = btn.getAttribute('data-category') || 'All';
-        filterArticles();
-      });
-    });
-
-    // Bind search
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value || '';
-        filterArticles();
-      });
-    }
-
-    // Bind reset
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        currentCategory = 'All';
-        searchQuery = '';
-        if (searchInput) searchInput.value = '';
-
-        catBtns.forEach((b, idx) => {
-          if (idx === 0) {
-            b.classList.add('active');
-            b.setAttribute('aria-selected', 'true');
+        // Update active chip state
+        chips.forEach(function (c) {
+          if (c.getAttribute('data-cat') === cleanCat) {
+            c.classList.add('active');
           } else {
-            b.classList.remove('active');
-            b.setAttribute('aria-selected', 'false');
+            c.classList.remove('active');
           }
         });
 
-        filterArticles();
+        // Filter featured card
+        if (featuredCard) {
+          var featCat = (featuredCard.getAttribute('data-category') || '').toLowerCase().trim();
+          if (cleanCat === 'all' || featCat.includes(cleanCat) || cleanCat.includes(featCat)) {
+            featuredCard.style.display = '';
+            visibleCount++;
+          } else {
+            featuredCard.style.display = 'none';
+          }
+        }
+
+        // Filter subcards
+        subcards.forEach(function (card) {
+          var itemCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
+          if (cleanCat === 'all' || itemCat.includes(cleanCat) || cleanCat.includes(itemCat)) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        if (noPosts) {
+          noPosts.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+      }
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var cat = this.getAttribute('data-cat');
+          filterCategory(cat);
+        });
+      });
+
+      quickJumpBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var cat = this.getAttribute('data-cat');
+          filterCategory(cat);
+          var mainFeed = document.querySelector('.feed-col');
+          if (mainFeed) {
+            mainFeed.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
       });
     }
-    
-    // Initial filter run
-    filterArticles();
-  }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBlogFilters);
+    } else {
+      initBlogFilters();
+    }
+
+    document.addEventListener('astro:page-load', initBlogFilters);
+  })();
 </script>
 
+<style>
+  /* ==========================================================================
+     EXACT REPLICA STYLES FROM BLOGS.OLLANODE.COM HOMEPAGE
+     ========================================================================== */
+
+  .blog-page-wrapper {
+    width: 100%;
+    background-color: var(--bg, #FFFFFF);
+    color: var(--text, #1E293B);
+    font-family: var(--font, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    position: relative;
+  }
+
+  .container-wide {
+    width: 100%;
+    max-width: 86rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
+  }
+
+  /* 1. STICKY CATEGORY CHIPS STRIP */
+  .category-strip {
+    width: 100%;
+    background: #F8FAFC;
+    border-top: 1px solid #E2E8F0;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 0.5rem 0;
+    position: sticky;
+    top: 62px;
+    z-index: 40;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .category-strip-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+  }
+
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.815rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #1E293B;
+    background: #FFFFFF;
+    border: 1px solid #D4E5F5;
+    padding: 0.3rem 0.9rem;
+    border-radius: 9999px;
+    transition: all 0.16s ease;
+    text-decoration: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(14, 165, 233, 0.04);
+    font-family: inherit;
+  }
+
+  .category-chip:hover {
+    color: #0284C7;
+    border-color: #38BDF8;
+    background: #E0F2FE;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
+  }
+
+  .category-chip.active {
+    color: #FFFFFF !important;
+    background: linear-gradient(135deg, #FF5722, #FF4500);
+    border: 1px solid #FF5500;
+    box-shadow: 0 2px 10px rgba(255, 69, 0, 0.35);
+    font-weight: 700;
+  }
+
+  /* 2. BLOG LAYOUT 3-COLUMN GRID */
+  .blog-layout-section {
+    width: 100%;
+    padding: 1.5rem 0 3rem;
+    overflow: visible;
+  }
+
+  .nh-layout-grid {
+    display: grid;
+    grid-template-columns: 215px 1fr 215px;
+    gap: 2.25rem;
+    width: 100%;
+    position: relative;
+  }
+
+  /* SIDEBARS */
+  .sidebar-col {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 112px !important;
+    align-self: start !important;
+    z-index: 30 !important;
+    width: 100% !important;
+  }
+
+  .sticky-sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    position: static !important;
+    gap: 1rem !important;
+  }
+
+  /* BADGE PILLS */
+  .badge-pill {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    width: max-content;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .founder-badge-purple {
+    background: #7C3AED;
+    color: #FFFFFF;
+    margin-bottom: 0.75rem;
+    align-self: flex-start;
+  }
+
+  .orange-badge {
+    background: #FF6600;
+    color: #FFFFFF;
+    margin-bottom: 0.75rem;
+    align-self: flex-start;
+  }
+
+  .newest-badge {
+    background: #FF6600;
+    color: #FFFFFF;
+  }
+
+  .flame-icon {
+    display: inline-block;
+  }
+
+  /* LEFT SIDEBAR ARTICLE LINKS */
+  .article-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .link-item {
+    font-size: 0.835rem;
+    font-weight: 500;
+    color: #0F172A;
+    text-decoration: none;
+    transition: color 0.15s ease, transform 0.15s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.36;
+  }
+
+  .link-item:hover {
+    color: #FF6600;
+    text-decoration: none;
+    transform: translate(2px);
+  }
+
+  .view-all-btn-purple {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #7C3AED;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .view-all-btn-purple:hover {
+    color: #6D28D9;
+    text-decoration: underline;
+    transform: translate(3px);
+  }
+
+  /* FEED CENTER COLUMN */
+  .feed-col {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .feed-header-wrap {
+    margin-bottom: 1.25rem;
+  }
+
+  .feed-section-title {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.35rem;
+    line-height: 1.25;
+  }
+
+  .feed-section-subtitle {
+    font-size: 0.92rem;
+    color: #64748B;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .newest-header-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .newest-subtitle-text {
+    font-size: 0.88rem;
+    color: #64748B;
+    font-weight: 500;
+  }
+
+  /* FEATURED MAIN CARD */
+  .featured-main-card {
+    display: block;
+    background: #FFFCF7;
+    border: 2px solid #FF6600;
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 18px -4px rgba(255, 102, 0, 0.12);
+    position: relative;
+    text-decoration: none !important;
+    color: inherit !important;
+    cursor: pointer !important;
+  }
+
+  .featured-main-card-no-img .featured-content-wrapper {
+    padding: 1.65rem 1.85rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .featured-main-card:hover {
+    border-color: #E65100;
+    box-shadow: 0 8px 25px -4px rgba(255, 102, 0, 0.22);
+    transform: translateY(-2px);
+  }
+
+  .featured-main-card:hover .featured-title {
+    color: #FF6600 !important;
+  }
+
+  .featured-main-card:hover .read-article-link {
+    text-decoration: underline !important;
+    transform: translate(3px);
+  }
+
+  .featured-top-tag {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+  }
+
+  .pill-tag-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #FF6600;
+    color: #FFFFFF;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .featured-category-badge {
+    display: inline-block;
+    align-self: flex-start;
+    background: #E65100;
+    color: #FFFFFF;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .featured-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.3;
+    margin: 0 0 0.65rem;
+    letter-spacing: -0.015em;
+    transition: color 0.15s ease;
+  }
+
+  .featured-desc {
+    font-size: 0.95rem;
+    color: #64748B;
+    line-height: 1.6;
+    max-width: 680px;
+    margin: 0 0 1.25rem;
+  }
+
+  .featured-footer-meta {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    color: #64748B;
+    font-weight: 500;
+  }
+
+  .meta-dot {
+    color: #CBD5E1;
+  }
+
+  .read-article-link {
+    color: #FF6600;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  /* SUBCARDS GRID */
+  .subcards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  .subcard-item {
+    background: #FFFDF0;
+    border: 2px solid #F59E0B;
+    border-radius: 14px;
+    padding: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+  }
+
+  .subcard-item:hover {
+    border-color: #D97706;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -2px rgba(245, 158, 11, 0.25);
+  }
+
+  .subcard-tag {
+    display: inline-block;
+    align-self: flex-start;
+    background: #E65100;
+    color: #FFFFFF;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.18rem 0.55rem;
+    border-radius: 9999px;
+    margin-bottom: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .subcard-title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.35;
+    margin: 0 0 0.45rem;
+  }
+
+  .subcard-title a {
+    color: #0F172A;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .subcard-title a:hover {
+    color: #FF6600;
+  }
+
+  .subcard-desc {
+    font-size: 0.78rem;
+    color: #64748B;
+    line-height: 1.45;
+    margin: 0 0 0.8rem;
+  }
+
+  .subcard-meta-footer {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #64748B;
+    border-top: 1px dashed rgba(245, 158, 11, 0.3);
+  }
+
+  .subcard-read-time {
+    font-size: 0.75rem;
+  }
+
+  .subcard-read-link {
+    color: #FF6600;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.78rem;
+    transition: transform 0.15s ease;
+  }
+
+  .subcard-read-link:hover {
+    text-decoration: underline;
+    transform: translate(2px);
+  }
+
+  .subcard-title-desktop,
+  .subcard-desc-desktop,
+  .subcard-read-text-desktop {
+    display: inline;
+  }
+
+  .subcard-title-mobile,
+  .subcard-desc-mobile,
+  .subcard-read-text-mobile {
+    display: none;
+  }
+
+  /* RIGHT SIDEBAR */
+  .sidebar-block {
+    margin-bottom: 1.25rem;
+  }
+
+  .quick-jump-capsules-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .quick-jump-capsule-white {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    color: #0F172A;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 0.38rem 0.4rem;
+    border-radius: 9999px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    line-height: 1.2;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .quick-jump-capsule-white:hover {
+    border-color: #FF6600;
+    color: #FF6600;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 102, 0, 0.15);
+  }
+
+  .simple-pricing-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .simple-pricing-bullets li {
+    font-size: 0.78rem;
+    color: #64748B;
+    line-height: 1.4;
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  .simple-pricing-bullets li:before {
+    content: "•";
+    color: #FF6600;
+    font-weight: 800;
+    font-size: 1.1rem;
+    position: absolute;
+    left: 0;
+    top: -2px;
+  }
+
+  .pricing-bullet-title {
+    font-weight: 700;
+    color: #0F172A;
+  }
+
+  .sidebar-contact-btn-orange {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: linear-gradient(135deg, #FF6600, #E65100);
+    color: #FFFFFF !important;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #FDE047;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(255, 102, 0, 0.3);
+    box-sizing: border-box;
+  }
+
+  .sidebar-contact-btn-orange:hover {
+    background: #E65100;
+    border-color: #FACC15;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 102, 0, 0.4);
+  }
+
+  /* 3. ARCHIVE SECTION */
+  .archive-section {
+    margin-top: 3.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid #E2E8F0;
+  }
+
+  .archive-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+  }
+
+  .archive-subtitle {
+    font-size: 0.95rem;
+    color: #64748B;
+    margin: 0 0 2rem;
+  }
+
+  .archive-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2.25rem 2rem;
+  }
+
+  .archive-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .group-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+    color: #0F172A;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.5rem;
+    border-bottom: 1.5px solid #E2E8F0;
+  }
+
+  .group-count {
+    font-size: 0.72rem;
+    color: #FF6600;
+    background: rgba(255, 69, 0, 0.08);
+    border: 1px solid rgba(255, 69, 0, 0.2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-weight: 700;
+  }
+
+  .archive-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .archive-list a {
+    font-size: 0.88rem;
+    color: #0F172A;
+    line-height: 1.42;
+    transition: color 0.15s ease, transform 0.15s ease;
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  .archive-list a:hover {
+    color: #FF4500;
+    transform: translate(2px);
+  }
+
+  /* 4. CONTRIBUTE BANNER */
+  .contribute-banner {
+    margin-top: 2.75rem;
+    margin-bottom: 0.5rem;
+    background: #080B11;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+  }
+
+  .contribute-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+  }
+
+  .contribute-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #FF6600;
+  }
+
+  .contribute-text-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .contribute-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  .contribute-desc {
+    font-size: 0.88rem;
+    color: #94A3B8;
+    margin: 0;
+    line-height: 1.45;
+  }
+
+  .contribute-banner-right {
+    flex-shrink: 0;
+  }
+
+  .btn-contact-eng {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 10px;
+    border: 1.5px solid #FF6600;
+    background: rgba(255, 102, 0, 0.06);
+    color: #FF7700 !important;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .btn-contact-eng:hover {
+    background: #FF6600;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(255, 102, 0, 0.4);
+  }
+
+  .btn-contact-eng svg {
+    transition: transform 0.2s ease;
+  }
+
+  .btn-contact-eng:hover svg {
+    transform: translate(3px);
+  }
+
+  /* ==========================================================================
+     RESPONSIVE BREAKPOINTS (TABLET: 768px - 1080px, MOBILE: <= 767px)
+     ========================================================================== */
+
+  /* TABLET VIEWPORT (768px to 1080px) */
+  @media (min-width: 768px) and (max-width: 1080px) {
+    .blog-layout-section {
+      padding-top: 0.35rem !important;
+    }
+
+    .nh-layout-grid {
+      grid-template-columns: 142px minmax(0, 1fr) 142px !important;
+      gap: 0.85rem !important;
+      width: 100% !important;
+    }
+
+    .sidebar-col {
+      display: block !important;
+      top: 106px !important;
+    }
+
+    .sticky-sidebar {
+      gap: 0.75rem !important;
+    }
+
+    .sidebar-block {
+      margin-bottom: 0.65rem !important;
+    }
+
+    .founder-badge-purple,
+    .orange-badge {
+      font-size: 0.6rem !important;
+      padding: 0.2rem 0.45rem !important;
+      letter-spacing: 0.04em !important;
+      margin-bottom: 0.4rem !important;
+    }
+
+    .article-links-list {
+      gap: 0.4rem !important;
+      padding-left: 0.5rem !important;
+    }
+
+    .link-item {
+      font-size: 0.7rem !important;
+      line-height: 1.25 !important;
+    }
+
+    .view-all-btn-purple {
+      font-size: 0.7rem !important;
+      padding: 0.32rem 0.5rem !important;
+      margin-top: 0.4rem !important;
+    }
+
+    .quick-jump-capsules-grid {
+      gap: 0.3rem !important;
+    }
+
+    .quick-jump-capsule-white {
+      font-size: 0.65rem !important;
+      padding: 0.22rem 0.38rem !important;
+    }
+
+    .simple-pricing-bullets {
+      padding-left: 0.5rem !important;
+      margin: 0 0 0.5rem !important;
+    }
+
+    .simple-pricing-bullets li {
+      font-size: 0.66rem !important;
+      line-height: 1.28 !important;
+      margin-bottom: 0.35rem !important;
+    }
+
+    .pricing-bullet-title {
+      font-size: 0.68rem !important;
+    }
+
+    .sidebar-contact-btn-orange {
+      font-size: 0.7rem !important;
+      padding: 0.4rem 0.5rem !important;
+    }
+
+    .feed-section-title {
+      font-size: 1.28rem !important;
+      line-height: 1.28 !important;
+      margin-bottom: 0.25rem !important;
+    }
+
+    .feed-section-subtitle {
+      font-size: 0.8rem !important;
+      margin-bottom: 0.85rem !important;
+    }
+
+    .newest-header-bar {
+      margin-bottom: 0.85rem !important;
+    }
+
+    .featured-main-card {
+      margin-bottom: 0.85rem !important;
+      border-radius: 12px !important;
+    }
+
+    .featured-main-card-no-img .featured-content-wrapper {
+      padding: 0.95rem 1.15rem !important;
+    }
+
+    .featured-title {
+      font-size: 1.08rem !important;
+      line-height: 1.3 !important;
+      margin-bottom: 0.35rem !important;
+    }
+
+    .featured-desc {
+      font-size: 0.76rem !important;
+      line-height: 1.42 !important;
+      margin-bottom: 0.5rem !important;
+    }
+
+    .featured-footer-meta {
+      font-size: 0.72rem !important;
+    }
+
+    .subcards-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 0.65rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+
+    .subcard-item {
+      padding: 0.75rem 0.65rem !important;
+      border-radius: 10px !important;
+    }
+
+    .subcard-tag {
+      font-size: 0.58rem !important;
+      padding: 0.12rem 0.38rem !important;
+      margin-bottom: 0.35rem !important;
+    }
+
+    .subcard-title {
+      font-size: 0.78rem !important;
+      line-height: 1.3 !important;
+      margin: 0 0 0.35rem !important;
+    }
+
+    .subcard-desc {
+      font-size: 0.68rem !important;
+      line-height: 1.35 !important;
+      margin: 0 0 0.5rem !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+    }
+
+    .subcard-meta-footer {
+      padding-top: 0.45rem !important;
+      font-size: 0.66rem !important;
+    }
+
+    .category-chip {
+      font-size: 0.76rem !important;
+      padding: 0.32rem 0.75rem !important;
+    }
+
+    .archive-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 1.75rem 1.35rem !important;
+    }
+
+    .archive-title {
+      font-size: 1.38rem !important;
+    }
+
+    .archive-subtitle {
+      font-size: 0.85rem !important;
+    }
+
+    .group-title {
+      font-size: 0.94rem !important;
+    }
+  }
+
+  /* HORIZONTAL SCROLL FOR CATEGORY STRIP ON TABLET & MOBILE (<= 1024px) */
+  @media (max-width: 1024px) {
+    .category-strip {
+      padding: 0.4rem 0;
+      overflow: hidden;
+    }
+
+    .category-strip .container-wide {
+      padding: 0 0.85rem;
+      display: block;
+      overflow: hidden;
+    }
+
+    .category-strip-inner {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+      align-items: center !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      gap: 0.5rem;
+      padding: 0.25rem 0.25rem 0.5rem;
+      margin: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .category-strip-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-chip {
+      flex-shrink: 0 !important;
+      white-space: nowrap !important;
+      font-size: 0.8rem;
+      padding: 0.32rem 0.85rem;
+    }
+  }
+
+  /* MOBILE VIEWPORT (<= 767px) */
+  @media (max-width: 767px) {
+    .blog-layout-section .container-wide {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+
+    .nh-layout-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1.25rem !important;
+    }
+
+    .sidebar-col {
+      display: none !important;
+    }
+
+    .feed-section-title {
+      font-size: 1.28rem !important;
+      line-height: 1.3 !important;
+      margin-bottom: 0.3rem !important;
+    }
+
+    .feed-section-subtitle {
+      font-size: 0.85rem !important;
+    }
+
+    .badge-pill {
+      font-size: 0.68rem !important;
+      padding: 0.28rem 0.68rem !important;
+    }
+
+    .featured-main-card {
+      border-radius: 12px !important;
+      margin-bottom: 0.75rem !important;
+    }
+
+    .featured-main-card-no-img .featured-content-wrapper {
+      padding: 0.85rem 0.95rem !important;
+    }
+
+    .featured-title {
+      font-size: 1.14rem !important;
+      line-height: 1.34 !important;
+      margin-bottom: 0.35rem !important;
+    }
+
+    .featured-desc {
+      font-size: 0.88rem !important;
+      line-height: 1.5 !important;
+      margin-bottom: 0.6rem !important;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .featured-footer-meta {
+      font-size: 0.8rem !important;
+      padding-top: 0.4rem !important;
+    }
+
+    .subcards-grid {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.85rem !important;
+      margin-bottom: 1.75rem !important;
+      width: 100% !important;
+    }
+
+    .subcard-item {
+      padding: 1rem 1.05rem !important;
+      border-radius: 14px !important;
+      border: 1.5px solid #F59E0B !important;
+      min-width: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      box-sizing: border-box !important;
+      background: #FFFDF0 !important;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08) !important;
+    }
+
+    .subcard-tag {
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+      padding: 0.22rem 0.6rem !important;
+      margin-bottom: 0.48rem !important;
+      border-radius: 6px !important;
+      background: #E65100 !important;
+      color: #FFFFFF !important;
+      display: inline-block !important;
+      line-height: 1.25 !important;
+      letter-spacing: 0.02em !important;
+      align-self: flex-start !important;
+    }
+
+    .subcard-title {
+      font-size: 1.08rem !important;
+      line-height: 1.36 !important;
+      font-weight: 800 !important;
+      margin: 0 0 0.45rem !important;
+      word-break: break-word !important;
+    }
+
+    .subcard-desc {
+      font-size: 0.88rem !important;
+      line-height: 1.52 !important;
+      color: #64748B !important;
+      margin: 0 0 0.8rem !important;
+      word-break: break-word !important;
+    }
+
+    .subcard-meta-footer {
+      padding-top: 0.75rem !important;
+      margin-top: auto !important;
+      font-size: 0.82rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      border-top: 1px dashed rgba(245, 158, 11, 0.3) !important;
+    }
+
+    .subcard-read-time {
+      font-size: 0.8rem !important;
+      white-space: nowrap !important;
+      color: #64748B !important;
+    }
+
+    .subcard-read-link {
+      font-size: 0.84rem !important;
+      white-space: nowrap !important;
+      color: #FF6600 !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+    }
+
+    /* Archive on Mobile */
+    .archive-section {
+      margin-top: 2.25rem !important;
+      padding-top: 1.5rem !important;
+    }
+
+    .archive-title {
+      font-size: 1.18rem !important;
+      margin-bottom: 0.25rem !important;
+    }
+
+    .archive-subtitle {
+      font-size: 0.76rem !important;
+      margin-bottom: 1.15rem !important;
+    }
+
+    .archive-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1.15rem !important;
+    }
+
+    .archive-group {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 0.85rem 0.95rem;
+    }
+
+    .group-title {
+      font-size: 0.88rem !important;
+      font-weight: 800 !important;
+      color: #FF6600 !important;
+      margin: 0 0 0.55rem !important;
+      padding-bottom: 0.35rem !important;
+      border-bottom: 1.5px solid rgba(255, 102, 0, 0.2) !important;
+    }
+
+    .group-count {
+      font-size: 0.65rem !important;
+      padding: 0.1rem 0.45rem !important;
+    }
+
+    .archive-list {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+    }
+
+    .archive-list a {
+      display: block !important;
+      font-size: 0.85rem !important;
+      font-weight: 600 !important;
+      color: #0F172A !important;
+      line-height: 1.4 !important;
+      padding: 0.45rem 0.65rem !important;
+      border-radius: 6px !important;
+      background: #FFFFFF !important;
+      border: 1px solid rgba(15, 23, 42, 0.07) !important;
+      text-decoration: none !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .archive-list a:hover,
+    .archive-list a:active {
+      color: #FF6600 !important;
+      border-color: #FF6600 !important;
+      background: #FFF7ED !important;
+      transform: translate(3px) !important;
+    }
+
+    /* Contribute Banner on Mobile */
+    .contribute-banner {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1.25rem 1.15rem;
+      gap: 1.1rem;
+      margin-top: 2.25rem;
+    }
+
+    .contribute-title {
+      font-size: 0.88rem !important;
+    }
+
+    .contribute-desc {
+      font-size: 0.74rem !important;
+    }
+
+    .contribute-banner-right {
+      width: 100%;
+    }
+
+    .btn-contact-eng {
+      width: 100%;
+      justify-content: center;
+      font-size: 0.78rem !important;
+      padding: 0.55rem 1rem !important;
+    }
+  }
+</style>
