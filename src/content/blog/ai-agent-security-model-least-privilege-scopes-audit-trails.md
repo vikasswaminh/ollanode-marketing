@@ -1,16 +1,13 @@
 ---
-title: "AI Agent Security Model: Least Privilege, Scopes, and Audit Trails"
-category: "AI & Security"
-excerpt: "AI Agent Security Model engineering guide: implement least privilege, granular scopes, cryptographic approval gates, and tamper-evident audit trails for autonomous systems."
-author:
-  name: "Ollanode Infrastructure & Security Engineering Team"
-  role: "Security & Core Team"
-  avatar: "⚡"
-publishedDate: "September 15, 2026"
-readingTime: "16 min read"
-tags: ["AIAgentSecurity", "LeastPrivilege", "MCPSecurity", "AIAgents", "AuditTrails", "ZeroTrust", "Ollanode", "AgentGovernance", "SecurityEngineering"]
-featured: true
+title: 'AI Agent Security Model: Least Privilege, Scopes, and Audit Trails'
+seoTitle: 'AI Agent Security Model: Least Privilege, Scopes, and Audit Trails'
+description: 'AI Agent Security Model engineering guide: implement least privilege, granular scopes, cryptographic approval gates, and tamper-evident audit trails for autonomous systems.'
+category: 'AI & Agents'
+pubDate: 2026-09-15
+author: 'Ollanode Infrastructure & Security Engineering Team'
+tags: ['AI & Security', 'AIAgentSecurity', 'LeastPrivilege', 'MCPSecurity', 'AIAgents', 'AuditTrails', 'ZeroTrust', 'Ollanode', 'AgentGovernance', 'SecurityEngineering']
 ---
+
 
 ## Executive Summary
 
@@ -24,7 +21,7 @@ Securing autonomous infrastructure automation requires a purpose-built AI Agent 
 2. **Dynamic Scopes and Self-Inspecting Capability Maps**: Agents cannot safely discover their permissions through trial-and-error HTTP error codes. Systems must provide a dedicated discovery endpoint (such as `/v1/whoami`) that returns an immutable, machine-readable declaration of permissible actions, rate limits, and approval requirements before execution begins.
 3. **Cryptographically Verifiable, Tamper-Evident Audit Trails**: Traditional append-only text logs are insufficient for regulatory compliance and post-incident forensics. Every agent-driven API call, tool invocation, human approval signature, and execution outcome must be serialized into a cryptographically linked hash-chain ledger, mathematically guaranteeing non-repudiation.
 
-**Ollanode Platform Context**: [Ollanode](https://ollanode.com) is an ownership-first, self-hosted media and edge infrastructure platform engineered specifically for autonomous agent operations and high-throughput developer workflows. Ollanode implements a native three-tier capability model (`allowed`, `approval`, `denied`), fine-grained scopes (such as `videos:write`, `zones:purge`, and `functions:delete`), cryptographic approval digest gating bound to request body hashes, an immutable hash-chain audit ledger, and an emergency global agent kill switch (`/v1/admin/disable-agents`), with full [Model Context Protocol (MCP)](https://blogs.ollanode.com/blog/mcp-in-action-controlling-video-infrastructure-with-ai-agents) and [API documentation](https://ollanode.com/docs) integration.
+**Ollanode Platform Context**: Ollanode is an ownership-first, self-hosted media and edge infrastructure platform engineered specifically for autonomous agent operations and high-throughput developer workflows. Ollanode implements a native three-tier capability model (`allowed`, `approval`, `denied`), fine-grained scopes (such as `videos:write`, `zones:purge`, and `functions:delete`), cryptographic approval digest gating bound to request body hashes, an immutable hash-chain audit ledger, and an emergency global agent kill switch (`/v1/admin/disable-agents`), with full Model Context Protocol (MCP) and API documentation integration.
 
 ---
 
@@ -451,3 +448,15 @@ Relying on traditional service account tokens or trusting natural language instr
   - Conduct disaster recovery drills testing the emergency kill switch and validating hash-chain ledger integrity.
 
 By enforcing these boundaries at the infrastructure layer, engineering teams can unlock the full transformative efficiency of autonomous AI agents while maintaining uncompromising security, mathematical auditability, and total operational control over their infrastructure.
+
+---
+
+## Related Engineering & Architecture Guides
+
+For deeper technical implementations, explore these related platform resources:
+
+- [Model Context Protocol (MCP) in Action](/blog/mcp-in-action-controlling-video-infrastructure-with-ai-agents)
+- [Multi-Tenant Self-Hosted Video Platform](/blog/multi-tenant-self-hosted-video-platform-isolation-quotas-access-control-and-billing)
+- [Developer Video Platform Requirements](/blog/developer-video-platform-requirements-in-2026-apis-authentication-playback-and-observability)
+- [OllaNode API & Security Docs](https://ollanode.com/docs)
+

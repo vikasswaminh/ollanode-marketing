@@ -1,6 +1,6 @@
 ---
 title: "Why We Built an Open-Source Mux Alternative in Rust: The True Cost of Per-Minute Billing"
-category: "Comparison"
+category: 'Comparisons'
 excerpt: "Compare Mux and self-hosted video infrastructure, understand the true cost of per-minute billing, and see why OllaNode chose Rust and Apache-2.0."
 author:
   name: "The OllaNode Team"
@@ -38,7 +38,7 @@ Mux is designed to remove operational work: you use its APIs and it handles the 
 
 The trade-off is straightforward:
 - **Managed video**: less infrastructure work, faster initial implementation, usage-based vendor billing, and less control over the underlying stack.
-- **Self-hosted video**: more operational responsibility, greater infrastructure control, more customization, and a cost model based on the infrastructure you operate rather than a vendor's per-minute meter. See our [Platform Feature Comparison](/#why-ollanode).
+- **Self-hosted video**: more operational responsibility, greater infrastructure control, more customization, and a cost model based on the infrastructure you operate rather than a vendor's per-minute meter. See our Platform Feature Comparison.
 
 Neither model is universally better. The important question is whether your team wants to optimize for convenience or long-term control.
 
@@ -48,11 +48,11 @@ Neither model is universally better. The important question is whether your team
 
 <div class="key-takeaways-box">
 
-1. **Managed vs. Self-Hosted**: Mux is a managed video platform; OllaNode is a self-hosted video infrastructure platform. See [OllaNode Platform Overview](/#platform-capabilities).
-2. **Pricing Dynamics**: Per-minute pricing can be attractive at low or predictable usage, but the bill grows rapidly with encoded, stored, and delivered video usage. Compare details on [OllaNode Pricing](/pricing).
+1. **Managed vs. Self-Hosted**: Mux is a managed video platform; OllaNode is a self-hosted video infrastructure platform. See OllaNode Platform Overview.
+2. **Pricing Dynamics**: Per-minute pricing can be attractive at low or predictable usage, but the bill grows rapidly with encoded, stored, and delivered video usage. Compare details on OllaNode Pricing.
 3. **Infrastructure Ownership**: A self-hosted model replaces vendor usage charges with infrastructure costs such as compute, storage, bandwidth, and operations.
 4. **Rust Performance**: OllaNode uses Rust and an event-driven architecture to build the video control plane as software you can inspect and modify.
-5. **Predictable Economics**: The goal is not to eliminate video infrastructure costs; it is to give teams more control over where those costs come from and how the system works. Review our [System Architecture](/#how-it-works).
+5. **Predictable Economics**: The goal is not to eliminate video infrastructure costs; it is to give teams more control over where those costs come from and how the system works. Review our System Architecture.
 
 </div>
 
@@ -102,8 +102,8 @@ This is where a fair comparison matters. Saying *"self-hosting is cheaper"* with
 
 Self-hosting is not free. You still pay for:
 - Compute for API services and video workers
-- Object storage (see [OllaNode Object Storage Docs](/docs/storage))
-- Network transfer & CDN edge bandwidth (see [Edge CDN Delivery Docs](/docs/cdn))
+- Object storage (see OllaNode Object Storage Docs)
+- Network transfer & CDN edge bandwidth (see Edge CDN Delivery Docs)
 - Databases, queues, and orchestration
 - Monitoring, logging, and backups
 - Infrastructure operations and engineering time
@@ -227,7 +227,7 @@ Conceptually, the pipeline looks like:
 
 $$\text{Upload} \longrightarrow \text{Validate} \longrightarrow \text{Metadata} \longrightarrow \text{Transcode} \longrightarrow \text{HLS} \longrightarrow \text{Thumbnails} \longrightarrow \text{Transcript} \longrightarrow \text{Storage} \longrightarrow \text{Webhook} \longrightarrow \text{Ready}$$
 
-That design matters for cost as well as reliability. A synchronous request that waits for video processing is difficult to scale. A queue-based workflow lets API services hand long-running jobs to workers and allows the system to process work independently. Learn more in our [VOD Pipeline Documentation](/docs/videos).
+That design matters for cost as well as reliability. A synchronous request that waits for video processing is difficult to scale. A queue-based workflow lets API services hand long-running jobs to workers and allows the system to process work independently. Learn more in our VOD Pipeline Documentation.
 
 OllaNode's architecture uses an event bus by default for event-driven job orchestration, with a workflow engine available as an optional alternative. The video pipeline can produce adaptive HLS renditions, thumbnails, transcripts, and delivery assets without forcing the API request to remain open.
 
@@ -289,7 +289,7 @@ Instead of asking *"Which video platform is cheapest?"*, ask a larger set of que
 - **Cost**: What are we paying for input? What are we paying for storage? What are we paying for delivery? What infrastructure would we need to run ourselves? How does the cost behave when usage doubles?
 - **Control**: Where does our video data live? Can we choose storage? Can we choose deployment regions? Can we inspect and modify the software?
 - **Engineering**: How much operational work does the platform remove? How much work does self-hosting add? Does our team have the skills to operate the stack?
-- **Security**: How are playback URLs protected? How are origins protected? Where are encryption keys handled? Can we audit infrastructure behavior? Review [API Security & Keys](/docs/authentication).
+- **Security**: How are playback URLs protected? How are origins protected? Where are encryption keys handled? Can we audit infrastructure behavior? Review API Security & Keys.
 - **Scalability**: Can the processing pipeline scale independently? Can CDN capacity scale separately from API capacity? Can workloads run across multiple regions?
 - **Exit strategy**: How difficult would it be to move our video library? How much of our application is tied to the provider's API? Can we keep operating the software if our hosting arrangement changes?
 
@@ -373,10 +373,10 @@ We would rather be clear about the trade-offs than turn this into a one-sided sa
 - Course platforms, creator tools, media libraries, and SaaS products with growing video catalogs.
 - Organizations with data-residency or infrastructure-control requirements.
 - Startups that want to understand and control the long-term economics of video delivery.
-- Teams building AI-native products that need governed programmatic access to video infrastructure (see [AI-Agent Governance](/#agent-native)).
+- Teams building AI-native products that need governed programmatic access to video infrastructure (see AI-Agent Governance).
 - Developers who want to inspect and modify the software running their video stack.
 
-Explore the platform at [OllaNode Homepage](/) or inspect our [Open-Source Documentation](/docs).
+Explore the platform at OllaNode Homepage or inspect our Open-Source Documentation.
 
 ---
 
@@ -389,7 +389,7 @@ A Mux alternative is another platform or architecture for building video workflo
 OllaNode is Apache-2.0 self-hosted software, so the software itself can be run and modified under the license. You still pay for the compute, storage, bandwidth, and other infrastructure required to operate it.
 
 ### Is self-hosted video cheaper than Mux?
-It can be, depending on workload, infrastructure efficiency, traffic, storage strategy, and operational costs. Self-hosting does not eliminate video costs; it changes the cost model from vendor usage billing to infrastructure ownership and operations. Compare details on our [Pricing Page](/pricing).
+It can be, depending on workload, infrastructure efficiency, traffic, storage strategy, and operational costs. Self-hosting does not eliminate video costs; it changes the cost model from vendor usage billing to infrastructure ownership and operations. Compare details on our Pricing Page.
 
 ### How does Mux pricing work?
 Mux currently separates Video pricing into input, storage, and delivery, and charges by minute with rates that vary by quality, resolution, and volume tier. Check Mux's current official pricing before making a purchasing decision because rates and product options can change.
@@ -437,3 +437,15 @@ If the first question you ask about your next video platform is *"How much will 
 That is the question OllaNode was built to answer.
 
 *Pricing Source Note: Current Mux pricing references in this article are based on Mux's official pricing documentation and public product pages accessed in August 2026. Pricing can change; verify current rates directly with Mux before using figures for procurement or financial planning.*
+
+---
+
+## Related Engineering & Architecture Guides
+
+For deeper technical implementations, explore these related platform resources:
+
+- [Self-Hosted Video Platform vs SaaS](/blog/self-hosted-video-platform-vs-saas-cost-control-security-and-stability)
+- [Setting Up Your First Open-Source Video Pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)
+- [Building a Production-Grade HLS Pipeline with Rust](/blog/building-production-grade-hls-transcoding-pipeline-rust-nats)
+- [OllaNode Pricing & Calculator](https://ollanode.com/pricing)
+

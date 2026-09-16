@@ -12,17 +12,44 @@ const gridArticles = mainFeatured
   ? articles.filter((a) => a.id !== mainFeatured.id)
   : articles;
 
-// Exact categories matching blogs.ollanode.com homepage
+// Canonical categories with slug mappings and compact short labels for capsules
 const allCategories = [
-  'All',
-  'Video Infrastructure & Developer Platforms',
-  'Video & CDN',
-  'Product & Changelog',
-  'Guides',
-  'Comparisons',
-  'AI & agents',
-  'Engineering',
+  { name: 'All', slug: 'all', short: 'All' },
+  { name: 'Video Infrastructure & Developer Platforms', slug: 'video-infra', short: 'Video Infra' },
+  { name: 'Video & CDN', slug: 'video-cdn', short: 'Video & CDN' },
+  { name: 'Product & Changelog', slug: 'product', short: 'Product' },
+  { name: 'Guides', slug: 'guides', short: 'Guides' },
+  { name: 'Comparisons', slug: 'comparisons', short: 'Comparisons' },
+  { name: 'AI & Agents', slug: 'ai', short: 'AI & Agents' },
+  { name: 'Engineering', slug: 'engineering', short: 'Engineering' },
 ];
+
+function getCategorySlug(cat: string | undefined): string {
+  if (!cat) return 'engineering';
+  const c = cat.toLowerCase().trim();
+  if (c.includes('developer platform') || c.includes('infrastructure & developer') || c.includes('architecture') || c.includes('observability')) {
+    return 'video-infra';
+  }
+  if (c.includes('video & cdn') || c.includes('cdn') || c.includes('streaming')) {
+    return 'video-cdn';
+  }
+  if (c.includes('product') || c.includes('changelog')) {
+    return 'product';
+  }
+  if (c.includes('guide') || c.includes('tutorial')) {
+    return 'guides';
+  }
+  if (c.includes('comparison') || c.includes('vs') || c.includes('alternative')) {
+    return 'comparisons';
+  }
+  if (c.includes('ai') || c.includes('agent')) {
+    return 'ai';
+  }
+  if (c.includes('engineering') || c.includes('transcoding pipeline') || c.includes('rust')) {
+    return 'engineering';
+  }
+  return 'engineering';
+}
 
 // Archive category groups
 const archiveGroups = new Map<string, typeof articles>();
@@ -45,9 +72,9 @@ const archiveList = Array.from(archiveGroups.entries());
           <button
             type="button"
             class={`category-chip ${idx === 0 ? 'active' : ''}`}
-            data-cat={cat.toLowerCase()}
+            data-cat={cat.slug}
           >
-            {cat}
+            {cat.name}
           </button>
         ))}
       </div>
@@ -107,7 +134,7 @@ const archiveList = Array.from(archiveGroups.entries());
               id="featured"
               href={`/blog/${mainFeatured.slug || mainFeatured.id}`}
               class="featured-main-card featured-main-card-no-img"
-              data-category={(mainFeatured.data.category || '').toLowerCase()}
+              data-category={getCategorySlug(mainFeatured.data.category)}
               aria-label={`Read featured post: ${mainFeatured.data.title}`}
             >
               <div class="featured-content-wrapper">
@@ -138,7 +165,7 @@ const archiveList = Array.from(archiveGroups.entries());
             {gridArticles.map((art) => (
               <div
                 class="subcard-item"
-                data-category={(art.data.category || '').toLowerCase()}
+                data-category={getCategorySlug(art.data.category)}
               >
                 <span class="subcard-tag">{art.data.category}</span>
                 <h4 class="subcard-title">
@@ -180,9 +207,10 @@ const archiveList = Array.from(archiveGroups.entries());
                   <button
                     type="button"
                     class="quick-jump-capsule-white quick-jump-filter-btn"
-                    data-cat={c.toLowerCase()}
+                    data-cat={c.slug}
+                    title={c.name}
                   >
-                    {c}
+                    {c.short}
                   </button>
                 ))}
                 <a href="#pricing-tab" class="quick-jump-capsule-white">Pricing</a>
@@ -277,23 +305,8 @@ const archiveList = Array.from(archiveGroups.entries());
       var subcards = document.querySelectorAll('.subcard-item');
       var noPosts = document.getElementById('no-category-posts');
 
-      function matchesCategory(articleCat, targetCat) {
-        if (!targetCat || targetCat === 'all') return true;
-        var a = (articleCat || '').toLowerCase().trim();
-        var t = targetCat.toLowerCase().trim();
-        if (a.includes(t) || t.includes(a)) return true;
-        if (t.includes('video') && a.includes('video')) return true;
-        if (t.includes('cdn') && (a.includes('cdn') || a.includes('video'))) return true;
-        if (t.includes('guide') && (a.includes('guide') || a.includes('tutorial'))) return true;
-        if (t.includes('comparison') && (a.includes('comparison') || a.includes('vs'))) return true;
-        if (t.includes('ai') && (a.includes('ai') || a.includes('agent'))) return true;
-        if (t.includes('engineering') && (a.includes('engineering') || a.includes('rust') || a.includes('infra'))) return true;
-        if (t.includes('product') && (a.includes('product') || a.includes('changelog') || a.includes('release'))) return true;
-        return false;
-      }
-
-      function filterCategory(cat) {
-        var cleanCat = (cat || 'all').toLowerCase().trim();
+      function filterCategory(targetCat) {
+        var cleanCat = (targetCat || 'all').toLowerCase().trim();
         var visibleCount = 0;
 
         // Update active chip state
@@ -307,8 +320,8 @@ const archiveList = Array.from(archiveGroups.entries());
 
         // Filter featured card
         if (featuredCard) {
-          var featCat = featuredCard.getAttribute('data-category') || '';
-          if (matchesCategory(featCat, cleanCat)) {
+          var featCat = (featuredCard.getAttribute('data-category') || '').toLowerCase().trim();
+          if (cleanCat === 'all' || featCat === cleanCat) {
             featuredCard.style.display = '';
             visibleCount++;
           } else {
@@ -316,10 +329,10 @@ const archiveList = Array.from(archiveGroups.entries());
           }
         }
 
-        // Filter subcards
+        // Filter subcards strictly
         subcards.forEach(function (card) {
-          var itemCat = card.getAttribute('data-category') || '';
-          if (matchesCategory(itemCat, cleanCat)) {
+          var itemCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
+          if (cleanCat === 'all' || itemCat === cleanCat) {
             card.style.display = '';
             visibleCount++;
           } else {
@@ -610,12 +623,12 @@ const archiveList = Array.from(archiveGroups.entries());
   .featured-main-card {
     display: block;
     background: #FFFCF7;
-    border: 2px solid #FF6600;
+    border: 2.5px solid #FF6600;
     border-radius: 18px;
     overflow: hidden;
     margin-bottom: 1.25rem;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 18px -4px rgba(255, 102, 0, 0.12);
+    box-shadow: 0 4px 18px -4px rgba(255, 102, 0, 0.15);
     position: relative;
     text-decoration: none !important;
     color: inherit !important;
@@ -717,21 +730,21 @@ const archiveList = Array.from(archiveGroups.entries());
   }
 
   /* ==========================================================================
-     UNIFORM EQUAL-SIZE SUBCARDS GRID (COMPACT, EQUAL HEIGHT, NOT OVERLY TALL)
+     UNIFORM EQUAL-SIZE SUBCARDS GRID (COMPACT, BOLDER BORDER, FULL TITLE VISIBLE)
      ========================================================================== */
   .subcards-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+    gap: 1.1rem;
     margin-bottom: 2rem;
     align-items: stretch;
   }
 
   .subcard-item {
     background: #FFFDF0;
-    border: 1.5px solid #F59E0B;
+    border: 2px solid #F59E0B; /* Increased border size / width */
     border-radius: 12px;
-    padding: 0.9rem 1rem;
+    padding: 0.85rem 0.95rem;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -742,9 +755,9 @@ const archiveList = Array.from(archiveGroups.entries());
   }
 
   .subcard-item:hover {
-    border-color: #D97706;
+    border-color: #FF6600;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px -2px rgba(245, 158, 11, 0.22);
+    box-shadow: 0 6px 18px -2px rgba(255, 102, 0, 0.25);
   }
 
   .subcard-tag {
@@ -756,7 +769,7 @@ const archiveList = Array.from(archiveGroups.entries());
     font-weight: 800;
     padding: 0.15rem 0.5rem;
     border-radius: 9999px;
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.4rem;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     line-height: 1.2;
@@ -766,14 +779,12 @@ const archiveList = Array.from(archiveGroups.entries());
     font-size: 0.88rem;
     font-weight: 800;
     color: #0F172A;
-    line-height: 1.28;
-    margin: 0 0 0.4rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    height: 2.56em; /* Fixed uniform 2 lines across all cards */
+    line-height: 1.3;
+    margin: 0 0 0.35rem;
+    /* Complete heading visible without truncation */
+    display: block;
     word-break: break-word;
+    height: auto;
   }
 
   .subcard-title a {
@@ -790,24 +801,23 @@ const archiveList = Array.from(archiveGroups.entries());
     font-size: 0.76rem;
     color: #64748B;
     line-height: 1.4;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.45rem;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 2; /* Little concise contents */
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 2.8em; /* Fixed uniform 2 lines across all cards */
     word-break: break-word;
   }
 
   .subcard-meta-footer {
     margin-top: auto;
-    padding-top: 0.6rem;
+    padding-top: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-size: 0.74rem;
     color: #64748B;
-    border-top: 1px dashed rgba(245, 158, 11, 0.35);
+    border-top: 1.5px dashed rgba(245, 158, 11, 0.35);
   }
 
   .subcard-read-time {
@@ -849,7 +859,7 @@ const archiveList = Array.from(archiveGroups.entries());
   .quick-jump-capsules-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.4rem;
+    gap: 0.35rem;
     margin-bottom: 0.85rem;
   }
 
@@ -857,9 +867,10 @@ const archiveList = Array.from(archiveGroups.entries());
     background: #FFFFFF;
     border: 1.5px solid #E2E8F0;
     color: #0F172A;
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    padding: 0.38rem 0.4rem;
+    height: 32px;
+    padding: 0 0.35rem;
     border-radius: 9999px;
     text-align: center;
     text-decoration: none;
@@ -867,9 +878,14 @@ const archiveList = Array.from(archiveGroups.entries());
     align-items: center;
     justify-content: center;
     transition: all 0.15s ease;
-    line-height: 1.2;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     cursor: pointer;
     font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
   }
 
   .quick-jump-capsule-white:hover {

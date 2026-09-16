@@ -19,7 +19,7 @@ Building a video platform usually starts with a simple requirement: upload a vid
 
 Self-hosted video infrastructure gives developers control over those systems instead of relying entirely on a managed video provider. The trade-off is that your team becomes responsible for operating the underlying infrastructure.
 
-OllaNode is a [self-hosted video infrastructure platform](https://ollanode.com) for developers who want to run and control their own video stack. It combines video processing, VOD, HLS delivery, CDN, storage, DNS, edge functions, APIs, and AI-agent governance under one control plane.
+OllaNode is a self-hosted video infrastructure platform for developers who want to run and control their own video stack. It combines video processing, VOD, HLS delivery, CDN, storage, DNS, edge functions, APIs, and AI-agent governance under one control plane.
 
 Built as an API-first platform and released under the Apache-2.0 license, OllaNode is designed for teams that want greater control over their video infrastructure, deployment model, and data.
 
@@ -238,11 +238,11 @@ OllaNode isn't trying to be the right answer for every team shipping video. If y
 
 ### 1. Is OllaNode really free to use?
 
-The self-host tier is free, full-stop — the complete platform, unlimited videos, zones, and projects, with community support. The cost you take on is your own infrastructure: the servers, storage, and bandwidth you provision to run it. If you'd rather not manage that infrastructure yourself, the [managed offering on ollanode.com](https://ollanode.com/#pricing) puts the OllaNode team in charge of operations on your cloud account, priced through a direct conversation rather than a metered plan.
+The self-host tier is free, full-stop — the complete platform, unlimited videos, zones, and projects, with community support. The cost you take on is your own infrastructure: the servers, storage, and bandwidth you provision to run it. If you'd rather not manage that infrastructure yourself, the managed offering on ollanode.com puts the OllaNode team in charge of operations on your cloud account, priced through a direct conversation rather than a metered plan.
 
 ### 2. What hardware do I need to self-host it?
 
-The recommended baseline is 8 or more vCPUs and 16–32 GB of RAM. A GPU is recommended, not required, for hardware-accelerated features like WhisperX speech transcription and NVENC encoding — you can run entirely on CPU if those specific features aren't part of your workflow yet. Explore hardware recommendations on the [OllaNode documentation](https://ollanode.com/docs).
+The recommended baseline is 8 or more vCPUs and 16–32 GB of RAM. A GPU is recommended, not required, for hardware-accelerated features like WhisperX speech transcription and NVENC encoding — you can run entirely on CPU if those specific features aren't part of your workflow yet. Explore hardware recommendations on the OllaNode documentation.
 
 ### 3. How is this different from just running FFmpeg on a server myself?
 
@@ -274,7 +274,7 @@ It's a Rust workspace built on the Axum web framework, structured as 11 shared l
 
 ### 10. How do I get started?
 
-The fastest path is the four-command bring-up sequence — `cp .env.example .env && make infra-up && make migrate && make run-gateway` — followed by creating a project and API key in the dashboard. From there, the [OllaNode quickstart guide](https://ollanode.com/docs/quickstart) walks through your first video upload and playback URL end to end, and you can start free whenever you're ready. For enterprise assistance, our team is available to help design your deployment.
+The fastest path is the four-command bring-up sequence — `cp .env.example .env && make infra-up && make migrate && make run-gateway` — followed by creating a project and API key in the dashboard. From there, the OllaNode quickstart guide walks through your first video upload and playback URL end to end, and you can start free whenever you're ready. For enterprise assistance, our team is available to help design your deployment.
 
 </div>
 
@@ -282,3 +282,15 @@ The fastest path is the four-command bring-up sequence — `cp .env.example .env
 OllaNode is a self-hosted video infrastructure platform for developers who want greater control over video processing, storage, HLS delivery, CDN infrastructure, and supporting services.
 Its approach combines VOD processing, adaptive HLS, storage, CDN delivery, DNS, edge functions, and API-driven workflows under infrastructure that teams can operate and modify themselves.
 For teams evaluating self-hosted video infrastructure, the main trade-off is clear: self-hosting requires more operational responsibility, but it can provide greater control over deployment, data, customization, and infrastructure ownership.
+
+---
+
+## Related Engineering & Architecture Guides
+
+For deeper technical implementations, explore these related platform resources:
+
+- [Why We Built an Open-Source Mux Alternative in Rust](/blog/why-we-built-open-source-mux-alternative-in-rust)
+- [Setting Up Your First Open-Source Video Pipeline](/blog/setting-up-first-open-source-video-pipeline-ollanode)
+- [AI Agent Security Model](/blog/ai-agent-security-model-least-privilege-scopes-audit-trails)
+- [OllaNode Documentation](https://ollanode.com/docs)
+
