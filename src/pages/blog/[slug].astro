@@ -573,7 +573,7 @@ const relatedArticles = [...sameCategory, ...differentCategory].slice(0, 5);
 
   /* PROSE ARTICLE BODY STYLING */
   .prose {
-    font-size: 1.06rem;
+    font-size: 1.05rem;
     color: var(--text, #0f172a);
     font-family: var(--font, 'Inter', sans-serif);
   }
@@ -582,28 +582,35 @@ const relatedArticles = [...sameCategory, ...differentCategory].slice(0, 5);
     margin-top: 1.15rem;
   }
 
+  /* SECTION HEADINGS (COMPACT, CRISP, WITH ONE-LINE GAP ABOVE & BELOW) */
   .prose h2 {
-    font-size: 1.5rem;
-    letter-spacing: -0.01em;
-    margin-top: 2.2rem;
+    font-size: 1.35rem;
+    letter-spacing: -0.015em;
+    margin-top: 1.85rem;
+    margin-bottom: 0.75rem;
     font-weight: 800;
     color: var(--text, #0f172a);
     scroll-margin-top: 96px;
+    line-height: 1.35;
   }
 
   .prose h3 {
-    font-size: 1.25rem;
-    margin-top: 1.8rem;
+    font-size: 1.15rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.6rem;
     font-weight: 750;
     color: var(--text, #0f172a);
     scroll-margin-top: 96px;
+    line-height: 1.35;
   }
 
   .prose h4 {
-    font-size: 1.12rem;
+    font-size: 1.02rem;
     font-weight: 700;
     color: var(--text, #0f172a);
-    margin-top: 1.4rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.45rem;
+    line-height: 1.35;
   }
 
   .prose p,

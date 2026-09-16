@@ -88,8 +88,6 @@ That's the entire mental model. You POST a video, the pipeline does the rest asy
 
 If you're the kind of developer who reads architecture diagrams before marketing copy, here's the shape of the system: a REST client talks to an `api-gateway`, which publishes events onto NATS JetStream. Independent services — `upload`, `transcode`, `thumbnail`, `transcript`, `webhook`, `cdn-edge-agent`, `playback`, and `dns-service` — consume those events, do their piece of work, and write results to PostgreSQL and an S3-compatible object store. Nothing runs synchronously inside a request handler; long-running work — and video processing is always long-running work — happens in the background, where it belongs.
 
----
-
 ## Under the Hood: A Rust Workspace, Not a Monolith
 
 Self-hosted software can take many forms, from wrappers around managed services to larger distributed systems. OllaNode takes the latter approach: the platform is structured as independently deployable services connected through defined infrastructure adapters.
@@ -114,8 +112,6 @@ The technology choices are deliberately boring in the best sense — proven, per
 Every one of those is permissively licensed — more on why that specific detail was non-negotiable for us in a moment.
 
 From a numbers standpoint, the platform breaks down into 9 services and 11 shared library crates, transcodes into an adaptive ladder spanning 360p to 4K, and — because AVIF is a genuinely better format than JPEG for web delivery — cuts poster image sizes by roughly 52% through the built-in image optimizer. The DNS service listens authoritatively on port 53, because if you're going to run your own CDN, you eventually want to run your own zones too.
-
----
 
 ## OllaNode's VOD Pipeline: One Upload, a Full Production Line
 
@@ -143,8 +139,6 @@ The entire sequence is visible, inspectable, and — because it's Apache-2.0 —
 
 It's also worth calling out what's off by default, because a platform that turns everything on by default is a platform that's slow and expensive by default. AI-generated metadata, speaker diarization, H.265/NVENC encoding, loudness normalization, and an SVT-AV1 encoding tier are all real, shipped capabilities — they're just config- and hardware-gated, so you opt into the compute cost only when you actually need the feature.
 
----
-
 ## Playback That Never Leaks Your Origin
 
 Encoding a video is only half the job — serving it safely and efficiently is the other half, and it's where a lot of homegrown video setups quietly fall apart. OllaNode's approach here is deliberately paranoid, in a good way.
@@ -156,8 +150,6 @@ On top of that private-origin proxy sits a signed, expiring token system. Every 
 For content that needs an extra layer of protection — think premium or licensed material — OllaNode supports AES-128 HLS encryption, with a per-video key delivered via the standard `#EXT-X-KEY` tag and token-gated key delivery, so even someone who captures the encrypted segments can't decrypt them without a valid, still-active token.
 
 And because most teams don't want to hand-roll a video player from scratch, OllaNode ships an embeddable Vidstack-based player at `/embed/:id`, complete with a quality selector, storyboard scrubbing, chapter navigation, and captions — drop it in an iframe and you have a production-grade playback experience without writing a line of player code.
-
----
 
 ## More Than Video: CDN, Storage, DNS, and Edge Functions
 
@@ -177,8 +169,6 @@ Finally, edge functions: deploy JavaScript or TypeScript and have it execute at 
 
 Put together, this means a team adopting OllaNode isn't just replacing a video vendor — they're often consolidating a video vendor, a CDN vendor, an object storage vendor, and a DNS provider into a single self-hosted control plane with one API and one bill: your server costs.
 
----
-
 ## Built for AI Agents, With Guardrails
 
 We built OllaNode in 2026, which means we built it in a world where AI agents routinely call APIs on behalf of humans — provisioning infrastructure, uploading content, purging caches, deploying edge functions. Pretending that isn't happening, or bolting on agent support as an afterthought, felt like designing for a world that no longer exists.
@@ -190,8 +180,6 @@ The model works like this: an agent calls `GET /v1/whoami` and receives back not
 Every action, gated or not, writes into a tamper-evident, hash-chain audit log that can be independently verified via `GET /v1/audit/verify`, so "what did the agent actually do last Tuesday" is always an answerable, provable question rather than a guess based on scattered logs. And if something goes wrong — an agent misbehaving, a compromised key, anything — there's a literal kill-switch that disables all agent access platform-wide in one call, plus a standing rule that certain categories of action (team management, API key issuance, organization settings) are human-only, returning a 403 to any agent credential regardless of its scopes, no exceptions.
 
 The API is described machine-readably via OpenAPI 3.1 at `GET /openapi.json`, and MCP (Model Context Protocol) support means agent frameworks can discover and call OllaNode's capabilities using the same standard that's rapidly becoming how AI tools talk to external systems.
-
----
 
 ## Why Apache-2.0 and Permissive OSS Matter
 
@@ -212,8 +200,6 @@ Practically, this means you can:
 
 That last point matters more than it might seem. A lot of "open-source" infrastructure software is really "source-available, until the license changes" — a pattern that's become common enough in the last few years that experienced engineering teams now check licensing before they check features. Apache-2.0 is a commitment that doesn't have an asterisk.
 
----
-
 ## Getting Started in One Terminal Window
 
 We tried to make the on-ramp as short as the pitch. If you've got a machine with at least 8 vCPUs and 16–32 GB of RAM — a GPU is recommended if you plan to use WhisperX transcription or NVENC-accelerated encoding, but isn't required to get started — here's the entire bring-up sequence:
@@ -226,8 +212,6 @@ That's it. `infra-up` brings up Postgres, NATS, and your object store; `migrate`
 
 If you'd rather not provision servers yourself, the same platform is available as a managed offering — we operate OllaNode on your cloud account, you keep full ownership of your data, and you get provisioning, upgrades, monitoring, multi-region edge points of presence, and an SLA with priority support layered on top. Both tiers run identical software; managed simply means we handle the operational burden instead of you. There's no metered, per-minute pricing in either case — self-host is free software, and managed is a flat conversation with our team based on your footprint, not your bandwidth.
 
----
-
 ## What OllaNode Is Not (Yet)
 
 We'd rather tell you the honest edges up front than let you discover them after you've integrated:
@@ -238,8 +222,6 @@ We'd rather tell you the honest edges up front than let you discover them after 
 
 We'd rather you know these boundaries from a blog post than from a support ticket.
 
----
-
 ## Who This Is For
 
 OllaNode isn't trying to be the right answer for every team shipping video. If you need a live-streaming platform today, or you'd genuinely rather never think about servers, a managed vendor is still a completely reasonable choice. But we built this for a specific set of people who kept showing up in our own conversations and in the broader developer community:
@@ -249,8 +231,6 @@ OllaNode isn't trying to be the right answer for every team shipping video. If y
 - **Startups that are cost-conscious early** and expect to scale.Per-minute vendor billing can remain attractive at low volume but may become a significant operating cost as video catalogs and viewing activity grow.; self-hosted infrastructure inverts that curve — higher fixed cost of ownership, but a marginal cost per video that approaches your raw compute and storage price.
 - **Teams building AI-native products** that need agents to provision, manage, and interact with video infrastructure programmatically, with an approval and audit model that a compliance team can actually sign off on — not a bolt-on afterthought.
 - **Developers who simply want to read the code.** Some of you just want to know, precisely, what happens to a file the moment it leaves your curl command. Apache-2.0 means you always can.
-
----
 
 ## Frequently Asked Questions
 
