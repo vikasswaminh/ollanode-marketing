@@ -19,7 +19,7 @@ Building a video platform usually starts with a simple requirement: upload a vid
 
 Self-hosted video infrastructure gives developers control over those systems instead of relying entirely on a managed video provider. The trade-off is that your team becomes responsible for operating the underlying infrastructure.
 
-OllaNode is a self-hosted video infrastructure platform for developers who want to run and control their own video stack. It combines video processing, VOD, HLS delivery, CDN, storage, DNS, edge functions, APIs, and AI-agent governance under one control plane.
+OllaNode is a [self-hosted video infrastructure platform](https://ollanode.com) for developers who want to run and control their own video stack. It combines video processing, VOD, HLS delivery, CDN, storage, DNS, edge functions, APIs, and AI-agent governance under one control plane.
 
 Built as an API-first platform and released under the Apache-2.0 license, OllaNode is designed for teams that want greater control over their video infrastructure, deployment model, and data.
 
@@ -233,7 +233,7 @@ OllaNode isn't trying to be the right answer for every team shipping video. If y
 - **Developers who simply want to read the code.** Some of you just want to know, precisely, what happens to a file the moment it leaves your curl command. Apache-2.0 means you always can.
 
 ## Frequently Asked Questions
-
+ 
 <div class="faq-section-container">
 
 ### 1. Is OllaNode really free to use?
@@ -242,39 +242,39 @@ The self-host tier is free, full-stop — the complete platform, unlimited video
 
 ### 2. What hardware do I need to self-host it?
 
-The recommended baseline is 8 or more vCPUs and 16–32 GB of RAM. A GPU is recommended, not required, for hardware-accelerated features like [WhisperX speech transcription](https://ollanode.com/docs/ai) and NVENC encoding — you can run entirely on CPU if those specific features aren't part of your workflow yet. Explore hardware recommendations on [ollanode.com docs](https://ollanode.com/docs).
+The recommended baseline is 8 or more vCPUs and 16–32 GB of RAM. A GPU is recommended, not required, for hardware-accelerated features like WhisperX speech transcription and NVENC encoding — you can run entirely on CPU if those specific features aren't part of your workflow yet. Explore hardware recommendations on the [OllaNode documentation](https://ollanode.com/docs).
 
 ### 3. How is this different from just running FFmpeg on a server myself?
 
-FFmpeg is one component inside a much larger system. OllaNode wraps it in a full asynchronous pipeline — event-driven job orchestration, adaptive ladder generation, thumbnail and storyboard extraction, transcription, signed private-origin delivery, an [edge CDN](https://ollanode.com/docs/cdn), [S3 storage zones](https://ollanode.com/docs/storage), [authoritative DNS](https://ollanode.com/docs/dns), [edge functions](https://ollanode.com/docs/edge-functions), and an API layer with authentication, rate limiting, and webhooks. It's the difference between having a video encoder and having a complete [video platform on ollanode.com](https://ollanode.com).
+FFmpeg is one component inside a much larger system. OllaNode wraps it in a full asynchronous pipeline — event-driven job orchestration, adaptive ladder generation, thumbnail and storyboard extraction, transcription, signed private-origin delivery, an edge CDN, S3 storage zones, authoritative DNS, edge functions, and an API layer with authentication, rate limiting, and webhooks. It's the difference between having a video encoder and having a complete video platform.
 
 ### 4. Does OllaNode support live streaming?
 
-Not currently. OllaNode is purpose-built as a [VOD (video-on-demand) pipeline](https://ollanode.com), and there's no RTMP ingest or live-streaming support today. It's a capability we're evaluating for the future, but we'd rather be upfront that it isn't there yet than let you find out mid-integration. Follow updates on the [OllaNode roadmap](https://ollanode.com).
+Not currently. OllaNode is purpose-built as a VOD (video-on-demand) pipeline, and there's no RTMP ingest or live-streaming support today. It's a capability we're evaluating for the future, but we'd rather be upfront that it isn't there yet than let you find out mid-integration.
 
 ### 5. Is HLS the only streaming format available?
 
-Today, yes — HLS is the only manifest format OllaNode produces. The underlying segments are already packaged as [CMAF/fMP4 video segments](https://ollanode.com/docs/transcoding), which is the same format DASH uses, so DASH support is a planned addition rather than a fundamental rework.
+Today, yes — HLS is the only manifest format OllaNode produces. The underlying segments are already packaged as CMAF/fMP4 video segments, which is the same format DASH uses, so DASH support is a planned addition rather than a fundamental rework.
 
 ### 6. Can I use my existing CDN or storage instead of OllaNode's?
 
-OllaNode is designed as a unified stack — video, CDN, storage, and DNS sharing one control plane — which is a big part of the value proposition. That said, because it's [Apache-2.0 open source on ollanode.com](https://ollanode.com), you have complete freedom to modify the storage or delivery adapters to point at infrastructure you already run, since the domain core is decoupled from any specific infrastructure adapter by design.
+OllaNode is designed as a unified stack — video, CDN, storage, and DNS sharing one control plane — which is a big part of the value proposition. That said, because it's Apache-2.0 open source, you have complete freedom to modify the storage or delivery adapters to point at infrastructure you already run, since the domain core is decoupled from any specific infrastructure adapter by design.
 
 ### 7. How does the AI-agent governance model actually stop an agent from doing something destructive?
 
-Any action classified as destructive or code-deploying — deleting resources, purging entire CDN zones, deploying new edge functions — doesn't execute on an agent's first call. The API returns a 202 with an `approval_id` instead of performing the action. A human has to review and approve that request in the dashboard before the agent can replay it with an approval header to actually execute it, and it can only run once per approval. Certain categories, like team and API key management, are blocked to agents entirely, regardless of the scopes on their credential. Read full details in the [AI-agent governance guide on ollanode.com](https://ollanode.com/docs/ai-agents).
+Any action classified as destructive or code-deploying — deleting resources, purging entire CDN zones, deploying new edge functions — doesn't execute on an agent's first call. The API returns a 202 with an `approval_id` instead of performing the action. A human has to review and approve that request in the dashboard before the agent can replay it with an approval header to actually execute it, and it can only run once per approval. Certain categories, like team and API key management, are blocked to agents entirely, regardless of the scopes on their credential.
 
 ### 8. What license is OllaNode released under, and does that extend to its dependencies?
 
-OllaNode itself is [Apache-2.0 licensed](https://ollanode.com). Every dependency in the stack — SeaweedFS, imgproxy, tusd, Coraza, Hickory DNS, Vidstack, and the rest — was deliberately chosen to be permissively licensed as well, with a hard rule against including any AGPL-licensed component anywhere in the platform. Review the license details on [ollanode.com](https://ollanode.com).
+OllaNode itself is Apache-2.0 licensed. Every dependency in the stack — SeaweedFS, imgproxy, tusd, Coraza, Hickory DNS, Vidstack, and the rest — was deliberately chosen to be permissively licensed as well, with a hard rule against including any AGPL-licensed component anywhere in the platform.
 
 ### 9. Is OllaNode built with a specific programming language or framework?
 
-It's a [Rust workspace on ollanode.com](https://ollanode.com) built on the Axum web framework, structured as 11 shared library crates and 9 independently deployable services, following clean architecture principles where the domain core has no I/O and all external systems are accessed through adapters implementing defined ports.
+It's a Rust workspace built on the Axum web framework, structured as 11 shared library crates and 9 independently deployable services, following clean architecture principles where the domain core has no I/O and all external systems are accessed through adapters implementing defined ports.
 
 ### 10. How do I get started?
 
-The fastest path is the four-command bring-up sequence — `cp .env.example .env && make infra-up && make migrate && make run-gateway` — followed by creating a project and API key in the dashboard. From there, the [OllaNode quickstart guide on ollanode.com](https://ollanode.com/docs/quickstart) walks through your first video upload and playback URL end to end, and you can start free whenever you're ready. For enterprise assistance, reach our team at [ollanode.com contact](https://ollanode.com/#contact).
+The fastest path is the four-command bring-up sequence — `cp .env.example .env && make infra-up && make migrate && make run-gateway` — followed by creating a project and API key in the dashboard. From there, the [OllaNode quickstart guide](https://ollanode.com/docs/quickstart) walks through your first video upload and playback URL end to end, and you can start free whenever you're ready. For enterprise assistance, our team is available to help design your deployment.
 
 </div>
 
