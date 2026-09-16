@@ -72,63 +72,97 @@ const apiAreas = [
         All requests go to <code>https://api.ollanode.com</code> and carry a bearer credential — either a token, API key or dashboard session token in the <code class="hl-orange">Authorization</code> header (the <code>x-api-key</code> header is also accepted). Create keys in the dashboard under API keys.
       </p>
 
-      <div class="auth-split-layout">
-        <!-- Left: Interactive Code Block -->
+      <!-- TOP ROW: Black Code Block on Left + GET /v1/whoami Info Card on Right -->
+      <div class="code-and-whoami-grid">
+        <!-- Left: Interactive Dark Code Block -->
         <div class="code-terminal-wrapper">
           <div class="terminal-header">
-            <div class="terminal-tab">
-              <span>curl</span>
-            <button class="btn-copy-code" id="btn-copy-curl" type="button">
+            <div class="terminal-tab">curl</div>
+            <button class="btn-copy-code" id="btn-copy-curl" type="button" aria-label="Copy curl command">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
               <span>Copy</span>
             </button>
           </div>
           <pre class="terminal-body"><code><span class="cmd-curl">curl</span> https://api.ollanode.com/v1/videos \
   <span class="cmd-flag">-H</span> <span class="cmd-str">"Authorization: Bearer OLK_your_key"</span></code></pre>
-
-          <!-- Quick Test Info Box -->
-          <div class="terminal-foot-info">
-            <span class="method-badge-get">GET</span>
-            <span class="foot-info-text"><code>/v1/whoami</code> returns who you are and a per-action capability map — the fastest way to confirm a key works and see what it can do.</span>
-          </div>
         </div>
 
-        <!-- Right: Auth Methods Card -->
-        <div class="auth-methods-card">
-          <h4 class="auth-card-title">AUTH METHODS</h4>
-          <div class="auth-methods-list">
-            
-            <div class="auth-method-item">
+        <!-- Right: Dedicated GET /v1/whoami Capability Box -->
+        <div class="whoami-card-box">
+          <div class="whoami-card-header">
+            <div class="whoami-badge-group">
+              <span class="method-badge-get">GET</span>
+              <code class="whoami-endpoint-path">/v1/whoami</code>
+            </div>
+            <span class="whoami-status-pill">CAPABILITY MAP</span>
+          </div>
+          <p class="whoami-card-desc">
+            <code>/v1/whoami</code> returns who you are and a per-action capability map — the fastest way to confirm a key works and inspect its granted scopes.
+          </p>
+          <div class="whoami-code-snippet">
+            <code><span class="cmd-curl">curl</span> https://api.ollanode.com/v1/whoami \<br/>&nbsp;&nbsp;<span class="cmd-flag">-H</span> <span class="cmd-str">"Authorization: Bearer $OLLA_KEY"</span></code>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW: AUTH METHODS (Side-by-Side 3-Column Grid occupying complete page band) -->
+      <div class="auth-methods-fullwidth">
+        <div class="auth-section-heading">
+          <h4 class="auth-card-title">SUPPORTED AUTHENTICATION METHODS</h4>
+        </div>
+        <div class="auth-methods-horizontal-grid">
+          
+          <!-- Method 1: Bearer Token -->
+          <div class="auth-method-card">
+            <div class="auth-card-top-row">
               <div class="auth-method-icon icon-orange">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF5A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
-              <div class="auth-method-text">
-                <div class="auth-name">Bearer Token</div>
-                <div class="auth-sub">Recommended</div>
+              <span class="auth-tag-pill tag-orange">RECOMMENDED</span>
+            </div>
+            <div class="auth-card-body">
+              <h3 class="auth-name">Bearer Token</h3>
+              <p class="auth-card-text">Standard OAuth &amp; service tokens passed in the standard Authorization header.</p>
+              <div class="auth-code-pill">
+                <code>Authorization: Bearer &lt;token&gt;</code>
               </div>
             </div>
+          </div>
 
-            <div class="auth-method-item">
+          <!-- Method 2: API Key -->
+          <div class="auth-method-card">
+            <div class="auth-card-top-row">
               <div class="auth-method-icon icon-blue">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-6 6 2-2m-2 2-7.5 7.5a2.12 2.12 0 1 1-3-3L12 7m0 0 2-2m2 2 4-4"/></svg>
               </div>
-              <div class="auth-method-text">
-                <div class="auth-name">API Key</div>
-                <div class="auth-sub">Header: / x-api-key</div>
+              <span class="auth-tag-pill tag-blue">CUSTOM HEADER</span>
+            </div>
+            <div class="auth-card-body">
+              <h3 class="auth-name">API Key (x-api-key)</h3>
+              <p class="auth-card-text">Direct API key header support for automated background scripts and AI agent runners.</p>
+              <div class="auth-code-pill">
+                <code>x-api-key: vbk_...</code>
               </div>
             </div>
+          </div>
 
-            <div class="auth-method-item">
+          <!-- Method 3: Dashboard Session -->
+          <div class="auth-method-card">
+            <div class="auth-card-top-row">
               <div class="auth-method-icon icon-green">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </div>
-              <div class="auth-method-text">
-                <div class="auth-name">Dashboard Session</div>
-                <div class="auth-sub">For browser requests</div>
+              <span class="auth-tag-pill tag-green">BROWSER / UI</span>
+            </div>
+            <div class="auth-card-body">
+              <h3 class="auth-name">Dashboard Session</h3>
+              <p class="auth-card-text">Cookie-backed session credentials automatically attached for web dashboard calls.</p>
+              <div class="auth-code-pill">
+                <code>Cookie: olla_sess=...</code>
               </div>
             </div>
-
           </div>
+
         </div>
       </div>
     </section>
@@ -411,19 +445,25 @@ const apiAreas = [
     background: #FFF7ED !important;
   }
 
-  .auth-split-layout {
+  /* 2. BASE URL & AUTHENTICATION SECTION */
+  .code-and-whoami-grid {
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: 24px;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+    align-items: stretch;
   }
 
-  /* TERMINAL CODE BOX */
+  /* TERMINAL CODE BOX (LEFT) */
   .code-terminal-wrapper {
     background: #0D1117;
     border: 1px solid #30363D;
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 10px 28px -4px rgba(15, 23, 42, 0.18);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 
   .terminal-header {
@@ -469,6 +509,9 @@ const apiAreas = [
     color: #C9D1D9;
     line-height: 1.6;
     overflow-x: auto;
+    flex: 1;
+    display: flex;
+    align-items: center;
   }
 
   .cmd-curl {
@@ -481,60 +524,197 @@ const apiAreas = [
     color: #7EE787;
   }
 
-  .terminal-foot-info {
+  /* WHOAMI DEDICATED CARD ON RIGHT */
+  .whoami-card-box {
+    background: #F0F9FF;
+    border: 1.5px solid #BAE6FD;
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(2, 132, 199, 0.08);
+  }
+
+  .whoami-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: #F0F9FF;
-    border-top: 1px solid #BAE6FD;
-    padding: 12px 18px;
-    color: #0369A1;
-    font-size: 12.5px;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .whoami-badge-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .method-badge-get {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 750;
     background: #0284C7;
     color: #FFFFFF;
-    padding: 2px 7px;
+    padding: 2.5px 8px;
     border-radius: 4px;
+    letter-spacing: 0.04em;
     flex-shrink: 0;
   }
 
-  .foot-info-text code {
-    font-size: 12px;
-    font-weight: 600;
+  .whoami-endpoint-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0369A1;
+    background: rgba(2, 132, 199, 0.1);
+    padding: 2px 7px;
+    border-radius: 4px;
   }
-  /* AUTH METHODS CARD */
-  .auth-methods-card {
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    border-radius: 16px;
-    padding: 20px 22px;
-    box-shadow: 0 10px 26px -4px rgba(15, 23, 42, 0.08);
+
+  .whoami-status-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #0284C7;
+    background: #E0F2FE;
+    border: 1px solid #BAE6FD;
+    padding: 2px 7px;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+  }
+
+  .whoami-card-desc {
+    font-size: 0.92rem;
+    color: #0C4A6E;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .whoami-code-snippet {
+    background: #0D1117;
+    border: 1px solid #1E293B;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: #E2E8F0;
+    line-height: 1.5;
+  }
+
+  /* AUTH METHODS FULL-WIDTH HORIZONTAL GRID */
+  .auth-methods-fullwidth {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .auth-section-heading {
+    margin-bottom: 12px;
   }
 
   .auth-card-title {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     font-weight: 700;
-    color: #94A3B8;
+    color: #64748B;
     letter-spacing: 0.08em;
-    margin: 0 0 16px;
+    margin: 0;
+    text-transform: uppercase;
   }
 
-  .auth-methods-list {
+  .auth-methods-horizontal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    width: 100%;
+  }
+
+  .auth-method-card {
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 14px;
+    padding: 18px 20px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .auth-method-item {
+  .auth-method-card:hover {
+    transform: translateY(-2px);
+    border-color: #94A3B8;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  }
+
+  .auth-card-top-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .auth-tag-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .tag-orange {
+    background: #FFF7ED;
+    color: #EA580C;
+    border: 1px solid #FFEDD5;
+  }
+
+  .tag-blue {
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 1px solid #DBEAFE;
+  }
+
+  .tag-green {
+    background: #ECFDF5;
+    color: #059669;
+    border: 1px solid #D1FAE5;
+  }
+
+  .auth-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .auth-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .auth-card-text {
+    font-size: 0.85rem;
+    color: #64748B;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  .auth-code-pill {
+    margin-top: 6px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    padding: 5px 9px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #334155;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .auth-method-icon {
@@ -571,18 +751,6 @@ const apiAreas = [
     background-color: #F0F9FF;
     color: #0EA5E9;
     border: 1px solid #E0F2FE;
-  }
-
-  .auth-name {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #0F172A;
-    line-height: 1.25;
-  }
-
-  .auth-sub {
-    font-size: 0.78rem;
-    color: #64748B;
   }
 
   /* 3. CONVENTIONS SECTION */
@@ -850,8 +1018,11 @@ const apiAreas = [
     .docs-hero-sec {
       grid-template-columns: 1fr;
     }
-    .auth-split-layout {
+    .code-and-whoami-grid {
       grid-template-columns: 1fr;
+    }
+    .auth-methods-horizontal-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
     .conventions-split-layout {
       grid-template-columns: 1fr;
@@ -873,7 +1044,10 @@ const apiAreas = [
     }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
+    .auth-methods-horizontal-grid {
+      grid-template-columns: 1fr;
+    }
     .api-cards-grid {
       grid-template-columns: 1fr;
     }
