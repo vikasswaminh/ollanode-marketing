@@ -32,15 +32,6 @@ const differentCategory = otherArticles.filter(
   (a) => a.data.category !== article.data.category
 );
 const relatedArticles = [...sameCategory, ...differentCategory].slice(0, 5);
-
-// Key takeaways from frontmatter if available or defaults
-const keyTakeaways = (article.data as any).keyTakeaways || [
-  `<strong>OllaNode</strong> is a self-hosted video infrastructure platform built for developers who want control over their video stack.`,
-  `It combines video processing, HLS delivery, CDN, storage, DNS, and edge functions in one platform.`,
-  `The VOD pipeline is asynchronous and event-driven, covering transcoding, HLS generation, thumbnails, transcripts, storage, and webhooks.`,
-  `<strong>Apache-2.0 licensing</strong> allows teams to inspect, modify, fork, and commercially deploy OllaNode.`,
-  `<strong>AI-agent workflows</strong> include security guardrails, such as scoped capabilities, approval gates, audit logging, and human-only actions.`,
-];
 ---
 
 <Site
@@ -50,103 +41,88 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
   <div class="article-page-wrap">
     <div class="container-wide">
       
-      <!-- 3-COLUMN ARTICLE LAYOUT -->
+      <!-- 3-COLUMN ARTICLE LAYOUT (EXACT REPLICATION OF BLOGS.OLLANODE.COM) -->
       <div class="article-3col-layout">
 
-        <!-- 1. LEFT SIDEBAR: STICKY "ON THIS PAGE" TABLE OF CONTENTS (IMAGE 1 STYLE) -->
+        <!-- 1. LEFT SIDEBAR: STICKY "ON THIS PAGE" TABLE OF CONTENTS -->
         <aside class="sidebar-col sidebar-toc">
           <div class="sticky-sidebar">
             <span class="badge-pill founder-badge-purple">ON THIS PAGE</span>
-            <nav class="toc-card-box" aria-label="Table of contents">
-              {tocHeadings.length > 0 ? (
-                <ul class="toc-list">
-                  {tocHeadings.map((h) => (
-                    <li class={`toc-item depth-${h.depth}`}>
-                      <a href={`#${h.slug}`} class="toc-link" title={h.text}>
-                        {h.text}
-                      </a>
+            <div class="toc-card-box">
+              <nav class="toc-nav" aria-label="Table of Contents">
+                {tocHeadings.length > 0 ? (
+                  <ul class="toc-list">
+                    {tocHeadings.map((h) => (
+                      <li class={`toc-item toc-depth-${h.depth}`}>
+                        <a href={`#${h.slug}`} class="toc-link" title={h.text}>
+                          {h.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <ul class="toc-list">
+                    <li class="toc-item toc-depth-2">
+                      <a href="#overview" class="toc-link">Overview</a>
                     </li>
-                  ))}
-                </ul>
-              ) : (
-                <ul class="toc-list">
-                  <li class="toc-item depth-2">
-                    <a href="#overview" class="toc-link">Overview</a>
-                  </li>
-                  <li class="toc-item depth-2">
-                    <a href="#architecture" class="toc-link">Architecture</a>
-                  </li>
-                </ul>
-              )}
-            </nav>
+                  </ul>
+                )}
+              </nav>
+            </div>
             <a href="/blog" class="view-all-btn-purple">← Back to Blog Home</a>
           </div>
         </aside>
 
-        <!-- 2. MIDDLE COLUMN: MAIN ARTICLE CONTENT (IMAGE 1, 2, 3 LAYOUT & STYLING) -->
+        <!-- 2. MIDDLE COLUMN: MAIN ARTICLE CONTENT & FLOW -->
         <main class="article-middle-col">
           
-          <!-- Breadcrumb Navigation (Exact Image 1 layout) -->
+          <!-- Breadcrumb Navigation -->
           <nav class="article-breadcrumb" aria-label="Breadcrumb">
-            <a href="/" class="crumb-link">Home</a>
-            <span class="crumb-sep">›</span>
-            <a href="/blog" class="crumb-link">Blog</a>
-            <span class="crumb-sep">›</span>
-            <span class="crumb-current">{article.data.title}</span>
+            <a href="/">Home</a>
+            <span class="breadcrumb-sep">›</span>
+            <a href="/blog">Blog</a>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current">{article.data.title}</span>
           </nav>
 
-          <!-- Article Header (Exact Image 1 layout, fonts & spacing) -->
+          <!-- Article Header -->
           <header class="article-header">
-            <div class="article-meta-top">
+            <div class="article-category-eyebrow">
               <span class="category-pill-orange">{article.data.category || 'Product & Changelog'}</span>
-              <span class="meta-dot">·</span>
-              <span class="meta-item">{article.data.publishedDate || 'Aug 21, 2026'}</span>
-              <span class="meta-dot">·</span>
-              <span class="meta-item">{article.data.readingTime || '27 min read'}</span>
+              <span class="eyebrow-dot">·</span>
+              <time datetime={article.data.publishedDate}>{article.data.publishedDate || 'Aug 21, 2026'}</time>
+              <span class="eyebrow-dot">·</span>
+              <span>{article.data.readingTime || '27 min read'}</span>
             </div>
 
             <h1 class="article-main-title">{article.data.title}</h1>
 
             <p class="article-lead-desc">{article.data.excerpt}</p>
 
-            <!-- Exact single-line author credit matching Image 1 -->
-            <div class="article-byline-bar">
-              <span>By <strong class="byline-highlight">{article.data.author?.name || 'The OllaNode Team'}</strong></span>
-              <span class="byline-sep">·</span>
-              <span>Category: <strong class="byline-highlight">{article.data.category || 'Product & Changelog'}</strong></span>
-              <span class="byline-sep">·</span>
-              <span>Published {article.data.publishedDate || 'Aug 21, 2026'}</span>
+            <div class="article-author-bar">
+              <div class="author-meta-text">
+                <span>By <strong class="author-name">{article.data.author?.name || 'The OllaNode Team'}</strong></span>
+                <span class="meta-dot">·</span>
+                <span>Category: <strong>{article.data.category || 'Product & Changelog'}</strong></span>
+                <span class="meta-dot">·</span>
+                <span>Published <time datetime={article.data.publishedDate}>{article.data.publishedDate || 'Aug 21, 2026'}</time></span>
+              </div>
             </div>
           </header>
 
-          <!-- Optional Hero Banner Image -->
+          <!-- Optional Cover Image -->
           {article.data.image && (
-            <div class="article-hero-banner">
-              <img src={article.data.image} alt={article.data.title} />
+            <div class="article-cover-wrap">
+              <img src={article.data.image} alt={article.data.title} class="article-cover-img" />
             </div>
           )}
 
-          <!-- Key Takeaways Callout Box (Exact Image 2 layout & styling) -->
-          {keyTakeaways && keyTakeaways.length > 0 && (
-            <div class="key-takeaways-box">
-              <div class="takeaways-header">
-                <span class="takeaways-sparkle-icon" aria-hidden="true">✦</span>
-                <h3 class="takeaways-title">KEY TAKEAWAYS</h3>
-              </div>
-              <ul class="takeaways-list">
-                {keyTakeaways.map((item: string) => (
-                  <li set:html={item} />
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <!-- Main Article Prose (Exact Image 3 Heading & Paragraph Typography) -->
-          <div class="article-prose-content prose">
+          <!-- Article Prose Body (Flow of content with headings, paragraphs, lists, code, and callouts) -->
+          <div class="prose article-prose-content">
             <Content />
           </div>
 
-          <!-- Tags Footer -->
+          <!-- Tags Footer (if tags present) -->
           {article.data.tags && article.data.tags.length > 0 && (
             <div class="article-tags-wrap">
               <span class="tags-label">Tags:</span>
@@ -158,28 +134,30 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
             </div>
           )}
 
-          <!-- Bottom CTA Banner Card -->
-          <div class="article-bottom-cta">
-            <div class="bottom-cta-inner">
-              <span class="cta-badge">GET STARTED</span>
-              <h3 class="cta-title">Run your own VOD transcoding, adaptive HLS, edge CDN, and AI-governed media storage</h3>
-              <p class="cta-desc">Deploy Apache-2.0 open source video infrastructure on your own cloud hardware in minutes.</p>
-              <div class="cta-btn-wrap">
-                <a href="https://ollanode.com" class="btn-cta-orange">Explore OllaNode ↗</a>
+          <!-- Article Bottom CTA Card -->
+          <div class="article-footer-cta">
+            <div class="article-footer-card">
+              <h3>Run your own VOD transcoding, adaptive HLS, edge CDN, and AI-governed media storage</h3>
+              <p>Deploy Apache-2.0 open source video infrastructure on your own cloud hardware in minutes.</p>
+              <div class="article-footer-actions">
+                <a href="https://ollanode.com" class="btn-ollanode-primary">Explore OllaNode ↗</a>
               </div>
             </div>
           </div>
 
         </main>
 
-        <!-- 3. RIGHT SIDEBAR: STICKY "RELATED READING" CARDS (IMAGE 1 STYLE) -->
+        <!-- 3. RIGHT SIDEBAR: STICKY "RELATED READING" CARDS -->
         <aside class="sidebar-col sidebar-related">
           <div class="sticky-sidebar">
             <span class="badge-pill orange-badge">RELATED READING</span>
             <div class="related-cards-stack">
               {relatedArticles.map((art) => (
                 <a href={`/blog/${art.slug || art.id}`} class="related-card-item">
-                  <span class="related-card-category">{art.data.category} ↗</span>
+                  <div class="related-card-top">
+                    <span class="related-card-tag">{art.data.category || 'Video & CDN'}</span>
+                    <span class="related-card-arrow" aria-hidden="true">↗</span>
+                  </div>
                   <h4 class="related-card-title">{art.data.title}</h4>
                   <p class="related-card-desc">{art.data.excerpt}</p>
                 </a>
@@ -250,16 +228,28 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
 
 <style>
   /* ==========================================================================
-     EXACT REPLICATION OF BLOGS.OLLANODE.COM POST LAYOUT & STYLING
-     (MATCHING IMAGES 1, 2, AND 3)
+     EXACT CSS COPY-PASTE FROM BLOGS.OLLANODE.COM /BLOG/[SLUG]
      ========================================================================== */
+
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #ff6600;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --radius: 12px;
+  }
 
   .article-page-wrap {
     width: 100%;
-    background-color: #FFFFFF;
-    color: #0F172A;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    padding: 2.25rem 0 5rem;
+    background-color: var(--bg, #ffffff);
+    color: var(--text, #0f172a);
+    font-family: var(--font, 'Inter', sans-serif);
+    padding: 1.5rem 0 3rem;
     position: relative;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -273,38 +263,48 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
     box-sizing: border-box;
   }
 
-  /* 3-COLUMN GRID LAYOUT (EXACT IMAGE 1 PROPORTIONS) */
+  /* 3-COLUMN GRID LAYOUT */
   .article-3col-layout {
     display: grid;
     grid-template-columns: 240px minmax(0, 1fr) 240px;
-    gap: 2.5rem;
-    width: 100%;
-    position: relative;
+    gap: 2rem;
     align-items: start;
+    padding: 1.5rem 0 0;
+    width: 100%;
   }
 
-  /* SIDEBAR COMMON STYLES */
+  /* SIDEBARS */
   .sidebar-col {
+    display: block !important;
     position: -webkit-sticky !important;
     position: sticky !important;
     top: 86px !important;
     align-self: start !important;
-    z-index: 25 !important;
     width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    z-index: 40 !important;
   }
 
   .sticky-sidebar {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.85rem !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
-  /* BADGE PILLS (EXACT IMAGE 1) */
+  .sidebar-related {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  /* BADGE PILLS */
   .badge-pill {
     display: inline-flex;
     align-items: center;
     align-self: flex-start;
     width: max-content;
+    gap: 0.35rem;
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.05em;
@@ -312,42 +312,40 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
     border-radius: 9999px;
     text-transform: uppercase;
     white-space: nowrap;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font, 'Inter', sans-serif);
   }
 
   .founder-badge-purple {
-    background: #7C3AED;
-    color: #FFFFFF;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.22);
+    background: #7c3aed;
+    color: #fff;
+    margin-bottom: 1.15rem;
+    align-self: flex-start;
+    width: max-content;
   }
 
   .orange-badge {
-    background: #FF6600;
-    color: #FFFFFF;
-    box-shadow: 0 2px 8px rgba(255, 102, 0, 0.22);
+    background: #ff6600;
+    color: #fff;
+    margin-bottom: 0.85rem;
+    align-self: flex-start;
+    width: max-content;
   }
 
-  /* LEFT SIDEBAR: TABLE OF CONTENTS BOX (EXACT IMAGE 1) */
+  /* LEFT SIDEBAR: TOC BOX */
   .toc-card-box {
-    background: #FAFAFA;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 0.85rem 0.65rem;
-    box-sizing: border-box;
-    max-height: calc(100vh - 180px);
-    overflow-y: auto;
+    background: var(--bg-soft, #f8fafc);
+    border: 1.5px solid var(--border, #e2e8f0);
+    border-radius: 14px;
+    padding: 1rem 0.85rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
   }
 
-  /* Custom subtle scrollbar */
-  .toc-card-box::-webkit-scrollbar {
-    width: 5px;
-  }
-  .toc-card-box::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .toc-card-box::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 4px;
+  .toc-nav {
+    max-height: calc(100vh - 270px);
+    overflow-y: auto;
+    padding-right: 0.35rem;
+    scrollbar-width: thin;
   }
 
   .toc-list {
@@ -356,387 +354,378 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
 
-  .toc-item {
-    line-height: 1.35;
-  }
-
-  .toc-item.depth-3 {
-    padding-left: 0.75rem;
+  .toc-depth-3 {
+    padding-left: 0.85rem;
   }
 
   .toc-link {
-    display: block;
-    font-size: 0.81rem;
-    font-weight: 500;
-    color: #475569;
+    font-size: 0.78rem;
+    color: var(--muted, #64748b);
+    line-height: 1.35;
     text-decoration: none;
-    padding: 0.32rem 0.5rem;
-    border-radius: 6px;
-    border-left: 2px solid transparent;
+    display: block;
     transition: all 0.15s ease;
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.32;
+    border-left: 2px solid transparent;
+    padding-left: 0.45rem;
   }
 
   .toc-link:hover {
-    color: #7C3AED;
-    background: #F3E8FF;
-    border-left-color: #7C3AED;
+    color: #7c3aed;
+    border-left-color: #7c3aed;
+    transform: translateX(2px);
+    text-decoration: none;
   }
 
   .toc-link.active {
-    color: #7C3AED;
+    color: #7c3aed;
+    border-left-color: #7c3aed;
     font-weight: 700;
-    background: #F3E8FF;
-    border-left-color: #7C3AED;
   }
 
   .view-all-btn-purple {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.84rem;
+    display: inline-block;
+    font-size: 0.85rem;
     font-weight: 700;
-    color: #7C3AED;
+    color: #7c3aed;
     text-decoration: none;
     transition: all 0.15s ease;
-    padding: 0.25rem 0;
   }
 
   .view-all-btn-purple:hover {
-    color: #6D28D9;
+    color: #6d28d9;
     text-decoration: underline;
-    transform: translateX(-2px);
+    transform: translateX(2px);
   }
 
   /* MIDDLE COLUMN */
   .article-middle-col {
-    min-width: 0;
+    max-width: 780px;
     width: 100%;
+    margin: 0 auto;
+    min-width: 0;
   }
 
-  /* BREADCRUMB (IMAGE 1) */
+  /* BREADCRUMBS */
   .article-breadcrumb {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.4rem;
     font-size: 0.82rem;
-    color: #64748B;
+    color: var(--muted, #64748b);
     margin-bottom: 1.25rem;
   }
 
-  .crumb-link {
-    color: #64748B;
+  .article-breadcrumb a {
+    color: var(--muted, #64748b);
     text-decoration: none;
-    font-weight: 500;
     transition: color 0.15s ease;
   }
 
-  .crumb-link:hover {
-    color: #FF6600;
-    text-decoration: underline;
+  .article-breadcrumb a:hover {
+    color: #ff6600;
   }
 
-  .crumb-sep {
-    color: #94A3B8;
-    font-size: 0.9rem;
+  .breadcrumb-sep {
+    color: #cbd5e1;
   }
 
-  .crumb-current {
-    color: #0F172A;
+  .breadcrumb-current {
+    color: var(--text, #0f172a);
     font-weight: 600;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
+    max-width: 380px;
+    white-space: nowrap;
     overflow: hidden;
-    max-width: 480px;
+    text-overflow: ellipsis;
   }
 
-  /* ARTICLE HEADER (IMAGE 1) */
+  /* ARTICLE HEADER */
   .article-header {
-    margin-bottom: 1.75rem;
+    margin-bottom: 2rem;
   }
 
-  .article-meta-top {
+  .article-category-eyebrow {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
     gap: 0.5rem;
-    font-size: 0.84rem;
-    color: #64748B;
+    font-size: 0.8rem;
+    color: var(--muted, #64748b);
     font-weight: 500;
-    margin-bottom: 0.95rem;
+    margin-bottom: 0.75rem;
   }
 
   .category-pill-orange {
     display: inline-block;
-    background: #FFF7ED;
-    color: #EA580C;
-    border: 1px solid #FFEDD5;
+    background: rgba(255, 102, 0, 0.08);
+    color: #ea580c;
+    border: 1px solid rgba(255, 102, 0, 0.2);
     font-size: 0.72rem;
     font-weight: 800;
-    padding: 0.22rem 0.7rem;
+    padding: 0.2rem 0.65rem;
     border-radius: 9999px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
 
+  .eyebrow-dot,
   .meta-dot {
-    color: #94A3B8;
-    font-size: 0.95rem;
-    line-height: 1;
+    color: #94a3b8;
   }
 
-  .meta-item {
-    color: #64748B;
-  }
-
-  /* H1 TITLE (IMAGE 1) */
   .article-main-title {
     font-size: 2.35rem;
-    font-weight: 850;
-    color: #0F172A;
+    font-weight: 900;
+    color: var(--text, #0f172a);
     line-height: 1.2;
-    letter-spacing: -0.03em;
-    margin: 0 0 1.15rem;
+    letter-spacing: -0.025em;
+    margin: 0 0 1rem;
+    font-family: var(--font, 'Inter', sans-serif);
   }
 
-  /* SUBTITLE / LEAD (IMAGE 1) */
   .article-lead-desc {
-    font-size: 1.1rem;
-    color: #475569;
+    font-size: 1.12rem;
     line-height: 1.6;
-    margin: 0 0 1.35rem;
+    color: var(--muted, #64748b);
+    margin: 0 0 1.25rem;
   }
 
-  /* SINGLE-LINE AUTHOR BYLINE BAR (IMAGE 1) */
-  .article-byline-bar {
+  .article-author-bar {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0.45rem;
+    border-top: 1px solid var(--border, #e2e8f0);
+    border-bottom: 1px solid var(--border, #e2e8f0);
+    padding: 0.75rem 0;
     font-size: 0.84rem;
-    color: #64748B;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid #E2E8F0;
+    color: var(--muted, #64748b);
   }
 
-  .byline-highlight {
-    color: #0F172A;
+  .author-meta-text strong {
+    color: var(--text, #0f172a);
     font-weight: 700;
   }
 
-  .byline-sep {
-    color: #94A3B8;
-  }
-
-  .article-hero-banner {
+  .article-cover-wrap {
     margin-bottom: 2rem;
-    border-radius: 14px;
+    border-radius: 16px;
     overflow: hidden;
-    border: 1px solid #E2E8F0;
+    border: 1.5px solid var(--border, #e2e8f0);
   }
 
-  .article-hero-banner img {
+  .article-cover-img {
     width: 100%;
     height: auto;
     display: block;
   }
 
-  /* ==========================================================================
-     KEY TAKEAWAYS BOX (EXACT REPLICATION OF IMAGE 2)
-     ========================================================================== */
-  .key-takeaways-box {
-    background: #FFFDF9;
-    border-left: 4.5px solid #FF5500;
-    border-radius: 0 14px 14px 0;
-    padding: 1.4rem 1.75rem;
-    margin: 2rem 0 2.5rem;
-    box-shadow: 0 2px 10px rgba(255, 85, 0, 0.04);
+  /* KEY TAKEAWAYS BOX STYLING */
+  :global(.key-takeaways-box) {
+    background: #fff9f5 !important;
+    border: 1px solid rgba(255, 102, 0, 0.2) !important;
+    border-left: 4px solid #ff6600 !important;
+    border-radius: 0 14px 14px 0 !important;
+    padding: 1.25rem 1.6rem !important;
+    margin: 2rem 0 2.5rem !important;
+    box-shadow: 0 4px 16px rgba(255, 102, 0, 0.06) !important;
   }
 
-  .takeaways-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.95rem;
+  :global(.key-takeaways-header) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    margin-bottom: 0.85rem !important;
   }
 
-  .takeaways-sparkle-icon {
-    color: #FF5500;
-    font-size: 1rem;
-    line-height: 1;
-    display: inline-block;
+  :global(.key-takeaways-icon) {
+    color: #ff6600 !important;
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
   }
 
-  .takeaways-title {
-    font-size: 0.95rem;
-    font-weight: 850;
-    color: #FF5500;
-    margin: 0;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-family: 'Inter', sans-serif;
+  :global(.key-takeaways-title) {
+    font-size: 0.84rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.08em !important;
+    color: #ff6600 !important;
+    margin: 0 !important;
+    text-transform: uppercase !important;
+    font-family: var(--font, 'Inter', sans-serif) !important;
   }
 
-  .takeaways-list {
-    margin: 0;
-    padding-left: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    list-style-type: disc;
+  :global(.key-takeaways-list) {
+    margin: 0 !important;
+    padding-left: 1.25rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.6rem !important;
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+    color: var(--text, #0f172a) !important;
+    list-style-type: disc !important;
   }
 
-  .takeaways-list li {
-    font-size: 0.96rem;
-    color: #1E293B;
-    line-height: 1.62;
+  :global(.key-takeaways-list strong) {
+    color: var(--text, #0f172a) !important;
+    font-weight: 700 !important;
   }
 
-  .takeaways-list li :global(strong) {
-    color: #0F172A;
-    font-weight: 750;
+  /* PROSE ARTICLE BODY STYLING */
+  .prose {
+    font-size: 1.06rem;
+    color: var(--text, #0f172a);
+    font-family: var(--font, 'Inter', sans-serif);
   }
 
-  /* ==========================================================================
-     ARTICLE PROSE TYPOGRAPHY & HEADING SIZES (EXACT REPLICATION OF IMAGE 3)
-     ========================================================================== */
-  .article-prose-content {
-    font-size: 1.05rem;
-    line-height: 1.75;
-    color: #1E293B;
+  .prose > * + * {
+    margin-top: 1.15rem;
   }
 
-  /* H2 HEADING (EXACT IMAGE 3) */
-  .article-prose-content h2 {
-    font-size: 1.75rem;
+  .prose h2 {
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    margin-top: 2.2rem;
     font-weight: 800;
-    color: #0F172A;
-    margin: 2.75rem 0 1.15rem;
-    line-height: 1.25;
-    letter-spacing: -0.025em;
+    color: var(--text, #0f172a);
     scroll-margin-top: 96px;
   }
 
-  /* H3 SUBHEADING (EXACT IMAGE 3) */
-  .article-prose-content h3 {
-    font-size: 1.35rem;
+  .prose h3 {
+    font-size: 1.25rem;
+    margin-top: 1.8rem;
     font-weight: 750;
-    color: #0F172A;
-    margin: 2.1rem 0 0.85rem;
-    line-height: 1.32;
-    letter-spacing: -0.015em;
+    color: var(--text, #0f172a);
     scroll-margin-top: 96px;
   }
 
-  /* H4 SUBHEADING */
-  .article-prose-content h4 {
-    font-size: 1.15rem;
+  .prose h4 {
+    font-size: 1.12rem;
     font-weight: 700;
-    color: #0F172A;
-    margin: 1.6rem 0 0.65rem;
-    line-height: 1.35;
+    color: var(--text, #0f172a);
+    margin-top: 1.4rem;
   }
 
-  .article-prose-content p {
-    margin: 0 0 1.25rem;
-    color: #334155;
-    line-height: 1.75;
+  .prose p,
+  .prose ul,
+  .prose ol {
+    margin-block: 0;
   }
 
-  .article-prose-content a {
-    color: #FF6600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    font-weight: 600;
-    transition: color 0.15s ease;
+  .prose p {
+    color: var(--text, #1e293b);
+    line-height: 1.72;
   }
 
-  .article-prose-content a:hover {
-    color: #E65100;
-  }
-
-  /* NUMBERED & BULLETED LISTS (EXACT IMAGE 3) */
-  .article-prose-content ol,
-  .article-prose-content ul {
-    margin: 0 0 1.5rem;
+  .prose ul,
+  .prose ol {
     padding-left: 1.4rem;
   }
 
-  .article-prose-content li {
-    margin-bottom: 0.75rem;
-    line-height: 1.7;
-    color: #334155;
+  .prose li + li {
+    margin-top: 0.3rem;
   }
 
-  .article-prose-content li strong {
-    color: #0F172A;
+  .prose li {
+    line-height: 1.65;
+    color: var(--text, #1e293b);
+  }
+
+  .prose li strong {
+    color: var(--text, #0f172a);
     font-weight: 700;
   }
 
-  .article-prose-content pre {
-    background: #0B0F19 !important;
-    color: #F8FAFC !important;
-    padding: 1.15rem 1.4rem !important;
-    border-radius: 12px !important;
-    overflow-x: auto !important;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
-    font-size: 0.88rem !important;
-    line-height: 1.6 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    margin: 1.5rem 0 1.75rem !important;
+  .prose img {
+    border-radius: var(--radius, 12px);
+    border: 1px solid var(--border, #e2e8f0);
   }
 
-  .article-prose-content code {
-    background: #F1F5F9;
-    color: #0F172A;
-    padding: 0.15rem 0.45rem;
+  .prose blockquote {
+    margin: 1.4rem 0;
+    padding: 0.2rem 1.1rem;
+    border-left: 3px solid var(--accent, #ff6600);
+    color: var(--muted, #64748b);
+    background: #fff9f5;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .prose code {
+    font-family: var(--mono, 'JetBrains Mono', monospace);
+    font-size: 0.9em;
+    background: var(--bg-soft, #f8fafc);
+    border: 1px solid var(--border, #e2e8f0);
     border-radius: 6px;
-    font-size: 0.88em;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    border: 1px solid #E2E8F0;
+    padding: 0.1rem 0.35rem;
+    color: var(--text, #0f172a);
   }
 
-  .article-prose-content pre code {
+  .prose pre {
+    background: #0d1117 !important;
+    border: 1px solid var(--border, #e2e8f0) !important;
+    border-radius: var(--radius, 12px) !important;
+    padding: 1rem 1.1rem !important;
+    overflow-x: auto !important;
+  }
+
+  .prose pre code {
     background: transparent !important;
-    color: inherit !important;
+    border: 0 !important;
     padding: 0 !important;
-    border: none !important;
+    font-size: 0.88rem !important;
+    color: #e6edf3 !important;
   }
 
-  .article-prose-content blockquote {
-    border-left: 4px solid #FF6600;
-    background: #FFF7ED;
-    padding: 1rem 1.35rem;
-    margin: 1.5rem 0;
-    border-radius: 0 10px 10px 0;
-    color: #431407;
-    font-style: italic;
+  .prose a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: #ea580c;
   }
 
-  .article-prose-content table {
+  /* High-visibility badge links matching blogs.ollanode.com */
+  .prose a[href*="ollanode.com"] {
+    color: #ea580c !important;
+    background: rgba(255, 102, 0, 0.09) !important;
+    border-bottom: 1.5px solid rgba(255, 102, 0, 0.4) !important;
+    padding: 0.12rem 0.45rem !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: all 0.15s ease !important;
+    display: inline !important;
+  }
+
+  .prose a[href*="ollanode.com"]:hover {
+    background: rgba(255, 102, 0, 0.18) !important;
+    border-bottom-color: #ff6600 !important;
+    color: #c2410c !important;
+    text-decoration: none !important;
+  }
+
+  .prose hr {
+    border: 0;
+    border-top: 1px solid var(--border, #e2e8f0);
+    margin: 2rem 0;
+  }
+
+  .prose table {
     width: 100%;
     border-collapse: collapse;
-    margin: 1.75rem 0;
-    font-size: 0.92rem;
+    display: block;
+    overflow-x: auto;
+    margin: 1.5rem 0;
   }
 
-  .article-prose-content th,
-  .article-prose-content td {
-    padding: 0.75rem 1rem;
-    border: 1px solid #E2E8F0;
+  .prose th,
+  .prose td {
+    border: 1px solid var(--border, #e2e8f0);
+    padding: 0.5rem 0.7rem;
     text-align: left;
   }
 
-  .article-prose-content th {
-    background: #F8FAFC;
+  .prose th {
+    background: var(--bg-soft, #f8fafc);
     font-weight: 700;
-    color: #0F172A;
   }
 
   /* TAGS FOOTER */
@@ -747,13 +736,13 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
     gap: 0.6rem;
     padding: 1.5rem 0;
     margin-top: 2rem;
-    border-top: 1px solid #E2E8F0;
+    border-top: 1px solid var(--border, #e2e8f0);
   }
 
   .tags-label {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #64748B;
+    color: var(--muted, #64748b);
   }
 
   .tags-list {
@@ -764,136 +753,146 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
 
   .tag-chip {
     display: inline-block;
-    background: #F1F5F9;
-    color: #334155;
+    background: var(--bg-soft, #f8fafc);
+    color: var(--text, #334155);
     font-size: 0.78rem;
     font-weight: 600;
     padding: 0.25rem 0.65rem;
     border-radius: 9999px;
-    border: 1px solid #E2E8F0;
+    border: 1px solid var(--border, #e2e8f0);
   }
 
-  /* BOTTOM CTA BANNER CARD */
-  .article-bottom-cta {
-    margin-top: 2.5rem;
-    background: linear-gradient(135deg, #0F172A 0%, #080C14 100%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 18px;
-    padding: 2.25rem 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
+  /* ARTICLE FOOTER CTA */
+  .article-footer-cta {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border, #e2e8f0);
   }
 
-  .bottom-cta-inner {
-    max-width: 680px;
+  .article-footer-card {
+    background: linear-gradient(135deg, rgba(255, 102, 0, 0.04) 0%, var(--bg-soft, #f8fafc) 100%);
+    border: 1.5px solid rgba(255, 102, 0, 0.25);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
   }
 
-  .cta-badge {
-    display: inline-block;
-    background: #FF6600;
-    color: #FFFFFF;
-    font-size: 0.68rem;
+  .article-footer-card h3 {
+    font-size: 1.4rem;
     font-weight: 800;
-    letter-spacing: 0.05em;
-    padding: 0.22rem 0.65rem;
-    border-radius: 9999px;
-    text-transform: uppercase;
-    margin-bottom: 0.85rem;
-    font-family: 'JetBrains Mono', monospace;
+    margin: 0 0 0.5rem;
+    color: var(--text, #0f172a);
   }
 
-  .cta-title {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #FFFFFF;
-    line-height: 1.3;
-    margin: 0 0 0.65rem;
-    letter-spacing: -0.015em;
+  .article-footer-card p {
+    font-size: 0.95rem;
+    color: var(--muted, #64748b);
+    max-width: 540px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.55;
   }
 
-  .cta-desc {
-    font-size: 0.92rem;
-    color: #94A3B8;
-    line-height: 1.5;
-    margin: 0 0 1.35rem;
+  .article-footer-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
-  .btn-cta-orange {
+  .btn-ollanode-primary {
     display: inline-flex;
     align-items: center;
-    background: linear-gradient(135deg, #FF6600, #E65100);
-    color: #FFFFFF !important;
-    font-size: 0.92rem;
+    background: linear-gradient(135deg, #ff6600, #e65100);
+    color: #ffffff !important;
     font-weight: 700;
+    font-size: 0.92rem;
     padding: 0.75rem 1.6rem;
     border-radius: 10px;
-    border: 1px solid #FDE047;
+    border: 1px solid #fde047;
     text-decoration: none !important;
     transition: all 0.2s ease;
     box-shadow: 0 4px 16px rgba(255, 102, 0, 0.35);
   }
 
-  .btn-cta-orange:hover {
-    background: #E65100;
+  .btn-ollanode-primary:hover {
+    background: #e65100;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 102, 0, 0.45);
   }
 
-  /* RIGHT SIDEBAR: RELATED READING (IMAGE 1) */
+  /* RIGHT SIDEBAR: RELATED READING CARDS */
   .related-cards-stack {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
   }
 
   .related-card-item {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
+    background: var(--bg-soft, #f8fafc);
+    border: 1.5px solid var(--border, #e2e8f0);
     border-radius: 12px;
     padding: 0.85rem 0.95rem;
+    text-decoration: none !important;
     display: flex;
     flex-direction: column;
-    text-decoration: none !important;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   }
 
   .related-card-item:hover {
-    border-color: #FF6600;
+    border-color: #ff6600;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px -2px rgba(255, 102, 0, 0.2);
+    box-shadow: 0 6px 16px rgba(255, 102, 0, 0.12);
+    text-decoration: none !important;
   }
 
-  .related-card-category {
-    font-size: 0.66rem;
+  .related-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+
+  .related-card-tag {
+    font-size: 0.65rem;
     font-weight: 800;
-    color: #EA580C;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    margin-bottom: 0.35rem;
+    color: #ff6600;
+    background: rgba(255, 102, 0, 0.08);
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+  }
+
+  .related-card-arrow {
+    font-size: 0.75rem;
+    color: var(--muted, #64748b);
+    transition: transform 0.15s ease;
+  }
+
+  .related-card-item:hover .related-card-arrow {
+    color: #ff6600;
+    transform: translate(2px, -2px);
   }
 
   .related-card-title {
     font-size: 0.84rem;
     font-weight: 700;
-    color: #0F172A;
-    line-height: 1.32;
-    margin: 0 0 0.35rem;
+    color: var(--text, #0f172a);
+    line-height: 1.35;
+    margin: 0 0 0.3rem;
+    font-family: var(--font, 'Inter', sans-serif);
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    transition: color 0.15s ease;
-  }
-
-  .related-card-item:hover .related-card-title {
-    color: #FF6600;
   }
 
   .related-card-desc {
-    font-size: 0.74rem;
-    color: #64748B;
-    line-height: 1.4;
+    font-size: 0.73rem;
+    color: var(--muted, #64748b);
+    line-height: 1.45;
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -902,43 +901,176 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
   }
 
   /* ==========================================================================
-     RESPONSIVE BREAKPOINTS
+     EXACT RESPONSIVE BREAKPOINTS FROM BLOGS.OLLANODE.COM
      ========================================================================== */
 
   /* LAPTOP / SMALL DESKTOP (901px to 1180px) */
   @media (min-width: 901px) and (max-width: 1180px) {
     .article-3col-layout {
-      grid-template-columns: 190px minmax(0, 1fr) 200px;
-      gap: 1.5rem;
+      display: grid !important;
+      grid-template-columns: 180px minmax(0, 1fr) 190px !important;
+      gap: 1.25rem !important;
+      align-items: start !important;
+      padding-top: 1rem !important;
+      width: 100% !important;
+    }
+    .sidebar-toc {
+      display: block !important;
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 86px !important;
+      align-self: start !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      z-index: 30 !important;
+    }
+    .article-middle-col {
+      min-width: 0 !important;
+      width: 100% !important;
+    }
+    .sidebar-related {
+      display: block !important;
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 86px !important;
+      align-self: start !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      z-index: 30 !important;
+      max-height: calc(100vh - 100px) !important;
+      overflow-y: auto !important;
+    }
+    .toc-card-box {
+      padding: 0.85rem 0.65rem !important;
+    }
+    .toc-link {
+      font-size: 0.72rem !important;
+      line-height: 1.3 !important;
     }
     .article-main-title {
-      font-size: 1.95rem;
+      font-size: 1.75rem !important;
+      line-height: 1.25 !important;
+      margin-bottom: 0.75rem !important;
+    }
+    .article-lead-desc {
+      font-size: 0.95rem !important;
+      line-height: 1.55 !important;
+      margin-bottom: 1rem !important;
+    }
+    .prose {
+      font-size: 0.95rem !important;
+    }
+    .prose h2 {
+      font-size: 1.28rem !important;
+      margin-top: 1.75rem !important;
+    }
+    .prose h3 {
+      font-size: 1.12rem !important;
+      margin-top: 1.4rem !important;
+    }
+    .related-card-item {
+      padding: 0.75rem !important;
+    }
+    .related-card-title {
+      font-size: 0.78rem !important;
+    }
+    .related-card-desc {
+      font-size: 0.68rem !important;
+    }
+    .article-footer-card h3 {
+      font-size: 1.2rem !important;
+    }
+    .article-footer-card p {
+      font-size: 0.86rem !important;
     }
   }
 
   /* TABLET (768px to 900px) */
   @media (min-width: 768px) and (max-width: 900px) {
     .article-3col-layout {
-      grid-template-columns: 150px minmax(0, 1fr) 160px;
-      gap: 1rem;
+      display: grid !important;
+      grid-template-columns: 145px minmax(0, 1fr) 155px !important;
+      gap: 0.85rem !important;
+      align-items: start !important;
+      padding-top: 0.85rem !important;
+      width: 100% !important;
     }
-    .article-main-title {
-      font-size: 1.65rem;
+    .sidebar-toc {
+      display: block !important;
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 76px !important;
+      align-self: start !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      z-index: 30 !important;
     }
-    .founder-badge-purple,
-    .orange-badge {
-      font-size: 0.62rem;
-      padding: 0.22rem 0.5rem;
+    .article-middle-col {
+      min-width: 0 !important;
+      width: 100% !important;
+    }
+    .sidebar-related {
+      display: block !important;
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 76px !important;
+      align-self: start !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      z-index: 30 !important;
+      max-height: calc(100vh - 90px) !important;
+      overflow-y: auto !important;
+    }
+    .toc-card-box {
+      padding: 0.75rem 0.55rem !important;
+      border-radius: 10px !important;
     }
     .toc-link {
-      font-size: 0.74rem;
-      padding: 0.25rem 0.35rem;
+      font-size: 0.68rem !important;
+      line-height: 1.25 !important;
+    }
+    .article-main-title {
+      font-size: 1.38rem !important;
+      line-height: 1.25 !important;
+      margin-bottom: 0.65rem !important;
+    }
+    .article-lead-desc {
+      font-size: 0.85rem !important;
+      line-height: 1.5 !important;
+      margin-bottom: 0.95rem !important;
+    }
+    .prose {
+      font-size: 0.88rem !important;
+    }
+    .prose h2 {
+      font-size: 1.15rem !important;
+      margin-top: 1.5rem !important;
+    }
+    .prose h3 {
+      font-size: 1.02rem !important;
+      margin-top: 1.25rem !important;
+    }
+    .related-card-item {
+      padding: 0.65rem !important;
+      border-radius: 10px !important;
+    }
+    .related-card-tag {
+      font-size: 0.58rem !important;
+      padding: 0.1rem 0.4rem !important;
     }
     .related-card-title {
-      font-size: 0.78rem;
+      font-size: 0.72rem !important;
+      line-height: 1.3 !important;
     }
     .related-card-desc {
-      font-size: 0.7rem;
+      font-size: 0.65rem !important;
+      line-height: 1.3 !important;
+    }
+    .article-footer-card h3 {
+      font-size: 1.05rem !important;
+    }
+    .article-footer-card p {
+      font-size: 0.8rem !important;
     }
   }
 
@@ -948,31 +1080,31 @@ const keyTakeaways = (article.data as any).keyTakeaways || [
       padding: 1.25rem 0 3.5rem;
     }
     .article-3col-layout {
-      grid-template-columns: 1fr;
-      gap: 2rem;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.5rem !important;
     }
     .sidebar-toc {
       display: none !important;
     }
     .sidebar-related {
+      display: block !important;
       position: static !important;
-      margin-top: 1.5rem;
+      margin-top: 2rem !important;
+      max-height: none !important;
+      overflow-y: visible !important;
     }
     .article-main-title {
       font-size: 1.6rem;
       line-height: 1.25;
     }
     .article-lead-desc {
-      font-size: 0.96rem;
+      font-size: 0.95rem;
     }
-    .key-takeaways-box {
-      padding: 1.15rem 1.25rem;
-      border-left-width: 4px;
-    }
-    .article-bottom-cta {
+    .article-footer-card {
       padding: 1.5rem 1.25rem;
     }
-    .cta-title {
+    .article-footer-card h3 {
       font-size: 1.15rem;
     }
   }
