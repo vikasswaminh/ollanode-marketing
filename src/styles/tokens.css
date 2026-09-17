@@ -805,37 +805,6 @@ h3 {
   transform: translateY(-1px);
 }
 
-.icon-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--line);
-  border-radius: var(--r1);
-  background: var(--bg);
-  color: var(--fg);
-  cursor: pointer;
-  transition: .15s;
-}
-
-.icon-btn:hover {
-  color: var(--fg);
-  background: var(--elev);
-  border-color: var(--line-2);
-}
-
-.icon-btn .moon {
-  display: none;
-}
-
-:root[data-theme="dark"] .icon-btn .sun {
-  display: none;
-}
-
-:root[data-theme="dark"] .icon-btn .moon {
-  display: block;
-}
-
 /* mobile burger + menu */
 .nav-burger {
   display: none;

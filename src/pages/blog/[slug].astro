@@ -1148,4 +1148,94 @@ const relatedArticles = [...sameCategory, ...differentCategory].slice(0, 5);
       font-size: 1.15rem;
     }
   }
+
+  /* DARK THEME STYLES FOR ARTICLE PAGE */
+  :root[data-theme="dark"] .article-page-wrap {
+    background: var(--bg, #0E0C0A);
+    color: var(--fg, #F5F2EB);
+  }
+
+  :root[data-theme="dark"] .article-main-title {
+    color: #F5F2EB;
+  }
+
+  :root[data-theme="dark"] .article-lead-desc {
+    color: #CBD5E1;
+  }
+
+  :root[data-theme="dark"] .author-meta-text {
+    color: #94A3B8;
+  }
+
+  :root[data-theme="dark"] .toc-card-box {
+    background: #141210;
+    border-color: #2A2620;
+  }
+
+  :root[data-theme="dark"] .toc-link {
+    color: #94A3B8;
+  }
+
+  :root[data-theme="dark"] .toc-link:hover,
+  :root[data-theme="dark"] .toc-link.active {
+    color: #FF6600;
+  }
+
+  :root[data-theme="dark"] .related-card-item {
+    background: #17130F;
+    border-color: #2A2620;
+  }
+
+  :root[data-theme="dark"] .related-card-item:hover {
+    border-color: #FF6600;
+  }
+
+  :root[data-theme="dark"] .related-card-title {
+    color: #F5F2EB;
+  }
+
+  :root[data-theme="dark"] .related-card-desc {
+    color: #94A3B8;
+  }
+
+  :root[data-theme="dark"] .article-prose-content {
+    color: #E2E8F0;
+  }
+
+  :root[data-theme="dark"] .article-prose-content h2,
+  :root[data-theme="dark"] .article-prose-content h3,
+  :root[data-theme="dark"] .article-prose-content h4 {
+    color: #F8FAFC;
+    border-bottom-color: #2A2620;
+  }
+
+  :root[data-theme="dark"] .article-prose-content p,
+  :root[data-theme="dark"] .article-prose-content li {
+    color: #CBD5E1;
+  }
+
+  :root[data-theme="dark"] .article-prose-content code {
+    background: #1C1814;
+    color: #FF8A00;
+    border-color: #2A2620;
+  }
+
+  :root[data-theme="dark"] .article-prose-content pre {
+    background: #141210;
+    border-color: #2A2620;
+  }
+
+  :root[data-theme="dark"] .article-prose-content blockquote {
+    background: #17130F;
+    border-left-color: #FF6600;
+    color: #E2E8F0;
+  }
+
+  :root[data-theme="dark"] .article-breadcrumb a {
+    color: #94A3B8;
+  }
+
+  :root[data-theme="dark"] .breadcrumb-current {
+    color: #E2E8F0;
+  }
 </style>
